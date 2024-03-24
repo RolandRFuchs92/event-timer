@@ -128,7 +128,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           "bg-graydark dark:bg-meta-4"
                         }`}
                       >
-                        Mongo
+                        Accounts
                       </Link>
                       <Link
                         href="#"

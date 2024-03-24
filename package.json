@@ -6,19 +6,26 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:gen": "prisma generate",
+    "db:pull": "prisma db pull --force",
+    "db": "yarn db:pull && yarn db:gen"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
+    "@prisma/client": "5.11.0",
     "apexcharts": "^3.45.2",
+    "bson": "^6.5.0",
     "clsx": "^2.1.0",
     "flatpickr": "^4.6.13",
     "jsvectormap": "^1.5.3",
     "next": "14.1.0",
+    "prisma": "^5.11.0",
     "react": "^18",
     "react-apexcharts": "^1.4.1",
     "react-dom": "^18",
     "react-hook-form": "^7.51.1",
+    "react-tailwindcss-select": "^1.8.5",
     "tailwind-merge": "^2.2.2",
     "zod": "^3.22.4"
   },
