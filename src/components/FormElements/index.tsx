@@ -13,8 +13,8 @@ import DatePickerTwo from "@/components/FormElements/DatePicker/DatePickerTwo";
 import DatePickerOne from "@/components/FormElements/DatePicker/DatePickerOne";
 import MultiSelect from "@/components/FormElements/MultiSelect";
 import { Input } from "./input";
-import { GlobalIcon } from "../Icons/icons";
 import { Dropdown } from "../SelectGroup/Dropdown";
+import { GlobalIcon } from "../Icons/GlobalIcon";
 
 const FormElements = () => {
   return (
