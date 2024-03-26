@@ -13,6 +13,7 @@ model account {
   email     String
   firstName String
   lastName  String
+  password  String
   roles     RoleEnum[] @default([User])
 }
 

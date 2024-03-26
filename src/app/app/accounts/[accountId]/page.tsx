@@ -1,3 +1,5 @@
+import { AccountDefaultValues } from "../schema";
+import { getAccount } from "./action";
 import { AccountForm } from "./form";
 
 type AccountPageProps = {
@@ -7,5 +9,10 @@ type AccountPageProps = {
 };
 
 export default async function AccountPage({ params }: AccountPageProps) {
-  return <AccountForm />;
+  const account =
+    params.accountId !== "null"
+      ? await getAccount(params.accountId)
+      : AccountDefaultValues;
+
+  return <AccountForm account={account} />;
 }

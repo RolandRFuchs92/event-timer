@@ -5,19 +5,22 @@ import z from "zod";
 
 interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   formMethods: ReturnType<typeof useForm<any>>;
+  formTitle: React.ReactNode;
 }
 
 export function Form({
   children,
   formMethods,
   className,
+  formTitle,
   ...props
 }: FormProps) {
   return (
     <FormProvider {...formMethods}>
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-        <form className={cn("p-6.5", className)} {...props}>
-          <div className="mb-4.5 flex flex-col gap-6">{children}</div>
+        <form className={cn(className)} {...props}>
+          {formTitle}
+          <div className="flex flex-col gap-2 p-6.5">{children}</div>
         </form>
       </div>
     </FormProvider>

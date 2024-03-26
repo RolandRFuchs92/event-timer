@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -9,36 +10,52 @@ import { Form } from "@/components/FormElements/form";
 import { RoleEnum } from "@prisma/client";
 
 import { createNewEntry } from "../action";
-import { someForm } from "../schema";
+import { AccountDefaultValues, AccountSchema } from "../schema";
 import { enumToOptions } from "@/lib/helper";
-import { MultiSelect } from "@/components/SelectGroup/SelectGroupOne";
+import { MultiSelect } from "@/components/SelectGroup/MultiSelect";
 import { FormTitle } from "@/components/FormElements/formTitle";
 import { useRouter } from "next/navigation";
+import { FormRow } from "@/components/FormElements/FormRow";
+import { getAccount } from "./action";
 
-export function AccountForm() {
+type AccountFormProps = {
+  account: Awaited<ReturnType<typeof getAccount>>;
+};
+
+export function AccountForm({ account }: AccountFormProps) {
   const { replace } = useRouter();
   const form = useForm({
-    resolver: zodResolver(someForm),
+    resolver: zodResolver(AccountSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      roles: [],
+      ...account!,
+      confirmPassword: "",
     },
   });
 
   const handleSubmit = form.handleSubmit(async (data) => {
-    const result = await createNewEntry(data);
-    alert(JSON.stringify(result));
+    await createNewEntry(data);
     replace("/app/accounts");
   });
 
   return (
-    <Form formMethods={form} onSubmit={handleSubmit}>
-      <FormTitle label={"Account"} />
-      <FInput name="firstName" label="Name" />
-      <FInput name="lastName" label="Last name" />
+    <Form
+      formTitle={<FormTitle label={"Account"} />}
+      formMethods={form}
+      onSubmit={handleSubmit}
+    >
+      <FormRow>
+        <FInput name="firstName" label="Name" />
+        <FInput name="lastName" label="Last name" />
+      </FormRow>
       <FInput name="email" label="Email" type="email" />
+      <FormRow>
+        <FInput name="password" label="Password" type="password" />
+        <FInput
+          name="confirmPassword"
+          label="Confirm Password"
+          type="password"
+        />
+      </FormRow>
       <MultiSelect
         name="roles"
         options={enumToOptions(RoleEnum)}

@@ -1,13 +1,13 @@
 "use server";
 
 import z from "zod";
+import bcrypt from "bcryptjs";
 
-import { _db } from "@/lib/db";
+import { MONGO_UPSERT_HACK, _db } from "@/lib/db";
 
-import { someForm } from "./schema";
+import { AccountSchema } from "./schema";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { revalidatePath, revalidateTag, unstable_noStore } from "next/cache";
-import { redirect } from "next/navigation";
+import { revalidatePath, unstable_noStore } from "next/cache";
 
 export async function getAccounts() {
   unstable_noStore();
@@ -37,12 +37,29 @@ export async function deleteAccount(id: string) {
   }
 }
 
-export async function createNewEntry(data: z.infer<typeof someForm>) {
-  const result = await _db.account.create({
-    data: {
-      ...data,
+export async function createNewEntry(data: z.infer<typeof AccountSchema>) {
+  const password = await new Promise<string>((res, rej) =>
+    bcrypt.hash(data.password, 10, (err, hash: string) => {
+      if (err) rej(err);
+      else res(hash);
+    }),
+  );
+  const { confirmPassword, id, ...input } = data;
+
+  const result = await _db.account.upsert({
+    create: {
+      ...input,
+      password,
+    },
+    update: {
+      ...input,
+      password,
+    },
+    where: {
+      id: id || MONGO_UPSERT_HACK,
     },
   });
+
   revalidatePath("/app/accounts");
   return result;
 }
