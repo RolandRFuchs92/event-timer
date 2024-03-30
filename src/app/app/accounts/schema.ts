@@ -1,4 +1,3 @@
-import { RoleEnum } from "@prisma/client";
 import z from "zod";
 
 export const AccountSchema = z
@@ -9,14 +8,12 @@ export const AccountSchema = z
     email: z.string(),
     password: z.string(),
     confirmPassword: z.string(),
-    roles: z
-      .array(
-        z.object({
-          value: z.string(),
-          label: z.string(),
-        }),
-      )
-      .transform((i) => i.map((i) => i.value as RoleEnum)),
+    roles: z.array(
+      z.object({
+        value: z.string(),
+        label: z.string(),
+      }),
+    ),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",

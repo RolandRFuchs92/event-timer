@@ -19,6 +19,11 @@
   dependencies:
     regenerator-runtime "^0.14.0"
 
+"@decs/typeschema@^0.12.2":
+  version "0.12.2"
+  resolved "https://registry.yarnpkg.com/@decs/typeschema/-/typeschema-0.12.2.tgz#d170bef9ac84a2104bd277f9a2b831fc26c2b76a"
+  integrity sha512-PA8uAH/Xfsa5X2UNNSnb5i6vB8qWZywp4+d2U8kNMCO7qwirYRPbFCHwIfWBJyURh4rULn3Ey+VBADLcK2xxaQ==
+
 "@eslint-community/eslint-utils@^4.2.0":
   version "4.4.0"
   resolved "https://registry.npmjs.org/@eslint-community/eslint-utils/-/eslint-utils-4.4.0.tgz"
@@ -1890,6 +1895,15 @@ natural-compare@^1.4.0:
   version "1.4.0"
   resolved "https://registry.npmjs.org/natural-compare/-/natural-compare-1.4.0.tgz"
   integrity sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==
+
+next-safe-action@^6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/next-safe-action/-/next-safe-action-6.2.0.tgz#3961c4e14502c2e492184d4d3359ea0f03498c3e"
+  integrity sha512-gssUs3OLoNjLXZalrQaly38s/mUtXsIcKWGIK3jFkW8GHl0/Xhq+3G8yEEyObET2YlYqUj79K+mH3iTNBLDcMw==
+  dependencies:
+    "@decs/typeschema" "^0.12.2"
+  optionalDependencies:
+    zod "^3.22.4"
 
 next@14.1.0:
   version "14.1.0"

@@ -10,7 +10,7 @@ import { Form } from "@/components/FormElements/form";
 import { RoleEnum } from "@prisma/client";
 
 import { createNewEntry } from "../action";
-import { AccountDefaultValues, AccountSchema } from "../schema";
+import { AccountSchema } from "../schema";
 import { enumToOptions } from "@/lib/helper";
 import { MultiSelect } from "@/components/SelectGroup/MultiSelect";
 import { FormTitle } from "@/components/FormElements/formTitle";
@@ -19,7 +19,7 @@ import { FormRow } from "@/components/FormElements/FormRow";
 import { getAccount } from "./action";
 
 type AccountFormProps = {
-  account: Awaited<ReturnType<typeof getAccount>>;
+  account: Awaited<ReturnType<typeof getAccount>>["data"];
 };
 
 export function AccountForm({ account }: AccountFormProps) {
@@ -29,11 +29,11 @@ export function AccountForm({ account }: AccountFormProps) {
     defaultValues: {
       ...account!,
       confirmPassword: "",
-    },
+    } as const,
   });
 
   const handleSubmit = form.handleSubmit(async (data) => {
-    await createNewEntry(data);
+    const result = await createNewEntry(data);
     replace("/app/accounts");
   });
 
