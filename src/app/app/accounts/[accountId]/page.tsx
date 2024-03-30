@@ -9,10 +9,7 @@ type AccountPageProps = {
 };
 
 export default async function AccountPage({ params }: AccountPageProps) {
-  const account =
-    params.accountId !== "null"
-      ? await getAccount(params.accountId)
-      : AccountDefaultValues;
+  const account = await getAccount(params.accountId);
 
-  return <AccountForm account={account} />;
+  return <AccountForm account={account.data!} />;
 }

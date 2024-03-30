@@ -48,22 +48,33 @@ export const createNewEntry = action(AccountSchema, async (data) => {
   );
   const { confirmPassword, id, roles, ...input } = data;
 
-  const result = await _db.account.upsert({
-    create: {
-      ...input,
-      password,
-      roles: roles.map((i) => i.value as RoleEnum),
-    },
-    update: {
-      ...input,
-      password,
-      roles: roles.map((i) => i.value as RoleEnum),
-    },
-    where: {
-      id: id || MONGO_UPSERT_HACK,
-    },
-  });
+  try {
+    const result = await _db.account.upsert({
+      create: {
+        ...input,
+        password,
+        roles: roles.map((i) => i.value as RoleEnum),
+      },
+      update: {
+        ...input,
+        password,
+        roles: roles.map((i) => i.value as RoleEnum),
+      },
+      where: {
+        id: id || MONGO_UPSERT_HACK,
+      },
+    });
 
-  revalidatePath("/app/accounts");
-  return result;
+    revalidatePath("/app/accounts");
+    return {
+      ...result,
+      confirmPassword: "",
+    };
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      if (e.code === "P2002")
+        throw new Error("That user name is already in use.");
+    }
+    throw new Error("An unexpected error has occured!");
+  }
 });

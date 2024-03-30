@@ -30,6 +30,7 @@
     "react-apexcharts": "^1.4.1",
     "react-dom": "^18",
     "react-hook-form": "^7.51.1",
+    "react-hot-toast": "^2.4.1",
     "react-tailwindcss-select": "^1.8.5",
     "tailwind-merge": "^2.2.2",
     "zod": "^3.22.4"

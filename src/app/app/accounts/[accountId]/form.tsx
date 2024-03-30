@@ -17,6 +17,7 @@ import { FormTitle } from "@/components/FormElements/formTitle";
 import { useRouter } from "next/navigation";
 import { FormRow } from "@/components/FormElements/FormRow";
 import { getAccount } from "./action";
+import toast from "react-hot-toast";
 
 type AccountFormProps = {
   account: Awaited<ReturnType<typeof getAccount>>["data"];
@@ -29,11 +30,12 @@ export function AccountForm({ account }: AccountFormProps) {
     defaultValues: {
       ...account!,
       confirmPassword: "",
-    } as const,
+    },
   });
 
   const handleSubmit = form.handleSubmit(async (data) => {
     const result = await createNewEntry(data);
+    if (result.serverError) toast.error(result.serverError);
     replace("/app/accounts");
   });
 

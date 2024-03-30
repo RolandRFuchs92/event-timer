@@ -6,3 +6,7 @@ export function enumToOptions(enumerable: object) {
     label: i.toString(),
   }));
 }
+
+export function mongoEnumToOptions(enumerable: string[]) {
+  return enumerable.map((i) => ({ value: i, label: i }));
+}
