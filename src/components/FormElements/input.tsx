@@ -5,6 +5,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   helperText?: string;
   isError?: boolean;
   label: string;
+  endIcon?: React.ReactNode;
 }
 
 export function Input({
@@ -12,19 +13,25 @@ export function Input({
   helperText,
   placeholder,
   isError,
+  endIcon = null,
   ...props
 }: InputProps) {
   return (
     <div>
-      <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+      <label className="block text-sm font-medium text-black dark:text-white">
         {label}
       </label>
-      <input
-        type="text"
-        placeholder={placeholder || label}
-        className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-        {...props}
-      />
+      <div className="relative">
+        <input
+          type="text"
+          placeholder={placeholder || label}
+          className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+          {...props}
+        />
+        {endIcon !== null ? (
+          <span className="absolute right-4 top-4">{endIcon}</span>
+        ) : null}
+      </div>
       {helperText ? <sub className="-top-1">{helperText}</sub> : null}
     </div>
   );
