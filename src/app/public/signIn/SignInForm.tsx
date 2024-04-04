@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { SignInSchema } from "./schema";
 import { LockIcon } from "@/components/Icons/PasswordIcon";
+import { signInAction } from "./action";
 
 const appName = process.env.APP_NAME;
 
@@ -21,8 +22,8 @@ export function SigninForm() {
     },
   });
 
-  const handleSubmit = formMethods.handleSubmit((data) => {
-    console.log(data);
+  const handleSubmit = formMethods.handleSubmit(async (data) => {
+    await signInAction(data);
   });
 
   return (

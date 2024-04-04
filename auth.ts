@@ -1,0 +1,70 @@
+import { _db } from "@/lib/db";
+import NextAuth from "next-auth";
+import { encode } from "next-auth/jwt";
+import CredentialsProvider from "next-auth/providers/credentials";
+
+export const {
+  auth,
+  signIn,
+  handlers: { GET, POST },
+  signOut,
+} = NextAuth({
+  providers: [
+    CredentialsProvider({
+      credentials: {
+        username: {
+          type: "email",
+          label: "Email",
+          placeholder: "Email",
+          name: "email",
+        },
+        password: {
+          type: "password",
+          label: "Password",
+          placeholder: "Password",
+          name: "password",
+        },
+      },
+      async authorize(credentials, request) {
+        if (!credentials.username) return null;
+
+        const user = await _db.account.findFirst({
+          where: {
+            email: credentials.username,
+          },
+        });
+
+        return {
+          id: user!.id,
+          name: user!.firstName,
+          email: user!.email,
+          rawUser: user,
+        };
+      },
+    }),
+  ],
+  secret: process.env.AUTH_SECRET!,
+  callbacks: {
+    jwt({ token, session, user, account }) {
+      return token;
+    },
+    async session({ session, token }) {
+      const user = await _db.account.findFirst({
+        where: {
+          id: token.sub,
+        },
+      });
+
+      const encryptedUserData = await encode({
+        token: user,
+        salt: process.env.AUTH_SECRET!,
+        secret: process.env.AUTH_SECRET!,
+      });
+      session.sessionToken = encryptedUserData;
+      return session;
+    },
+    redirect() {
+      return "/app";
+    },
+  },
+});

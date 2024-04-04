@@ -1,6 +1,6 @@
 import { SigninForm } from "./SignInForm";
 
-export default function SignIn() {
+export default async function SignIn() {
   return (
     <div className="flex h-screen w-screen items-center justify-center overflow-hidden dark:bg-boxdark-2 dark:text-bodydark">
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
