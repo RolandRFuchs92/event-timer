@@ -1,3 +1,4 @@
+import { getLoginUserData, validateUserCredentials } from "@/lib/authHelper";
 import { _db } from "@/lib/db";
 import NextAuth from "next-auth";
 import { encode } from "next-auth/jwt";
@@ -27,11 +28,9 @@ export const {
       },
       async authorize(credentials, request) {
         if (!credentials.username) return null;
-
-        const user = await _db.account.findFirst({
-          where: {
-            email: credentials.username,
-          },
+        const user = await validateUserCredentials({
+          username: credentials.username as string,
+          password: credentials.password as string,
         });
 
         return {
@@ -49,11 +48,7 @@ export const {
       return token;
     },
     async session({ session, token }) {
-      const user = await _db.account.findFirst({
-        where: {
-          id: token.sub,
-        },
-      });
+      const user = await getLoginUserData(token.sub!);
 
       const encryptedUserData = await encode({
         token: user,

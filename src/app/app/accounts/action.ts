@@ -1,6 +1,5 @@
 "use server";
 
-import z, { EnumValues } from "zod";
 import bcrypt from "bcryptjs";
 
 import { MONGO_UPSERT_HACK, _db } from "@/lib/db";
