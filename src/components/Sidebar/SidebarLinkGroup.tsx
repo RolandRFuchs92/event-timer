@@ -41,7 +41,7 @@ const SidebarLinkGroup = ({
         />
       }
 
-      {open ? children(handleClick, open) : null}
+      {open ? <div className="pl-4">{children(handleClick, open)}</div> : null}
     </li>
   );
 };
