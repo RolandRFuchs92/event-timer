@@ -14,6 +14,7 @@ import { LogoutIcon } from "../Icons/LogoutIcon";
 import { SettingsIcon } from "../Icons/SettingsIcon";
 import { TableIcon } from "../Icons/TableIcon";
 import { BellAlertIcon } from "@heroicons/react/24/outline";
+import { SidebarButton } from "./SidebarButton";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -85,19 +86,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             </h3>
 
             <ul className="mb-6 flex flex-col gap-1.5">
-              <li>
-                <Link
-                  href="/app/accounts"
-                  className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                    (pathname === "/" || pathname.includes("dashboard")) &&
-                    "bg-graydark dark:bg-meta-4"
-                  }`}
-                >
-                  <MyProfileIcon />
-                  Accounts
-                </Link>
-              </li>
-
+              <SidebarButton
+                label={"Accounts"}
+                href="/app/accounts"
+                frontIcon={<MyProfileIcon />}
+              />
+              <SidebarButton
+                label={"Clients"}
+                href="/app/clients"
+                frontIcon={<MyProfileIcon />}
+              />
               <SidebarLinkGroup
                 label="Page Demos"
                 pathMatch="app/pageDemo"

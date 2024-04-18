@@ -9,12 +9,20 @@ datasource db {
 
 /// This collection uses a JSON Schema defined in the database, which requires additional setup for migrations. Visit https://pris.ly/d/mongodb-json-schema for more info.
 model account {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
   email     String
   firstName String
   lastName  String
   password  String
   roles     RoleEnum[] @default([User])
+  clients   client[]
+}
+
+model client {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  account_id String @db.ObjectId
+  account account?  @relation(fields: [account_id], references: [id])
+  credits Int
 }
 
 enum RoleEnum {
