@@ -23,6 +23,7 @@ model client {
   account_id String @db.ObjectId
   account account?  @relation(fields: [account_id], references: [id])
   credits Int
+  name String
 }
 
 enum RoleEnum {
