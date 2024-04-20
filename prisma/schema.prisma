@@ -35,10 +35,10 @@ model event {
   start_on   DateTime
   end_on     DateTime
   created_on DateTime
-  event_type EventType[]
+  event_type EventTypeEnum[]
 }
 
-enum EventType {
+enum EventTypeEnum {
   ObstacleCourseRace
   TimeTrial
   Race

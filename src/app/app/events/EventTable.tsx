@@ -1,15 +1,16 @@
 "use client";
+import React from "react";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+
 import TwDialog from "@/components/Dialog/Dialog";
 import { EditIcon } from "@/components/Icons/EditIcon";
 import { TrashIcon } from "@/components/Icons/TrashIcon";
 import { Table } from "@/components/Tables/table";
-import { useRouter } from "next/navigation";
-import React from "react";
-import toast from "react-hot-toast";
-import { deleteEvent } from "./action";
+import { deleteEvent, getEvents } from "./action";
 
 interface EventTable {
-  data: any[];
+  data: Awaited<ReturnType<typeof getEvents>>;
 }
 
 export function EventTable({ data }: EventTable) {
@@ -18,7 +19,7 @@ export function EventTable({ data }: EventTable) {
 
   return (
     <TwDialog<(typeof data)[0]>
-      body={(i) => `You sure you wana delete ${i?.name}'s account?`}
+      body={(i) => `You sure you wana delete event - ${i?.name}`}
       title={"Really delete"}
       onYes={async (i) => {
         const result = await deleteEvent(i.id);
@@ -29,15 +30,15 @@ export function EventTable({ data }: EventTable) {
       {(setData, toggle) => {
         return (
           <Table
-            heading="Client Table"
-            href={"/app/clients/null"}
+            heading="Events Table"
+            href={"/app/events/null"}
             tableProps={{
               data: data,
               enableHiding: true,
               initialState: {
                 columnVisibility: {
                   id: false,
-                  account_id: false,
+                  client_id: false,
                 },
               },
               columns: [
@@ -52,19 +53,28 @@ export function EventTable({ data }: EventTable) {
                   cell: (p) => p.getValue(),
                 },
                 {
-                  accessorKey: "account_id",
-                  header: "account_id",
+                  accessorKey: "client_id",
+                  header: "client_id",
                   cell: (p) => p.getValue(),
                 },
                 {
-                  accessorKey: "account",
-                  header: "Account Owner",
-                  cell: (p) =>
-                    `${p.getValue().firstName} ${p.getValue().lastName}`,
+                  accessorKey: "client",
+                  header: "Client",
+                  cell: (p) => p.getValue(),
                 },
                 {
-                  accessorKey: "credits",
-                  header: "Credits",
+                  accessorKey: "event_type",
+                  header: "Type",
+                  cell: (p) => p.getValue().join(", "),
+                },
+                {
+                  accessorKey: "start_on",
+                  header: "Start",
+                  cell: (p) => p.getValue(),
+                },
+                {
+                  accessorKey: "end_on",
+                  header: "End",
                   cell: (p) => p.getValue(),
                 },
                 {
