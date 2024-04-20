@@ -26,6 +26,8 @@ export function AccountsTable({ data }: AccountsTableProps) {
       {(setData, toggle) => {
         return (
           <Table
+            heading="Accounts"
+            href="app/accounts/null"
             tableProps={{
               data: data,
               enableHiding: true,

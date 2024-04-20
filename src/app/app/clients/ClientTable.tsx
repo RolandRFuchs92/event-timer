@@ -2,10 +2,11 @@
 import TwDialog from "@/components/Dialog/Dialog";
 import { EditIcon } from "@/components/Icons/EditIcon";
 import { Table } from "@/components/Tables/table";
-import { TrashIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { getClients } from "./action";
+import { deleteClient, getClients } from "./action";
+import { TrashIcon } from "@/components/Icons/TrashIcon";
+import toast from "react-hot-toast";
 
 type ClientTableProps = {
   data: Awaited<ReturnType<typeof getClients>>;
@@ -13,25 +14,30 @@ type ClientTableProps = {
 
 export function ClientTable({ data }: ClientTableProps) {
   const { push } = useRouter();
+  const { replace } = useRouter();
 
   return (
     <TwDialog<(typeof data)[0]>
       body={(i) => `You sure you wana delete ${i?.name}'s account?`}
       title={"Really delete"}
       onYes={async (i) => {
-        alert("Beep");
-        // await deleteAccount(i.id);
+        const result = await deleteClient(i.id);
+        toast.success(result.message);
+        replace("");
       }}
     >
       {(setData, toggle) => {
         return (
           <Table
+            heading="Client Table"
+            href={"/app/clients/null"}
             tableProps={{
               data: data,
               enableHiding: true,
               initialState: {
                 columnVisibility: {
                   id: false,
+                  account_id: false,
                 },
               },
               columns: [
@@ -53,12 +59,13 @@ export function ClientTable({ data }: ClientTableProps) {
                 {
                   accessorKey: "account",
                   header: "Account Owner",
-                  cell: (p) => p.getValue().firstName,
+                  cell: (p) =>
+                    `${p.getValue().firstName} ${p.getValue().lastName}`,
                 },
                 {
                   accessorKey: "credits",
                   header: "Credits",
-                  cell: (p) => p.getValue().join(", "),
+                  cell: (p) => p.getValue(),
                 },
                 {
                   accessorKey: "actions",
