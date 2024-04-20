@@ -19,11 +19,34 @@ model account {
 }
 
 model client {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  account_id String @db.ObjectId
-  account account?  @relation(fields: [account_id], references: [id])
-  credits Int
-  name String
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  account_id String   @db.ObjectId
+  account    account? @relation(fields: [account_id], references: [id])
+  credits    Int
+  name       String
+  events     event[]
+}
+
+model event {
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  client_id  String      @db.ObjectId
+  client     client      @relation(fields: [client_id], references: [id])
+  name       String
+  start_on   DateTime
+  end_on     DateTime
+  created_on DateTime
+  event_type EventType[]
+}
+
+enum EventType {
+  ObstacleCourseRace
+  TimeTrial
+  Race
+  SprintRace
+  LaneRace
+  Marathon
+  Ultra
+  Trail
 }
 
 enum RoleEnum {
