@@ -9,6 +9,7 @@ interface DropdownProps<T>
   icon?: React.ReactNode;
   getKey?: T extends object ? (i: T) => string : undefined;
   getValue?: T extends object ? (i: T) => string : undefined;
+  name: string;
 }
 
 export function Dropdown<T>({

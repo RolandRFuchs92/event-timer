@@ -26,3 +26,9 @@ export function Form({
     </FormProvider>
   );
 }
+
+export function FormData() {
+  const form = useFormContext();
+
+  return <pre>{JSON.stringify(form.watch(), null, 2)}</pre>;
+}

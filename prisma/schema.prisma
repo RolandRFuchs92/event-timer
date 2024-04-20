@@ -33,7 +33,7 @@ model event {
   client     client      @relation(fields: [client_id], references: [id])
   name       String
   start_on   DateTime
-  end_on     DateTime
+  end_on     DateTime?
   created_on DateTime
   event_type EventTypeEnum[]
 }

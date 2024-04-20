@@ -1,12 +1,22 @@
-import { EnumValues } from "zod";
+import { snakeCase, startCase } from "lodash";
 
 export function enumToOptions(enumerable: object) {
   return Object.keys(enumerable).map((i) => ({
     value: i.toString(),
-    label: i.toString(),
+    label: startCase(i.toString()),
   }));
 }
 
 export function mongoEnumToOptions(enumerable: string[]) {
-  return enumerable.map((i) => ({ value: i, label: i }));
+  return enumerable.map((i) => ({
+    value: i,
+    label: startCase(snakeCase(i)),
+    disabled: false,
+  }));
+}
+
+export function optionsToStringArray(
+  option: ReturnType<typeof mongoEnumToOptions>[0],
+) {
+  return option.value;
 }

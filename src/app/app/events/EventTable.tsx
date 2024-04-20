@@ -8,6 +8,7 @@ import { EditIcon } from "@/components/Icons/EditIcon";
 import { TrashIcon } from "@/components/Icons/TrashIcon";
 import { Table } from "@/components/Tables/table";
 import { deleteEvent, getEvents } from "./action";
+import { fullDateFormat } from "@/lib/DateTimeUtils";
 
 interface EventTable {
   data: Awaited<ReturnType<typeof getEvents>>;
@@ -24,14 +25,14 @@ export function EventTable({ data }: EventTable) {
       onYes={async (i) => {
         const result = await deleteEvent(i.id);
         toast.success(result.message);
-        replace("");
+        replace("./");
       }}
     >
       {(setData, toggle) => {
         return (
           <Table
             heading="Events Table"
-            href={"/app/events/null"}
+            href={"/app/events/edit/null"}
             tableProps={{
               data: data,
               enableHiding: true,
@@ -60,7 +61,7 @@ export function EventTable({ data }: EventTable) {
                 {
                   accessorKey: "client",
                   header: "Client",
-                  cell: (p) => p.getValue(),
+                  cell: (p) => p.getValue().name,
                 },
                 {
                   accessorKey: "event_type",
@@ -70,12 +71,17 @@ export function EventTable({ data }: EventTable) {
                 {
                   accessorKey: "start_on",
                   header: "Start",
-                  cell: (p) => p.getValue(),
+                  cell: (p) => fullDateFormat(p.getValue()),
                 },
                 {
                   accessorKey: "end_on",
                   header: "End",
-                  cell: (p) => p.getValue(),
+                  cell: (p) => fullDateFormat(p.getValue()),
+                },
+                {
+                  accessorKey: "created_on",
+                  header: "Created",
+                  cell: (p) => fullDateFormat(p.getValue()),
                 },
                 {
                   accessorKey: "actions",
@@ -93,7 +99,7 @@ export function EventTable({ data }: EventTable) {
                       <button
                         className="hover:text-primary"
                         onClick={() =>
-                          push(`/app/clients/${stuff.row.original.id}`)
+                          push(`/app/events/edit/${stuff.row.original.id}`)
                         }
                       >
                         <EditIcon />

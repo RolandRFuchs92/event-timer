@@ -1,3 +1,4 @@
+import { OptionSchema } from "@/js/schema";
 import { MONGO_UPSERT_HACK } from "@/lib/db";
 import z from "zod";
 
@@ -5,10 +6,10 @@ export const EventSchema = z.object({
   id: z.string(),
   client_id: z.string(),
   name: z.string(),
-  start_on: z.date(),
-  end_on: z.date(),
-  created_on: z.date(),
-  event_type: z.string().array(),
+  start_on: z.coerce.date().default(new Date()),
+  end_on: z.coerce.date().nullable(),
+  created_on: z.coerce.date(),
+  event_type: z.array(OptionSchema),
 });
 
 export const DefaultEvent: z.infer<typeof EventSchema> = {

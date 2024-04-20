@@ -1,6 +1,6 @@
 import React from "react";
 import { EventForm } from "./EventForm";
-import { getEvent } from "./action";
+import { getClientOptions, getEvent } from "./action";
 
 interface EventPageProps {
   params: {
@@ -10,5 +10,6 @@ interface EventPageProps {
 
 export default async function EventPage({ params }: EventPageProps) {
   const event = await getEvent(params.eventId);
-  return <EventForm event={event} />;
+  const clients = await getClientOptions();
+  return <EventForm event={event} clients={clients} />;
 }
