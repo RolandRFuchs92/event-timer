@@ -1,21 +1,20 @@
 "use client";
-import React from "react";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
 
 import TwDialog from "@/components/Dialog/Dialog";
-import { EditIcon } from "@/components/Icons/EditIcon";
-import { TrashIcon } from "@/components/Icons/TrashIcon";
+import { useRouter } from "next/navigation";
+import React from "react";
+import toast from "react-hot-toast";
+import { deleteRace } from "./action";
 import { Table } from "@/components/Tables/table";
-import { deleteEvent, getEvents } from "./action";
+import { EditIcon } from "@/components/Icons/EditIcon";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import { fullDateFormat } from "@/lib/DateTimeUtils";
-import { VisibleIcon } from "@/components/Icons/VisibleIcon";
 
-interface EventTable {
-  data: Awaited<ReturnType<typeof getEvents>>;
+interface RaceTableProps {
+  data: any[];
 }
 
-export function EventTable({ data }: EventTable) {
+export function RaceTable({ data }: RaceTableProps) {
   const { push } = useRouter();
   const { replace } = useRouter();
 
@@ -24,7 +23,7 @@ export function EventTable({ data }: EventTable) {
       body={(i) => `You sure you wana delete event - ${i?.name}`}
       title={"Really delete"}
       onYes={async (i) => {
-        const result = await deleteEvent(i.id);
+        const result = await deleteRace(i.id);
         toast.success(result.message);
         replace("./");
       }}
@@ -32,8 +31,8 @@ export function EventTable({ data }: EventTable) {
       {(setData, toggle) => {
         return (
           <Table
-            heading="Events Table"
-            href={"/app/events/edit/null"}
+            heading="Races in this event"
+            href={"/app/events/home/race/null"}
             tableProps={{
               data: data,
               enableHiding: true,
@@ -70,32 +69,10 @@ export function EventTable({ data }: EventTable) {
                   cell: (p) => p.getValue().join(", "),
                 },
                 {
-                  accessorKey: "start_on",
-                  header: "Start",
-                  cell: (p) => fullDateFormat(p.getValue()),
-                },
-                {
-                  accessorKey: "end_on",
-                  header: "End",
-                  cell: (p) => fullDateFormat(p.getValue()),
-                },
-                {
-                  accessorKey: "created_on",
-                  header: "Created",
-                  cell: (p) => fullDateFormat(p.getValue()),
-                },
-                {
                   accessorKey: "actions",
                   header: "Actions",
                   cell: (stuff) => (
                     <div className="flex items-center space-x-3.5">
-                      <button className="hover:text-primary">
-                        <VisibleIcon
-                          onClick={() => {
-                            replace("/app/events/home");
-                          }}
-                        />
-                      </button>
                       <button className="hover:text-primary">
                         <TrashIcon
                           onClick={() => {

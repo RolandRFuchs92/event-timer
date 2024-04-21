@@ -15,8 +15,13 @@ import MultiSelect from "@/components/FormElements/MultiSelect";
 import { Input } from "./input";
 import { Dropdown } from "../SelectGroup/Dropdown";
 import { GlobalIcon } from "../Icons/GlobalIcon";
+import { Form } from "./form";
+import { useForm } from "react-hook-form";
+import { enumToOptions } from "@/lib/helper";
+import { EventTypeEnum } from "@prisma/client";
 
 const FormElements = () => {
+  const form = useForm();
   return (
     <>
       <Breadcrumb pageName="FormElements" />
@@ -186,12 +191,17 @@ const FormElements = () => {
               </h3>
             </div>
             <div className="flex flex-col gap-5.5 p-6.5">
-              <Dropdown
-                icon={<GlobalIcon />}
-                label="Select Country"
-                options={["USA", "UK", "Canada"]}
-              />
-              <MultiSelect id="multiSelect" />
+              <Form formTitle="Demo" formMethods={form}>
+                <Dropdown
+                  icon={<GlobalIcon />}
+                  label="Select Country"
+                  options={enumToOptions(EventTypeEnum)}
+                  name="beep"
+                  getKey={(i) => i.value}
+                  getValue={(i) => i.label}
+                />
+                <MultiSelect id="multiSelect" />
+              </Form>
             </div>
           </div>
         </div>
