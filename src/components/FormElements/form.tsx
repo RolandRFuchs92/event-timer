@@ -32,8 +32,8 @@ export function FormData() {
   const searchParams = useSearchParams();
   const [isVisible, setIsVisible] = React.useState(false);
   const form = useFormContext();
-  const debug = searchParams.get("debug");
-  if (process.env.NODE_ENV !== "development" || debug !== "true") return null;
+  // const debug = searchParams.get("debug");
+  // if (process.env.NODE_ENV !== "development" && debug !== "true") return null;
 
   return (
     <div>

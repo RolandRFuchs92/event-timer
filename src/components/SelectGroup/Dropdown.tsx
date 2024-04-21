@@ -6,7 +6,7 @@ interface DropdownProps<T>
   extends React.SelectHTMLAttributes<HTMLSelectElement> {
   options: T[];
   label: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   getKey: T extends object ? (i: T) => string : undefined;
   getValue?: T extends object ? (i: T) => string : undefined;
   name: string;

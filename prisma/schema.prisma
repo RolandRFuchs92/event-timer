@@ -36,10 +36,10 @@ model event {
   end_on     DateTime?
   created_on DateTime
   event_type EventTypeEnum[]
-  races      race[]
+  races      races[]
 }
 
-model race {
+model races {
   id       String  @id @default(auto()) @map("_id") @db.ObjectId
   event_id String  @db.ObjectId
   name     String

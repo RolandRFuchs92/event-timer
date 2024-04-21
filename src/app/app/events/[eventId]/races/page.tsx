@@ -1,6 +1,14 @@
 import { RaceTable } from "./RaceTable";
+import { getEventRaces } from "./action";
 
-export default async function RacesPage() {
-  return <RaceTable data={[]} />
+interface RacePageProps {
+  params: {
+    eventId: string;
+  };
 }
 
+export default async function RacesPage({ params }: RacePageProps) {
+  const eventId = params.eventId;
+  const races = await getEventRaces(eventId);
+  return <RaceTable data={races} />;
+}

@@ -26,7 +26,7 @@ export function RaceTable({ data }: RaceTableProps) {
       onYes={async (i) => {
         const result = await deleteRace(i.id);
         toast.success(result.message);
-        replace("./");
+        replace("");
       }}
     >
       {(setData, toggle) => {
@@ -70,6 +70,7 @@ export function RaceTable({ data }: RaceTableProps) {
                     <div className="flex items-center space-x-3.5">
                       <button className="hover:text-primary">
                         <TrashIcon
+                          className="h-4 w-4"
                           onClick={() => {
                             setData(stuff.row.original);
                             toggle();

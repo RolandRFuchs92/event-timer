@@ -1,4 +1,6 @@
 import React from "react";
+import { RaceForm } from "./RaceForm";
+import { getRace } from "./action";
 
 interface RacePageProps {
   params: {
@@ -7,5 +9,8 @@ interface RacePageProps {
 }
 
 export default async function RacePage({ params }: RacePageProps) {
-  return <h1>{params.raceId}</h1>;
+  const raceId = params.raceId;
+  const race = await getRace(raceId);
+
+  return <RaceForm race={race} />;
 }

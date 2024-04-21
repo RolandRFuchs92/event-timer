@@ -39,7 +39,7 @@ export function EventForm({ event, clients }: EventFormProps) {
 
   return (
     <Form
-      formTitle={<FormTitle label={"Account"} />}
+      formTitle={<FormTitle label={"Event"} />}
       formMethods={form}
       onSubmit={handleSubmit}
     >
