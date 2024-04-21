@@ -11,9 +11,16 @@ import {
 
 interface EventHomeLayoutProps {
   children: React.ReactNode;
+  params: {
+    eventId: string;
+  };
 }
 
-export default function EventHomeLayout({ children }: EventHomeLayoutProps) {
+export default function EventHomeLayout({
+  children,
+  params,
+}: EventHomeLayoutProps) {
+  const eventId = params.eventId;
   return (
     <div className="flex flex-col">
       <Tabs
@@ -22,42 +29,42 @@ export default function EventHomeLayout({ children }: EventHomeLayoutProps) {
             Icon: <HomeIcon className="h-4 w-4" />,
             text: "Home",
             linkProps: {
-              href: "/app/events/home",
+              href: `/app/events/${eventId}`,
             },
           },
           {
             Icon: <RaceIcon className="h-4 w-4" />,
             text: "Races",
             linkProps: {
-              href: "/app/events/home/races",
+              href: `/app/events/${eventId}/races`,
             },
           },
           {
             Icon: <ClipboardIcon className="h-4 w-4" />,
             text: "Registration",
             linkProps: {
-              href: "/app/events/home/registration",
+              href: `/app/events/${eventId}/registration`,
             },
           },
           {
             Icon: <PeopleIcon />,
             text: "Participants",
             linkProps: {
-              href: "/app/events/home/participants",
+              href: `/app/events/${eventId}/participants`,
             },
           },
           {
             Icon: <FinishersIcon />,
             text: "Finishers",
             linkProps: {
-              href: "/app/events/home/finishers",
+              href: `/app/events/${eventId}/finishers`,
             },
           },
           {
             Icon: <TrophyIcon className="h-4 w-4" />,
             text: "Results",
             linkProps: {
-              href: "/app/events/home/results",
+              href: `/app/events/${eventId}/results`,
             },
           },
         ]}

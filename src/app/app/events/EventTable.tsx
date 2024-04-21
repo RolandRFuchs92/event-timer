@@ -92,7 +92,7 @@ export function EventTable({ data }: EventTable) {
                       <button className="hover:text-primary">
                         <VisibleIcon
                           onClick={() => {
-                            replace("/app/events/home");
+                            replace(`/app/events/${stuff.row.original.id}`);
                           }}
                         />
                       </button>
