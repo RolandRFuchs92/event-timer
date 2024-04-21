@@ -1,3 +1,5 @@
+import ParticipantPage from "./[participantId]/page";
+
 export default async function RegistrationPage() {
-  return <h1>Registration Page</h1>;
+  return <ParticipantPage />;
 }

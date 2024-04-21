@@ -1,8 +1,9 @@
-import { CalendarIcon } from "@/components/Icons/CalendarIcon";
+import { BatchIcon } from "@/components/Icons/BatchIcon";
 import { FinishersIcon } from "@/components/Icons/FinisherIcon";
 import { PeopleIcon } from "@/components/Icons/PeopleIcon";
 import { RaceIcon } from "@/components/Icons/RaceIcon";
 import { Tabs } from "@/components/Tabs/Tabs";
+import { MONGO_UPSERT_HACK } from "@/lib/db";
 import {
   ClipboardIcon,
   HomeIcon,
@@ -44,7 +45,7 @@ export default function EventHomeLayout({
             Icon: <ClipboardIcon className="h-4 w-4" />,
             text: "Registration",
             linkProps: {
-              href: `/app/events/${eventId}/registration`,
+              href: `/app/events/${eventId}/registration/${MONGO_UPSERT_HACK}`,
             },
           },
           {
@@ -52,6 +53,13 @@ export default function EventHomeLayout({
             text: "Participants",
             linkProps: {
               href: `/app/events/${eventId}/participants`,
+            },
+          },
+          {
+            Icon: <BatchIcon />,
+            text: "Batches",
+            linkProps: {
+              href: `/app/events/${eventId}/batches`,
             },
           },
           {

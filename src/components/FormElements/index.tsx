@@ -2,7 +2,7 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import CheckboxFive from "@/components/Checkboxes/CheckboxFive";
 import CheckboxFour from "@/components/Checkboxes/CheckboxFour";
-import CheckboxOne from "@/components/Checkboxes/CheckboxOne";
+import { Checkbox } from "@/components/Checkboxes/CheckboxOne";
 import CheckboxThree from "@/components/Checkboxes/CheckboxThree";
 import CheckboxTwo from "@/components/Checkboxes/CheckboxTwo";
 import SwitcherFour from "@/components/Switchers/SwitcherFour";
@@ -13,12 +13,8 @@ import DatePickerTwo from "@/components/FormElements/DatePicker/DatePickerTwo";
 import DatePickerOne from "@/components/FormElements/DatePicker/DatePickerOne";
 import MultiSelect from "@/components/FormElements/MultiSelect";
 import { Input } from "./input";
-import { Dropdown } from "../SelectGroup/Dropdown";
-import { GlobalIcon } from "../Icons/GlobalIcon";
-import { Form } from "./form";
+import { Form, FormData } from "./form";
 import { useForm } from "react-hook-form";
-import { enumToOptions } from "@/lib/helper";
-import { EventTypeEnum } from "@prisma/client";
 
 const FormElements = () => {
   const form = useForm();
@@ -175,11 +171,14 @@ const FormElements = () => {
               </h3>
             </div>
             <div className="flex flex-col gap-5.5 p-6.5">
-              <CheckboxOne />
-              <CheckboxTwo />
-              <CheckboxThree />
-              <CheckboxFour />
-              <CheckboxFive />
+              <Form formTitle="Demo" formMethods={form}>
+                <FormData />
+                <Checkbox name="test" />
+                <CheckboxTwo />
+                <CheckboxThree />
+                <CheckboxFour />
+                <CheckboxFive />
+              </Form>
             </div>
           </div>
 
@@ -192,14 +191,6 @@ const FormElements = () => {
             </div>
             <div className="flex flex-col gap-5.5 p-6.5">
               <Form formTitle="Demo" formMethods={form}>
-                <Dropdown
-                  icon={<GlobalIcon />}
-                  label="Select Country"
-                  options={enumToOptions(EventTypeEnum)}
-                  name="beep"
-                  getKey={(i) => i.value}
-                  getValue={(i) => i.label}
-                />
                 <MultiSelect id="multiSelect" />
               </Form>
             </div>
