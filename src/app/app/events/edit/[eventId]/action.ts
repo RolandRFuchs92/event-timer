@@ -17,7 +17,6 @@ export async function getEvent(eventId: string) {
   });
 
   if (!rawResult) return DefaultEvent;
-  console.log("Beep");
 
   const result = {
     ...rawResult,
@@ -38,7 +37,6 @@ export async function mutateEvent({
     ) as any,
   };
 
-  console.log(event);
   const result = await _db.event.upsert({
     create: event,
     update: event,

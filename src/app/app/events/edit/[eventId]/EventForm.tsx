@@ -3,27 +3,26 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import { EventTypeEnum } from "@prisma/client";
+import { useRouter } from "next/navigation";
 
 import { FormRow } from "@/components/FormElements/FormRow";
 import { Form, FormData } from "@/components/FormElements/form";
 import { FormTitle } from "@/components/FormElements/formTitle";
 import { FInput } from "@/components/FormElements/input";
 import { MultiSelect } from "@/components/SelectGroup/MultiSelect";
-import { enumToOptions } from "@/lib/helper";
 import { Button } from "@/components/FormElements/button";
 import { Dropdown } from "@/components/SelectGroup/Dropdown";
 
 import { EventSchema } from "./schema";
 import { getClientOptions, getEvent, mutateEvent } from "./action";
-import { useRouter } from "next/navigation";
 
 interface EventFormProps {
   event: Awaited<ReturnType<typeof getEvent>>;
   clients: Awaited<ReturnType<typeof getClientOptions>>;
+  opts: any[];
 }
 
-export function EventForm({ event, clients }: EventFormProps) {
+export function EventForm({ event, clients, opts }: EventFormProps) {
   const { replace } = useRouter();
   const form = useForm({
     resolver: zodResolver(EventSchema),
@@ -72,7 +71,7 @@ export function EventForm({ event, clients }: EventFormProps) {
         getValue={(i) => i.label}
         label="Client"
       />
-      <MultiSelect name="event_type" options={[]} label="Type" />
+      <MultiSelect name="event_type" options={opts} label="Type" />
       <Button label="Submit" />
     </Form>
   );
