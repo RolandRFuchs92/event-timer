@@ -28,6 +28,7 @@ export default function EventHomeLayout({
           {
             Icon: <HomeIcon className="h-4 w-4" />,
             text: "Home",
+            exactMatch: true,
             linkProps: {
               href: `/app/events/${eventId}`,
             },

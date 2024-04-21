@@ -10,6 +10,7 @@ interface TabProps {
     text: string;
     Icon: React.ReactNode;
     linkProps: React.ComponentProps<typeof Link>;
+    exactMatch?: boolean;
   }[];
 }
 
@@ -20,9 +21,16 @@ export function Tabs({ options }: TabProps) {
     <div className="border-gray-200 dark:border-gray-700 border-b">
       <ul className="text-gray-500 dark:text-gray-400 -mb-px flex flex-wrap text-center text-sm font-medium">
         {options.map(
-          ({ text, Icon, linkProps: { className, ...linkProps } }) => {
+          ({
+            exactMatch,
+            text,
+            Icon,
+            linkProps: { className, ...linkProps },
+          }) => {
             const isSelected =
-              pathname === (linkProps.href as any as string) &&
+              ((!exactMatch &&
+                pathname.includes(linkProps.href as any as string)) ||
+                (exactMatch && pathname === linkProps.href)) &&
               linkProps.href !== "";
 
             return (

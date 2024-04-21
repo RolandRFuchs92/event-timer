@@ -4,23 +4,24 @@ import TwDialog from "@/components/Dialog/Dialog";
 import { useRouter } from "next/navigation";
 import React from "react";
 import toast from "react-hot-toast";
-import { deleteRace } from "./action";
+import { deleteRace, getEventRaces } from "./action";
 import { Table } from "@/components/Tables/table";
 import { EditIcon } from "@/components/Icons/EditIcon";
 import { TrashIcon } from "@heroicons/react/24/outline";
-import { fullDateFormat } from "@/lib/DateTimeUtils";
+import { useEventId } from "../eventUtils";
 
 interface RaceTableProps {
-  data: any[];
+  data: Awaited<ReturnType<typeof getEventRaces>>;
 }
 
 export function RaceTable({ data }: RaceTableProps) {
+  const eventId = useEventId();
   const { push } = useRouter();
   const { replace } = useRouter();
 
   return (
     <TwDialog<(typeof data)[0]>
-      body={(i) => `You sure you wana delete event - ${i?.name}`}
+      body={(i) => `You sure you want to delete ${i.name}?`}
       title={"Really delete"}
       onYes={async (i) => {
         const result = await deleteRace(i.id);
@@ -32,7 +33,7 @@ export function RaceTable({ data }: RaceTableProps) {
         return (
           <Table
             heading="Races in this event"
-            href={"/app/events/home/race/null"}
+            href={`/app/events/${eventId}/races/null`}
             tableProps={{
               data: data,
               enableHiding: true,
@@ -54,19 +55,13 @@ export function RaceTable({ data }: RaceTableProps) {
                   cell: (p) => p.getValue(),
                 },
                 {
-                  accessorKey: "client_id",
-                  header: "client_id",
-                  cell: (p) => p.getValue(),
-                },
-                {
-                  accessorKey: "client",
-                  header: "Client",
-                  cell: (p) => p.getValue().name,
-                },
-                {
-                  accessorKey: "event_type",
-                  header: "Type",
-                  cell: (p) => p.getValue().join(", "),
+                  accessorKey: "batches",
+                  header: "Batches",
+                  cell: (p) =>
+                    p
+                      .getValue()
+                      .map((i) => i.name)
+                      .join(", "),
                 },
                 {
                   accessorKey: "actions",
