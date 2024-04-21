@@ -35,7 +35,6 @@ export function EventForm({ event, clients }: EventFormProps) {
     toast.success(result.message);
     replace("../");
   });
-  const opts = enumToOptions(EventTypeEnum);
 
   return (
     <Form
@@ -73,7 +72,7 @@ export function EventForm({ event, clients }: EventFormProps) {
         getValue={(i) => i.label}
         label="Client"
       />
-      <MultiSelect name="event_type" options={opts} label="Type" />
+      <MultiSelect name="event_type" options={[]} label="Type" />
       <Button label="Submit" />
     </Form>
   );

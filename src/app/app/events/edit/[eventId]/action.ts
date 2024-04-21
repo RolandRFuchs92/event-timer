@@ -2,11 +2,7 @@
 
 import { _db } from "@/lib/db";
 import { DefaultEvent } from "./schema";
-import {
-  enumToOptions,
-  mongoEnumToOptions,
-  optionsToStringArray,
-} from "@/lib/helper";
+import { mongoEnumToOptions, optionsToStringArray } from "@/lib/helper";
 import { revalidatePath, unstable_noStore } from "next/cache";
 import { event } from "@prisma/client";
 
@@ -21,6 +17,7 @@ export async function getEvent(eventId: string) {
   });
 
   if (!rawResult) return DefaultEvent;
+  console.log("Beep");
 
   const result = {
     ...rawResult,

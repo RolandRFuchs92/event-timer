@@ -66,13 +66,13 @@ export function RaceTable({ data }: RaceTableProps) {
                 {
                   accessorKey: "actions",
                   header: "Actions",
-                  cell: (stuff) => (
+                  cell: (i) => (
                     <div className="flex items-center space-x-3.5">
                       <button className="hover:text-primary">
                         <TrashIcon
                           className="h-4 w-4"
                           onClick={() => {
-                            setData(stuff.row.original);
+                            setData(i.row.original);
                             toggle();
                           }}
                         />
@@ -80,7 +80,9 @@ export function RaceTable({ data }: RaceTableProps) {
                       <button
                         className="hover:text-primary"
                         onClick={() =>
-                          push(`/app/events/edit/${stuff.row.original.id}`)
+                          push(
+                            `/app/events/${i.row.original.event_id}/races/${i.row.original.id}`,
+                          )
                         }
                       >
                         <EditIcon />
