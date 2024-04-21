@@ -1,3 +1,4 @@
+import { defaultDateTimetring } from "@/lib/DateTimeUtils";
 import React from "react";
 import { Controller } from "react-hook-form";
 
@@ -46,10 +47,16 @@ export function FInput({ name, helperText, ...props }: FInputProps) {
     <Controller
       name={name}
       render={({ field, fieldState }) => {
+        const isDateTimeField =
+          props.type === "datetime-local" && !!field.value;
+
         return (
           <Input
             {...props}
             {...field}
+            {...(isDateTimeField
+              ? { value: defaultDateTimetring(field.value) }
+              : {})}
             name={name}
             helperText={fieldState.error?.message}
           />

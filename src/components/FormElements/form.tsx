@@ -1,4 +1,5 @@
 import { cn } from "@/lib/styles";
+import { useSearchParams } from "next/navigation";
 import React from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import z from "zod";
@@ -28,7 +29,20 @@ export function Form({
 }
 
 export function FormData() {
+  const searchParams = useSearchParams();
+  const [isVisible, setIsVisible] = React.useState(false);
   const form = useFormContext();
+  const debug = searchParams.get("debug");
+  if (process.env.NODE_ENV !== "development" || debug !== "true") return null;
 
-  return <pre>{JSON.stringify(form.watch(), null, 2)}</pre>;
+  return (
+    <div>
+      <button onClick={() => setIsVisible((i) => !i)} type="button">
+        Show/hide
+      </button>
+      {isVisible === true ? (
+        <pre>{JSON.stringify(form.watch(), null, 2)}</pre>
+      ) : null}
+    </div>
+  );
 }

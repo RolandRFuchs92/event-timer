@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { EventTypeEnum } from "@prisma/client";
 
 import { FormRow } from "@/components/FormElements/FormRow";
-import { FormData, Form } from "@/components/FormElements/form";
+import { Form, FormData } from "@/components/FormElements/form";
 import { FormTitle } from "@/components/FormElements/formTitle";
 import { FInput } from "@/components/FormElements/input";
 import { MultiSelect } from "@/components/SelectGroup/MultiSelect";
@@ -43,6 +43,7 @@ export function EventForm({ event, clients }: EventFormProps) {
       formMethods={form}
       onSubmit={handleSubmit}
     >
+      <FormData />
       <FInput name="name" label="Event Name" />
       <FormRow>
         <FInput
