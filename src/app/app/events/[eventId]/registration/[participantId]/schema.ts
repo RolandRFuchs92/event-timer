@@ -7,7 +7,7 @@ export const RegistrationSchema = z.object({
   id: z.coerce.string(),
   first_name: z.string().min(2),
   last_name: z.string(),
-  race_number: z.string().optional(),
+  race_number: z.string().nullable(),
   birthdate: z.coerce.date(),
   batches: z.array(
     z.object({

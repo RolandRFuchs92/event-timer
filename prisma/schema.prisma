@@ -28,15 +28,16 @@ model client {
 }
 
 model event {
-  id         String          @id @default(auto()) @map("_id") @db.ObjectId
-  client_id  String          @db.ObjectId
-  client     client          @relation(fields: [client_id], references: [id])
-  name       String
-  start_on   DateTime
-  end_on     DateTime?
-  created_on DateTime
-  event_type EventTypeEnum[]
-  races      races[]
+  id          String          @id @default(auto()) @map("_id") @db.ObjectId
+  client_id   String          @db.ObjectId
+  client      client          @relation(fields: [client_id], references: [id])
+  name        String
+  start_on    DateTime
+  end_on      DateTime?
+  created_on  DateTime
+  event_type  EventTypeEnum[]
+  races       races[]
+  participant participant[]
 }
 
 model races {
@@ -55,6 +56,8 @@ model participant {
   race_number String?
   batches     participant_batch[]
   is_male     Boolean
+  event_id    String              @db.ObjectId
+  event       event               @relation(fields: [event_id], references: [id])
 }
 
 type participant_batch {
@@ -84,4 +87,10 @@ enum EventTypeEnum {
 enum RoleEnum {
   Admin
   User
+}
+
+enum FinishStatusEnum {
+  DNF
+  DNS
+  DQ
 }

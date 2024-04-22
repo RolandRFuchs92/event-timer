@@ -14,26 +14,30 @@ import { Form, FormData, FormErrors } from "@/components/FormElements/form";
 import { Checkbox } from "@/components/Checkboxes/CheckboxOne";
 import { Dropdown } from "@/components/SelectGroup/Dropdown";
 
-import { getEventRaces, mutateParticipant } from "./action";
+import { getEventRaces, getParticipant, mutateParticipant } from "./action";
 import { DefaultRegistration, RegistrationSchema } from "./schema";
 import { useEventId } from "../../eventUtils";
 
 interface RegistrationFormProps {
   races: Awaited<ReturnType<typeof getEventRaces>>;
+  participant: Awaited<ReturnType<typeof getParticipant>>;
 }
-
-export function RegistrationForm({ races }: RegistrationFormProps) {
+DefaultRegistration;
+export function RegistrationForm({
+  races,
+  participant,
+}: RegistrationFormProps) {
   const { replace } = useRouter();
   const eventId = useEventId();
   const form = useForm({
     resolver: zodResolver(RegistrationSchema),
-    defaultValues: DefaultRegistration,
+    defaultValues: participant,
   });
 
   const handleSubmit = form.handleSubmit(async (data) => {
     const result = await mutateParticipant(eventId, data);
     toast.success(result.message);
-    replace("../");
+    replace(`/app/events/${eventId}/participants`);
   });
 
   return (

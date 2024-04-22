@@ -1,3 +1,16 @@
-export default async function ParticipantsPage() {
-  return <h1>Participants Page</h1>;
+import { ParticipantTable } from "./ParticipantTable";
+import { getParticipants } from "./action";
+
+interface ParticipantsPageProps {
+  params: {
+    participantId: string;
+    eventId: string;
+  };
+}
+
+export default async function ParticipantsPage({
+  params,
+}: ParticipantsPageProps) {
+  const data = await getParticipants(params.eventId);
+  return <ParticipantTable data={data} />;
 }

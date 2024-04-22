@@ -1,8 +1,9 @@
 "use server";
-import { _db } from "@/lib/db";
-import { RegistrationSchema } from "./schema";
+import { MONGO_UPSERT_HACK, _db } from "@/lib/db";
+import { DefaultRegistration, RegistrationSchema } from "./schema";
 import { z } from "zod";
 import { participant } from "@prisma/client";
+import { revalidatePath, unstable_noStore } from "next/cache";
 
 export async function mutateParticipant(
   eventId: string,
@@ -13,10 +14,10 @@ export async function mutateParticipant(
       event_id: eventId,
     },
   });
-  console.log(participant);
 
   const newParticipant: Omit<participant, "id"> = {
     ...participant,
+    event_id: eventId,
     batches: participant.batches.map((i) => {
       const race = races.find((r) => r.id === i.race_id)!;
       const race_name = race.name;
@@ -32,7 +33,6 @@ export async function mutateParticipant(
     }),
   };
 
-  console.log(newParticipant);
   const result = await _db.participant.upsert({
     update: newParticipant,
     create: newParticipant,
@@ -40,6 +40,8 @@ export async function mutateParticipant(
       id,
     },
   });
+
+  revalidatePath(`/app/events/${eventId}/participants`);
 
   return {
     result,
@@ -55,4 +57,19 @@ export async function getEventRaces(eventId: string) {
   });
 
   return races;
+}
+
+export async function getParticipant(eventId: string, participantId: string) {
+  if (participantId === MONGO_UPSERT_HACK) return DefaultRegistration;
+
+  unstable_noStore();
+  const result = await _db.participant.findFirst({
+    where: {
+      event_id: eventId,
+      id: participantId,
+    },
+  });
+
+  if (!result) return DefaultRegistration;
+  return result;
 }
