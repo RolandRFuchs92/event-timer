@@ -9,6 +9,7 @@ import { Table } from "@/components/Tables/table";
 import { EditIcon } from "@/components/Icons/EditIcon";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { useEventId } from "../eventUtils";
+import { BatchIcon } from "@/components/Icons/BatchIcon";
 
 interface RaceTableProps {
   data: Awaited<ReturnType<typeof getEventRaces>>;
@@ -68,6 +69,16 @@ export function RaceTable({ data }: RaceTableProps) {
                   header: "Actions",
                   cell: (i) => (
                     <div className="flex items-center space-x-3.5">
+                      <button className="hover:text-primary">
+                        <BatchIcon
+                          className="h-4 w-4"
+                          onClick={() => {
+                            push(
+                              `/app/events/${eventId}/races/${i.row.original.id}/batches`,
+                            );
+                          }}
+                        />
+                      </button>
                       <button className="hover:text-primary">
                         <TrashIcon
                           className="h-4 w-4"

@@ -56,13 +56,6 @@ export default function EventHomeLayout({
             },
           },
           {
-            Icon: <BatchIcon />,
-            text: "Batches",
-            linkProps: {
-              href: `/app/events/${eventId}/batches`,
-            },
-          },
-          {
             Icon: <FinishersIcon />,
             text: "Finishers",
             linkProps: {
