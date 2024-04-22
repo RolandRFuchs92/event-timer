@@ -47,6 +47,23 @@ model races {
   event    event   @relation(fields: [event_id], references: [id])
 }
 
+model participant {
+  id          String              @id @default(auto()) @map("_id") @db.ObjectId
+  first_name  String
+  last_name   String
+  birthdate   DateTime
+  race_number String?
+  batches     participant_batch[]
+  is_male     Boolean
+}
+
+type participant_batch {
+  race_id    String
+  batch_id   String
+  batch_name String
+  race_name  String
+}
+
 type batch {
   batch_id String    @db.ObjectId
   name     String
