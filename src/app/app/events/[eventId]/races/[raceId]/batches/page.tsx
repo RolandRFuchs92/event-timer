@@ -1,5 +1,22 @@
-import React from "react";
+import React, { Suspense } from "react";
+import { BatchList } from "./BatchList";
 
-export default function BatchPage() {
-  return <h1>These are the batches for this race.</h1>;
+interface BatchPageProps {
+  params: {
+    raceId: string;
+    eventId: string;
+  };
+}
+
+export default function BatchPage({ params }: BatchPageProps) {
+  const raceId = params.raceId;
+
+  return (
+    <div>
+      <h3>Batches</h3>
+      <Suspense fallback={<h1>LOADING</h1>}>
+        <BatchList raceId={raceId} />
+      </Suspense>
+    </div>
+  );
 }
