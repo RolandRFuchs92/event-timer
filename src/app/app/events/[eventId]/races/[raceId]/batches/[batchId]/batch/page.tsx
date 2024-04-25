@@ -20,7 +20,6 @@ export default async function BatchPageProps({
   });
 
   const batch = race?.batches.find((i) => i.batch_id === batchId);
-  console.log(batch);
 
   return (
     <div className="flex flex-col gap-2">

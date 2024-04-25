@@ -23,13 +23,13 @@ export default async function Participants({
   });
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       <h1>Participants</h1>
       <LinkButton label="Batches" href="batch" />
       {participants.length === 0 ? (
         <h3>There are not participants for this batch</h3>
       ) : (
-        <div className="border-gray-400 border">
+        <div className="border-gray-400 flex flex-col gap-2 border">
           {participants.map((i, index) => (
             <div
               key={i.id}
