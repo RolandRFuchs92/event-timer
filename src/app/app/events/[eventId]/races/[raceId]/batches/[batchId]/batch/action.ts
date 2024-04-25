@@ -3,6 +3,7 @@
 import { _db } from "@/lib/db";
 import { action } from "@/lib/safeAction";
 import { batchTimerSchema } from "./schema";
+import { races } from "@prisma/client";
 
 export const startBatchTimer = action(
   batchTimerSchema,
@@ -18,10 +19,12 @@ export const startBatchTimer = action(
     });
 
     if (!race) throw new Error("Unable to find that batch!");
+    console.log(startTime);
 
     let batchName = "";
-    const newRace = {
-      ...race,
+    const newRace: Omit<races, "id"> = {
+      name: race.name,
+      event_id: race.event_id,
       batches: race.batches.map((i) => {
         if (i.batch_id !== batchId) return i;
         batchName = i.name;
