@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import React, { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { MyProfileIcon } from "../Icons/MyProfileIcon";
@@ -86,6 +85,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 href="/app/events"
                 frontIcon={<EventIcon />}
               />
+
               <SidebarDemoOptions />
             </ul>
           </div>
