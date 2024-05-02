@@ -58,6 +58,13 @@ export async function getRaces() {
   return races;
 }
 
-export async function setFinisher(raceNumber: string, finishStatus: string) {
-  console.log(raceNumber, finishStatus);
+type setFinisherParams = {
+  race_number: string;
+  finish_status: string;
+  race_ids: string[];
+  event_id: string;
+};
+
+export async function setFinisher(payload: setFinisherParams) {
+  console.log(payload);
 }

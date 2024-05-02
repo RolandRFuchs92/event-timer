@@ -8,12 +8,15 @@ import { enumToOptions } from "@/lib/helper";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { setFinisher } from "./action";
+import { useEventId, useRaceIds } from "../eventUtils";
 
 interface FinisherFormProp {
   FinisherStatusOptions: ReturnType<typeof enumToOptions>;
 }
 
 export function FinishersForm({ FinisherStatusOptions }: FinisherFormProp) {
+  const raceIds = useRaceIds();
+  const eventId = useEventId();
   const form = useForm({
     defaultValues: {
       race_number: "",
@@ -22,7 +25,12 @@ export function FinishersForm({ FinisherStatusOptions }: FinisherFormProp) {
   });
 
   const handleSubmit = form.handleSubmit(async (data) => {
-    const result = await setFinisher(data.race_number, data.finish_status);
+    const result = await setFinisher({
+      race_number: data.race_number,
+      finish_status: data.finish_status,
+      race_ids: raceIds,
+      event_id: eventId,
+    });
   });
 
   return (
