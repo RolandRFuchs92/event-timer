@@ -27,7 +27,6 @@ export function MultiSelect<T>({
     <Controller
       name={name}
       render={({ field, fieldState }) => {
-        console.log(field.value);
         return (
           <div className="mb-4.5">
             <label className="mb-2.5 block text-black dark:text-white">

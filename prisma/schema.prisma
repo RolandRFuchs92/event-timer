@@ -61,10 +61,12 @@ model participant {
 }
 
 type participant_batch {
-  race_id    String
-  batch_id   String
-  batch_name String
-  race_name  String
+  race_id       String
+  batch_id      String
+  batch_name    String
+  race_name     String
+  finish_time   DateTime?
+  finish_status FinishStatusEnum?
 }
 
 type batch {
@@ -90,6 +92,7 @@ enum RoleEnum {
 }
 
 enum FinishStatusEnum {
+  Finished
   DNF
   DNS
   DQ

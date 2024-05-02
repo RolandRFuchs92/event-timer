@@ -8,8 +8,8 @@ import { Button, LinkButton } from "../FormElements/button";
 
 interface TableProps<T extends object> {
   tableProps: Omit<Parameters<typeof useReactTable<T>>[0], "getCoreRowModel">;
-  heading: string;
-  href: string;
+  heading: React.ReactNode;
+  href?: string;
 }
 
 export function Table<T extends object>({
@@ -26,8 +26,8 @@ export function Table<T extends object>({
     <div className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
       <div className="max-w-full overflow-x-auto">
         <div className="mb-2 flex flex-row justify-between justify-items-center">
-          <div>{heading}</div>
-          <LinkButton label="Add" href={href} />
+          {typeof heading === "string" ? <div>{heading}</div> : heading}
+          {href ? <LinkButton label="Add" href={href} /> : null}
         </div>
         <table className="w-full table-auto">
           <thead>

@@ -8,10 +8,11 @@ import { EditIcon } from "@/components/Icons/EditIcon";
 import { TrashIcon } from "@/components/Icons/TrashIcon";
 import { Table } from "@/components/Tables/table";
 import { getParticipants, deleteParticipant } from "./action";
-import { fullDateFormat } from "@/lib/DateTimeUtils";
+import { defaultDateString, fullDateFormat } from "@/lib/DateTimeUtils";
 import { VisibleIcon } from "@/components/Icons/VisibleIcon";
 import { useEventId } from "../eventUtils";
 import { MONGO_UPSERT_HACK } from "@/lib/db";
+import { differenceInYears } from "date-fns";
 
 interface ParticpantTableProps {
   data: Awaited<ReturnType<typeof getParticipants>>;
@@ -55,17 +56,34 @@ export function ParticipantTable({ data }: ParticpantTableProps) {
                 {
                   accessorKey: "first_name",
                   header: "Name",
-                  cell: (p) => p.getValue(),
+                  cell: (p) => {
+                    const fname = p.row.original.first_name;
+                    const lname = p.row.original.last_name;
+                    const name = `${fname} ${lname}`;
+                    return name;
+                  },
                 },
                 {
-                  accessorKey: "last_name",
-                  header: "Last Name",
+                  accessorKey: "race_number",
+                  header: "Race no.",
                   cell: (p) => p.getValue(),
                 },
                 {
                   accessorKey: "birthdate",
-                  header: "Birthdate",
-                  cell: (p) => fullDateFormat(p.getValue()),
+                  header: "Age",
+                  cell: (p) => differenceInYears(new Date(), p.getValue()),
+                },
+                {
+                  accessorKey: "batches",
+                  header: "Race[Batch]",
+                  cell: (p) => {
+                    const batches = p.row.original.batches;
+                    const result = batches
+                      .map((i) => `${i.race_name}[${i.batch_name}]`)
+                      .join(", ");
+
+                    return result;
+                  },
                 },
                 {
                   accessorKey: "actions",
