@@ -30,7 +30,7 @@ export function FinishersIcon(props: SVGProps<SVGSVGElement>) {
         y2="72"
         style={{
           fill: "none",
-          stroke: "#000000",
+          stroke: "currentcolor",
           strokeLinecap: "round",
           strokeLinejoin: "round",
           strokeWidth: "48px",
@@ -43,7 +43,7 @@ export function FinishersIcon(props: SVGProps<SVGSVGElement>) {
         y2="120"
         style={{
           fill: "none",
-          stroke: "#000000",
+          stroke: "currentcolor",
           strokeLinecap: "round",
           strokeLinejoin: "round",
           strokeWidth: "48px",
@@ -55,7 +55,7 @@ export function FinishersIcon(props: SVGProps<SVGSVGElement>) {
         r="32"
         style={{
           fill: "none",
-          stroke: "#000000",
+          stroke: "currentcolor",
           strokeMiterlimit: "10",
           strokeWidth: "32px",
         }}
@@ -64,7 +64,7 @@ export function FinishersIcon(props: SVGProps<SVGSVGElement>) {
         d="M256,96A176,176,0,1,0,432,272,176,176,0,0,0,256,96Z"
         style={{
           fill: "none",
-          stroke: "#000000",
+          stroke: "currentcolor",
           strokeMiterlimit: "10",
           strokeWidth: "32px",
         }}

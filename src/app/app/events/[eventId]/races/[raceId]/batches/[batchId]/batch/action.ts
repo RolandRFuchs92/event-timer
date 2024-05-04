@@ -19,12 +19,12 @@ export const startBatchTimer = action(
     });
 
     if (!race) throw new Error("Unable to find that batch!");
-    console.log(startTime);
 
     let batchName = "";
     const newRace: Omit<races, "id"> = {
       name: race.name,
       event_id: race.event_id,
+      race_type: race.race_type,
       batches: race.batches.map((i) => {
         if (i.batch_id !== batchId) return i;
         batchName = i.name;

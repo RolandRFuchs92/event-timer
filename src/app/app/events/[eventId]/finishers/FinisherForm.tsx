@@ -9,6 +9,8 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { setFinisher } from "./action";
 import { useEventId, useRaceIds } from "../eventUtils";
+import { FinishStatusEnum } from "@prisma/client";
+import toast from "react-hot-toast";
 
 interface FinisherFormProp {
   FinisherStatusOptions: ReturnType<typeof enumToOptions>;
@@ -20,7 +22,7 @@ export function FinishersForm({ FinisherStatusOptions }: FinisherFormProp) {
   const form = useForm({
     defaultValues: {
       race_number: "",
-      finish_status: FinisherStatusOptions[0].value,
+      finish_status: FinisherStatusOptions[0].value as FinishStatusEnum,
     },
   });
 
@@ -28,9 +30,12 @@ export function FinishersForm({ FinisherStatusOptions }: FinisherFormProp) {
     const result = await setFinisher({
       race_number: data.race_number,
       finish_status: data.finish_status,
-      race_ids: raceIds,
+      raceIds,
       event_id: eventId,
+      finish_time: new Date(),
     });
+
+    if (result.serverError) toast.error(result.serverError);
   });
 
   return (

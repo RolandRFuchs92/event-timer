@@ -17,7 +17,10 @@ export async function FinishersTableContainer({
   return (
     <div>
       <FinishersForm FinisherStatusOptions={finishStatusOptions} />
-      <FinishersTable data={finishers} />
+      <FinishersTable
+        data={finishers}
+        finisherStatusOptions={finishStatusOptions}
+      />
     </div>
   );
 }

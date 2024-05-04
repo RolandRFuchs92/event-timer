@@ -10,12 +10,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FinishersFilterSchema } from "./schema";
 import { FormTitle } from "@/components/FormElements/formTitle";
 import { z } from "zod";
+import { Dropdown } from "@/components/SelectGroup/Dropdown";
+import { enumToOptions } from "@/lib/helper";
 
 interface FinishersFilterProps {
   races: Awaited<ReturnType<typeof getRaces>>;
+  raceTypes: ReturnType<typeof enumToOptions>;
 }
 
-export function FinishersFilter({ races }: FinishersFilterProps) {
+export function FinishersFilter({ races, raceTypes }: FinishersFilterProps) {
   const form = useForm<z.infer<typeof FinishersFilterSchema>>({
     resolver: zodResolver(FinishersFilterSchema),
     defaultValues: {
@@ -41,6 +44,15 @@ export function FinishersFilter({ races }: FinishersFilterProps) {
       onSubmit={handleSubmit}
     >
       <FormData />
+
+      <Dropdown
+        options={raceTypes}
+        label="Race Type"
+        getKey={(i) => i.label}
+        getValue={(i) => i.value}
+        name="race_type"
+      />
+
       <MultiSelect
         options={races.map((i) => ({ value: i.id, label: i.name }))}
         name="races"

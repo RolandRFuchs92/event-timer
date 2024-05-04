@@ -41,11 +41,12 @@ model event {
 }
 
 model races {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  event_id String  @db.ObjectId
-  name     String
-  batches  batch[]
-  event    event   @relation(fields: [event_id], references: [id])
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  event_id  String       @db.ObjectId
+  name      String
+  race_type RaceTypeEnum
+  batches   batch[]
+  event     event        @relation(fields: [event_id], references: [id])
 }
 
 model participant {
@@ -67,12 +68,19 @@ type participant_batch {
   race_name     String
   finish_time   DateTime?
   finish_status FinishStatusEnum?
+  time_taken    String?
+  time_taken_ms Int?
 }
 
 type batch {
   batch_id String    @db.ObjectId
   name     String
   start_on DateTime?
+}
+
+enum RaceTypeEnum {
+  StandardNoLaps
+  LaneRace
 }
 
 enum EventTypeEnum {

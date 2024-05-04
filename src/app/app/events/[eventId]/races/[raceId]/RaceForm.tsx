@@ -11,12 +11,15 @@ import { RaceSchema } from "./schema";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useEventId } from "../../eventUtils";
+import { Dropdown } from "@/components/SelectGroup/Dropdown";
+import { enumToOptions } from "@/lib/helper";
 
 interface RaceFormProps {
   race: Awaited<ReturnType<typeof getRace>>;
+  raceTypes: ReturnType<typeof enumToOptions>;
 }
 
-export function RaceForm({ race }: RaceFormProps) {
+export function RaceForm({ race, raceTypes }: RaceFormProps) {
   const eventId = useEventId();
   const { replace } = useRouter();
   const form = useForm({
@@ -49,6 +52,14 @@ export function RaceForm({ race }: RaceFormProps) {
       onSubmit={handleSubmit}
     >
       <FormData />
+
+      <Dropdown
+        options={raceTypes}
+        label="Race Type"
+        getKey={(i) => i.label}
+        getValue={(i) => i.value}
+        name="race_type"
+      />
 
       <FInput name="name" label="Race Name" />
       <div>

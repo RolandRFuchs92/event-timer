@@ -4,9 +4,10 @@ import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 type DialogProps<T extends object> = {
   title: ((value: T) => React.ReactNode) | React.ReactNode;
-  body: ((value: T) => React.ReactNode) | React.ReactNode;
+  body: ((value: T, toggle: () => void) => React.ReactNode) | React.ReactNode;
   onYes: (value: T) => Promise<void>;
   children: (setData: (data: T) => void, toggle: () => void) => React.ReactNode;
+  disableButtons?: boolean;
 };
 
 export default function TwDialog<T extends object>({
@@ -14,6 +15,7 @@ export default function TwDialog<T extends object>({
   body,
   onYes,
   children,
+  disableButtons = false,
 }: DialogProps<T>) {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<T | null>(null);
@@ -26,7 +28,7 @@ export default function TwDialog<T extends object>({
         <Transition.Root show={open} as={Fragment}>
           <Dialog
             as="div"
-            className="relative z-10"
+            className="z-1000 relative"
             initialFocus={cancelButtonRef}
             onClose={setOpen}
           >
@@ -70,31 +72,33 @@ export default function TwDialog<T extends object>({
                             {typeof title === "function" ? title(data) : title}
                           </Dialog.Title>
                           <div className="mt-2">
-                            {typeof body === "function" ? body(data) : body}
+                            {typeof body === "function" ? body(data, () => setOpen(i => !i)) : body}
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                      <button
-                        type="button"
-                        className="hover:bg-red-500 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto"
-                        onClick={async () => {
-                          await onYes(data);
-                          setOpen(false);
-                        }}
-                      >
-                        Yes
-                      </button>
-                      <button
-                        type="button"
-                        className="text-gray-900 ring-gray-300 hover:bg-gray-50 mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset sm:mt-0 sm:w-auto"
-                        onClick={() => setOpen(false)}
-                        ref={cancelButtonRef}
-                      >
-                        No
-                      </button>
-                    </div>
+                    {disableButtons ? null : (
+                      <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <button
+                          type="button"
+                          className="hover:bg-red-500 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto"
+                          onClick={async () => {
+                            await onYes(data);
+                            setOpen(false);
+                          }}
+                        >
+                          Yes
+                        </button>
+                        <button
+                          type="button"
+                          className="text-gray-900 ring-gray-300 hover:bg-gray-50 mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset sm:mt-0 sm:w-auto"
+                          onClick={() => setOpen(false)}
+                          ref={cancelButtonRef}
+                        >
+                          No
+                        </button>
+                      </div>
+                    )}
                   </Dialog.Panel>
                 </Transition.Child>
               </div>

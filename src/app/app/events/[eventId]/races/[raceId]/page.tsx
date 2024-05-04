@@ -1,6 +1,8 @@
 import React from "react";
 import { RaceForm } from "./RaceForm";
 import { getRace } from "./action";
+import { enumToOptions } from "@/lib/helper";
+import { RaceTypeEnum } from "@prisma/client";
 
 interface RacePageProps {
   params: {
@@ -11,7 +13,8 @@ interface RacePageProps {
 export default async function RacePage({ params }: RacePageProps) {
   const raceId = params.raceId;
   const race = await getRace(raceId);
+  const raceTypes = enumToOptions(RaceTypeEnum);
 
   console.log(race);
-  return <RaceForm race={race} />;
+  return <RaceForm race={race} raceTypes={raceTypes} />;
 }
