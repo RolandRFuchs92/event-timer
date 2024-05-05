@@ -7,7 +7,7 @@ import { BatchElapsedTime } from "@/components/time/TimeElapsed";
 import { CurrentTime } from "@/components/time/Timer";
 import { TimerDisplay } from "@/components/time/TimerTile";
 import { batch } from "@prisma/client";
-import { startBatchTimer } from "./action";
+import { resetBatchTimer, startBatchTimer } from "./action";
 import toast from "react-hot-toast";
 import TwDialog from "@/components/Dialog/Dialog";
 
@@ -32,6 +32,17 @@ export function BatchTimerTile({ batch }: BatchTimerTile) {
     }
   };
 
+  const handleResetBatch = async () => {
+    setBatchTime(null);
+    const result = await resetBatchTimer({ batchId: batch!.batch_id });
+    if (result.serverError) {
+      toast.error(result.serverError);
+      return;
+    }
+    setBatchTime(null);
+    toast.success(result.data!.message);
+  };
+
   return (
     <div className="flex flex-col gap-2">
       <TimerDisplay
@@ -53,13 +64,13 @@ export function BatchTimerTile({ batch }: BatchTimerTile) {
         body="Are you sure you really want to restart this batch?"
         title="Really restart?"
         onYes={async (t) => {
-          handleStartBatch();
+          await handleResetBatch();
         }}
       >
         {(setBatch, toggle) => {
           return (
             <Button
-              label="Start"
+              label={batchTime ? "Reset" : "Start"}
               type="button"
               onClick={async () => {
                 if (!batchTime) {

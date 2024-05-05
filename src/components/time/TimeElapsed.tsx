@@ -8,11 +8,17 @@ type BatchElapsedTimeProps = {
   startTime: Date | null;
 };
 
+const msg = "Not started";
+
 export function BatchElapsedTime({ startTime }: BatchElapsedTimeProps) {
-  const [time, setTime] = React.useState("0");
+  const [time, setTime] = React.useState(msg);
 
   React.useEffect(() => {
-    if (!startTime) return;
+    if (!startTime) {
+      setTime(msg);
+      return;
+    }
+
     const handleTimeSet = () => {
       const now = new Date();
       const diff = differenceInSeconds(now, startTime);

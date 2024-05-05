@@ -10,6 +10,7 @@ import { EditIcon } from "@/components/Icons/EditIcon";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { useEventId } from "../eventUtils";
 import { BatchIcon } from "@/components/Icons/BatchIcon";
+import { startCase } from "lodash";
 
 interface RaceTableProps {
   data: Awaited<ReturnType<typeof getEventRaces>>;
@@ -58,7 +59,7 @@ export function RaceTable({ data }: RaceTableProps) {
                 {
                   accessorKey: "race_type",
                   header: "Type",
-                  cell: (p) => p.getValue(),
+                  cell: (p) => startCase(p.getValue()),
                 },
                 {
                   accessorKey: "batches",

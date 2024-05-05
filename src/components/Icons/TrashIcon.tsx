@@ -1,14 +1,15 @@
+import { cn } from "@/lib/styles";
 import { SVGProps } from "react";
 
-export function TrashIcon(props: SVGProps<SVGSVGElement>) {
+export function TrashIcon({ className, ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg
-      className="fill-current"
       width="18"
       height="18"
       viewBox="0 0 18 18"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      className={cn("fill-current", className)}
       {...props}
     >
       <path

@@ -17,6 +17,7 @@ import { Dropdown } from "@/components/SelectGroup/Dropdown";
 import { getEventRaces, getParticipant, mutateParticipant } from "./action";
 import { DefaultRegistration, RegistrationSchema } from "./schema";
 import { useEventId } from "../../eventUtils";
+import { TrashIcon } from "@/components/Icons/TrashIcon";
 
 interface RegistrationFormProps {
   races: Awaited<ReturnType<typeof getEventRaces>>;
@@ -72,35 +73,60 @@ function BatchFieldArray({ form, races }: BatchFieldArrayProps) {
     control: form.control,
   });
 
-  const handleAddBatch = () => {
+  const handleAddRace = () => {
     const batchCount = batchFieldArray.fields.length;
     batchFieldArray.insert(batchCount, { batch_id: "", race_id: "" });
   };
 
+  const removeRaceAssignment = (index: number) => {
+    batchFieldArray.remove(index);
+  };
+
   return (
     <div>
-      <Button label="Add batch" type="button" onClick={handleAddBatch} />
+      <Button label="Add Race" type="button" onClick={handleAddRace} />
       {batchFieldArray.fields.map((i, index) => {
         const thingy = form.watch(`batches.${index}.race_id`);
         const selectedRace = races.find((r) => r.id === thingy);
         const batchOptions = selectedRace?.batches ?? [];
+        const isLaneRace = selectedRace?.race_type === "LaneRace";
+
+        const remainingRaceOptions = races.filter((r) => {
+          const isCurrentOption = i.race_id === r.id;
+          if (isCurrentOption) return true;
+
+          const isChosen = batchFieldArray.fields.some(
+            (bfa) => bfa.race_id === r.id,
+          );
+
+          return isChosen === false;
+        });
 
         return (
           <div key={i.id} className="flex flex-row gap-2">
             <Dropdown
-              options={races}
+              options={remainingRaceOptions}
               getValue={(i) => i.name}
               getKey={(i) => i.id}
               label="Race"
               name={`batches.${index}.race_id`}
             />
-            <Dropdown
-              options={batchOptions}
-              getValue={(i) => i.name}
-              getKey={(i) => i.batch_id}
-              label="Batch"
-              name={`batches.${index}.batch_id`}
-            />
+            {!isLaneRace && selectedRace ? (
+              <Dropdown
+                options={batchOptions}
+                getValue={(i) => i.name}
+                getKey={(i) => i.batch_id}
+                label="Batch"
+                name={`batches.${index}.batch_id`}
+              />
+            ) : null}
+            <div
+              className="relative cursor-pointer transition-all duration-150 hover:[&>svg]:fill-primary"
+              role="button"
+              onClick={() => removeRaceAssignment(index)}
+            >
+              <TrashIcon className="absolute left-1/2 top-1/2 ml-4" />
+            </div>
           </div>
         );
       })}

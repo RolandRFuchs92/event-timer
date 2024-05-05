@@ -1,6 +1,10 @@
 import z from 'zod';
 
-export const batchTimerSchema = z.object({
+export const BatchTimerSchema = z.object({
   batchId: z.string(),
   startTime: z.coerce.date()
+});
+
+export const ResetBatchSchema = z.object({
+  batchId: z.string()
 });
