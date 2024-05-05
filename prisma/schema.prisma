@@ -41,12 +41,38 @@ model event {
 }
 
 model races {
-  id        String       @id @default(auto()) @map("_id") @db.ObjectId
-  event_id  String       @db.ObjectId
-  name      String
-  race_type RaceTypeEnum
-  batches   batch[]
-  event     event        @relation(fields: [event_id], references: [id])
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
+  event_id        String           @db.ObjectId
+  name            String
+  race_type       RaceTypeEnum
+  batches         batch[]
+  heat_containers heat_container[]
+  event           event            @relation(fields: [event_id], references: [id])
+}
+
+type heat_container {
+  name         String
+  heat_index   Int
+  is_qualifier Boolean
+  max_heats    Int
+  heats        heat[]
+  is_closed    Boolean
+}
+
+type heat {
+  index        Int
+  participants heat_participant[]
+  start_time   DateTime?
+  is_closed    Boolean
+}
+
+type heat_participant {
+  index          Int
+  participant_id String    @db.ObjectId
+  name           String
+  is_winner      Boolean
+  end_time       DateTime?
+  total_time_ms  String?
 }
 
 model participant {
@@ -56,9 +82,15 @@ model participant {
   birthdate   DateTime
   race_number String?
   batches     participant_batch[]
+  races       participant_race[]
   is_male     Boolean
   event_id    String              @db.ObjectId
   event       event               @relation(fields: [event_id], references: [id])
+}
+
+type participant_race {
+  race_id   String
+  race_type RaceTypeEnum
 }
 
 type participant_batch {

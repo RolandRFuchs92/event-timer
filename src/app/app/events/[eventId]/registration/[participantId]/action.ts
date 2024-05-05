@@ -18,19 +18,31 @@ export async function mutateParticipant(
   const newParticipant: Omit<participant, "id"> = {
     ...participant,
     event_id: eventId,
-    batches: participant.batches.map((i) => {
-      const race = races.find((r) => r.id === i.race_id)!;
-      const race_name = race.name;
-      const batch_name = race.batches.find(
-        (b) => b.batch_id === i.batch_id,
-      )!.name;
+    batches: participant.batches
+      .filter((i) => {
+        const race = races.find((r) => i.race_id === r.id);
+        if (!race) return false;
 
-      return {
-        ...i,
-        race_name,
-        batch_name,
-      };
-    }),
+        const batch = race.batches.find((b) => b.batch_id === i.batch_id);
+        return !!batch;
+      })
+      .map((i) => {
+        const race = races.find((r) => r.id === i.race_id)!;
+        const race_name = race.name;
+        const batch_name = race.batches.find(
+          (b) => b.batch_id === i.batch_id,
+        )!.name;
+
+        return {
+          ...i,
+          time_taken: null,
+          finish_time: null,
+          race_name,
+          batch_name,
+          time_taken_ms: null,
+          finish_status: null,
+        };
+      }),
   };
 
   const result = await _db.participant.upsert({
