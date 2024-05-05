@@ -15,6 +15,5 @@ export default async function RacePage({ params }: RacePageProps) {
   const race = await getRace(raceId);
   const raceTypes = enumToOptions(RaceTypeEnum);
 
-  console.log(race);
   return <RaceForm race={race} raceTypes={raceTypes} />;
 }

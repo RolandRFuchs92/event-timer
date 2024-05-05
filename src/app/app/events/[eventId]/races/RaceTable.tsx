@@ -56,6 +56,11 @@ export function RaceTable({ data }: RaceTableProps) {
                   cell: (p) => p.getValue(),
                 },
                 {
+                  accessorKey: "race_type",
+                  header: "Type",
+                  cell: (p) => p.getValue(),
+                },
+                {
                   accessorKey: "batches",
                   header: "Batches",
                   cell: (p) =>

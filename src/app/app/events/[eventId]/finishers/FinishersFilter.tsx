@@ -23,6 +23,7 @@ export function FinishersFilter({ races, raceTypes }: FinishersFilterProps) {
     resolver: zodResolver(FinishersFilterSchema),
     defaultValues: {
       races: [],
+      race_type: "StandardNoLaps",
     },
   });
 
@@ -37,6 +38,10 @@ export function FinishersFilter({ races, raceTypes }: FinishersFilterProps) {
     replace(newUrl);
   });
 
+  const givenRaceType = form.watch("race_type");
+  console.log("givenRaceType");
+  console.log(givenRaceType);
+
   return (
     <Form
       formMethods={form}
@@ -48,13 +53,20 @@ export function FinishersFilter({ races, raceTypes }: FinishersFilterProps) {
       <Dropdown
         options={raceTypes}
         label="Race Type"
-        getKey={(i) => i.label}
-        getValue={(i) => i.value}
+        getKey={(i) => i.value}
+        getValue={(i) => i.label}
         name="race_type"
       />
 
       <MultiSelect
-        options={races.map((i) => ({ value: i.id, label: i.name }))}
+        key={givenRaceType}
+        options={races
+          .filter((i) => {
+            return i.race_type === givenRaceType;
+          })
+          .map((i) => ({ value: i.id, label: i.name }))}
+        getKey={(i) => i.value}
+        getValue={(i) => i.label}
         name="races"
         label="Races"
       />

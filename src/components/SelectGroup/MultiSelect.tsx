@@ -23,6 +23,8 @@ export function MultiSelect<T>({
   name,
   ...props
 }: MultiSelectProps<T>) {
+  console.log(options);
+
   return (
     <Controller
       name={name}

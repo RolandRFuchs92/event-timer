@@ -1,9 +1,10 @@
 import { OptionSchema } from "@/js/schema";
-import { FinishStatusEnum } from "@prisma/client";
+import { FinishStatusEnum, RaceTypeEnum } from "@prisma/client";
 import z from "zod";
 
 export const FinishersFilterSchema = z.object({
   races: z.array(OptionSchema),
+  race_type: z.nativeEnum(RaceTypeEnum)
 });
 
 export const FinisherSchema = z.object({

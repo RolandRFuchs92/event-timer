@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/FormElements/button";
-import { Form, FormData } from "@/components/FormElements/form";
+import { Form, FormData, FormErrors } from "@/components/FormElements/form";
 import { FormTitle } from "@/components/FormElements/formTitle";
 import { FInput } from "@/components/FormElements/input";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -52,12 +52,13 @@ export function RaceForm({ race, raceTypes }: RaceFormProps) {
       onSubmit={handleSubmit}
     >
       <FormData />
+      <FormErrors />
 
       <Dropdown
         options={raceTypes}
         label="Race Type"
-        getKey={(i) => i.label}
-        getValue={(i) => i.value}
+        getKey={(i) => i.value}
+        getValue={(i) => i.label}
         name="race_type"
       />
 
