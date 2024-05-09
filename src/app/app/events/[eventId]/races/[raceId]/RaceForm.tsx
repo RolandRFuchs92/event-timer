@@ -45,6 +45,8 @@ export function RaceForm({ race, raceTypes }: RaceFormProps) {
     batchRows.insert(batchCount, { name: "" });
   };
 
+  const isLaneRace = form.watch("race_type") === "LaneRace";
+
   return (
     <Form
       formTitle={<FormTitle label={"Race"} />}
@@ -67,23 +69,25 @@ export function RaceForm({ race, raceTypes }: RaceFormProps) {
         <h3>Batches</h3>
         <Button type="button" label="Add Batch" onClick={insertBatch} />
       </div>
-      <div className="flex flex-wrap gap-2">
-        {batchRows.fields.map((i, index) => {
-          return (
-            <div key={i.id} className="flex flex-wrap gap-2">
-              <FInput
-                name={`batches.${index}.name`}
-                label={`Batch ${index + 1}`}
-              />
-              <Button
-                className="self-end"
-                label="Delete"
-                onClick={() => batchRows.remove(index)}
-              />
-            </div>
-          );
-        })}
-      </div>
+      {isLaneRace ? null : (
+        <div className="flex flex-wrap gap-2">
+          {batchRows.fields.map((i, index) => {
+            return (
+              <div key={i.id} className="flex flex-wrap gap-2">
+                <FInput
+                  name={`batches.${index}.name`}
+                  label={`Batch ${index + 1}`}
+                />
+                <Button
+                  className="self-end"
+                  label="Delete"
+                  onClick={() => batchRows.remove(index)}
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
       <div className="flex justify-end">
         <Button label="Submit" />
       </div>
