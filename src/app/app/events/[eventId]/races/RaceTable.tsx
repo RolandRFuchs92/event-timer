@@ -27,7 +27,12 @@ export function RaceTable({ data }: RaceTableProps) {
       title={"Really delete"}
       onYes={async (i) => {
         const result = await deleteRace(i.id);
-        toast.success(result.message);
+        if (result.serverError) {
+          toast.error(result.serverError!);
+          return;
+        }
+
+        toast.success(result.data!.message);
         replace("");
       }}
     >

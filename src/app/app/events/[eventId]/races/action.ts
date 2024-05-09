@@ -3,21 +3,38 @@
 import { _db } from "@/lib/db";
 import { omit } from "lodash";
 import { revalidatePath, unstable_noStore } from "next/cache";
+import { DeleteRaceSchema } from "./schema";
+import { action } from "@/lib/safeAction";
 
-export async function deleteRace(raceId: string) {
+export const deleteRace = action(DeleteRaceSchema, async (raceId) => {
   const result = await _db.races.delete({
     where: {
       id: raceId,
     },
   });
 
+  if (!result) {
+    throw new Error("Unable to find that race!");
+  }
+
   const raceParticipants = await _db.participant.findMany({
     where: {
-      batches: {
-        some: {
-          race_id: raceId,
+      OR: [
+        {
+          races: {
+            some: {
+              race_id: raceId,
+            },
+          },
         },
-      },
+        {
+          batches: {
+            some: {
+              race_id: raceId,
+            },
+          },
+        },
+      ],
     },
   });
 
@@ -26,6 +43,7 @@ export async function deleteRace(raceId: string) {
       _db.participant.update({
         data: {
           ...omit(i, "id"),
+          races: i.races.filter((r) => r.race_id !== raceId),
           batches: i.batches.filter((b) => b.race_id !== raceId),
         },
         where: {
@@ -41,7 +59,7 @@ export async function deleteRace(raceId: string) {
     result,
     message: `Successfully deleted that race.`,
   };
-}
+});
 
 export async function getEventRaces(eventId: string) {
   unstable_noStore();
