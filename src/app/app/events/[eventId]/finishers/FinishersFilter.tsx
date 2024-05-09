@@ -12,6 +12,7 @@ import { FormTitle } from "@/components/FormElements/formTitle";
 import { z } from "zod";
 import { Dropdown } from "@/components/SelectGroup/Dropdown";
 import { enumToOptions } from "@/lib/helper";
+import { useEventId } from "../eventUtils";
 
 interface FinishersFilterProps {
   races: Awaited<ReturnType<typeof getRaces>>;
@@ -19,6 +20,7 @@ interface FinishersFilterProps {
 }
 
 export function FinishersFilter({ races, raceTypes }: FinishersFilterProps) {
+  const eventId = useEventId();
   const form = useForm<z.infer<typeof FinishersFilterSchema>>({
     resolver: zodResolver(FinishersFilterSchema),
     defaultValues: {
@@ -29,18 +31,19 @@ export function FinishersFilter({ races, raceTypes }: FinishersFilterProps) {
 
   const pathName = usePathname();
   const { replace } = useRouter();
+  const givenRaceType = form.watch("race_type");
 
   const handleSubmit = form.handleSubmit((data) => {
     const newParams = new URLSearchParams();
     const races = encodeURIComponent(data.races.map((i) => i.value).join(","));
     newParams.set("races", races);
-    const newUrl = `${pathName}?${newParams.toString()}`;
+    const newPathName =
+      givenRaceType === "LaneRace"
+        ? `/app/events/${eventId}/laneRace`
+        : pathName;
+    const newUrl = `${newPathName}?${newParams.toString()}`;
     replace(newUrl);
   });
-
-  const givenRaceType = form.watch("race_type");
-  console.log("givenRaceType");
-  console.log(givenRaceType);
 
   return (
     <Form

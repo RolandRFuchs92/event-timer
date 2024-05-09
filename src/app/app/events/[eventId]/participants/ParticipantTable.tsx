@@ -78,10 +78,15 @@ export function ParticipantTable({ data }: ParticpantTableProps) {
                   header: "Race[Batch]",
                   cell: (p) => {
                     const batches = p.row.original.batches;
-                    const result = batches
-                      .map((i) => `${i.race_name}[${i.batch_name}]`)
-                      .join(", ");
+                    const batchResult = batches.map((i) => {
+                      return `${i.race_name}[${i.batch_name}]`;
+                    });
 
+                    const laneRaces = p.row.original.races.map(
+                      (i) => i.race_name,
+                    );
+
+                    const result = [...batchResult, ...laneRaces].join(", ");
                     return result;
                   },
                 },

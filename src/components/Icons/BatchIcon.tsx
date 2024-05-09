@@ -1,5 +1,7 @@
+import { cn } from "@/lib/styles";
 import { SVGProps } from "react";
-export function BatchIcon(props: SVGProps<SVGSVGElement>) {
+
+export function BatchIcon({ className, ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -7,7 +9,7 @@ export function BatchIcon(props: SVGProps<SVGSVGElement>) {
       viewBox="0 0 24 24"
       stroke-width="1.5"
       stroke="currentColor"
-      className="h-6 w-6"
+      className={cn("h-6 w-6", className)}
       {...props}
     >
       <path

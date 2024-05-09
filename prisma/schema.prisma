@@ -57,6 +57,7 @@ type heat_container {
   max_heats    Int
   heats        heat[]
   is_closed    Boolean
+  all_participant_ids String[]
 }
 
 type heat {
@@ -91,6 +92,7 @@ model participant {
 type participant_race {
   race_id   String
   race_type RaceTypeEnum
+  race_name String
 }
 
 type participant_batch {

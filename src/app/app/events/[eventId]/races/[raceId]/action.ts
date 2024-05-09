@@ -4,6 +4,7 @@ import { _db } from "@/lib/db";
 import { DefaultRace } from "./schema";
 import { revalidatePath, unstable_noStore } from "next/cache";
 import { newObjectId } from "@/lib/helper";
+import { races } from "@prisma/client";
 
 export async function getRace(raceId: string) {
   if (raceId === "null") return DefaultRace;
@@ -21,11 +22,14 @@ export async function getRace(raceId: string) {
 }
 
 export async function mutateRace({ id, ...rawRace }: typeof DefaultRace) {
-  const race = {
+  const race: Omit<races, "id"> = {
     ...rawRace,
+    heat_containers: [],
     batches: rawRace.batches.map((i) => ({
       ...i,
       batch_id: newObjectId().toString(),
+      name: i.name,
+      start_on: null,
     })),
   };
 

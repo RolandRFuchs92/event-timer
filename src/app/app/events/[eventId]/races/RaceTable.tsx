@@ -79,6 +79,12 @@ export function RaceTable({ data }: RaceTableProps) {
                         <BatchIcon
                           className="h-4 w-4"
                           onClick={() => {
+                            if (i.row.original.race_type === "LaneRace") {
+                              push(
+                                `/app/events/${eventId}/laneRace?raceId=${i.row.original.id}`,
+                              );
+                              return;
+                            }
                             push(
                               `/app/events/${eventId}/races/${i.row.original.id}/batches`,
                             );

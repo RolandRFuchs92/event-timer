@@ -18,10 +18,24 @@ export async function mutateParticipant(
   const newParticipant: Omit<participant, "id"> = {
     ...participant,
     event_id: eventId,
+    races: participant.batches
+      .filter((i) => {
+        const race = races.find((r) => i.race_id === r.id);
+        return !race || race.race_type === "LaneRace";
+      })
+      .map((i) => {
+        const race = races.find((r) => i.race_id === r.id)!;
+
+        return {
+          race_type: race.race_type,
+          race_id: race.id,
+          race_name: race.name
+        };
+      }),
     batches: participant.batches
       .filter((i) => {
         const race = races.find((r) => i.race_id === r.id);
-        if (!race) return false;
+        if (!race || race.race_type === "LaneRace") return false;
 
         const batch = race.batches.find((b) => b.batch_id === i.batch_id);
         return !!batch;
