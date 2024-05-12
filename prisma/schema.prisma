@@ -51,12 +51,12 @@ model races {
 }
 
 type heat_container {
-  name         String
-  heat_index   Int
-  is_qualifier Boolean
-  max_heats    Int
-  heats        heat[]
-  is_closed    Boolean
+  name                String
+  heat_index          Int
+  is_qualifier        Boolean
+  max_heats           Int
+  heats               heat[]
+  is_closed           Boolean
   all_participant_ids String[]
 }
 

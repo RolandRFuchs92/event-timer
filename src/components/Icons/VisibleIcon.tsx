@@ -1,9 +1,10 @@
+import { cn } from "@/lib/styles";
 import { SVGProps } from "react";
 
-export function VisibleIcon(props: SVGProps<SVGSVGElement>) {
+export function VisibleIcon({ className, ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg
-      className="fill-current"
+      className={cn("fill-current", className)}
       width="18"
       height="18"
       viewBox="0 0 18 18"

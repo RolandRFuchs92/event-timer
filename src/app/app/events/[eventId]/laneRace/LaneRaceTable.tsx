@@ -1,18 +1,21 @@
-import { LaneRacerTile } from "./LaneRacerTile";
-import { getQualifierCompetitors } from "./action";
+import React from 'react';
+import { LaneRaceContainer } from "./LaneRaceContainer";
+import { getLaneRace } from "./action";
+import { LaneRaceFilter } from './LaneRaceFilter';
 
 interface LaneRaceTableProps {
-  competitors: Awaited<ReturnType<typeof getQualifierCompetitors>>;
+  laneRace: Awaited<ReturnType<typeof getLaneRace>>["data"];
 }
 
-export function LaneRaceTable({ competitors }: LaneRaceTableProps) {
+export function LaneRaceTable({ laneRace }: LaneRaceTableProps) {
+
   return (
     <div className="flex flex-col">
-      <h1>Lane Race Participants</h1>
-      <div className="flex w-64 flex-col gap-2">
-        {competitors.data!.map((i) => (
-          <LaneRacerTile participant={i} key={i.id} />
-        ))}
+      <LaneRaceFilter laneRace={laneRace} />
+      <div>
+        <React.Suspense fallback="Loading...">
+          <LaneRaceContainer />
+        </React.Suspense>
       </div>
     </div>
   );

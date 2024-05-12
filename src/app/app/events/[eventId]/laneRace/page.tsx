@@ -1,5 +1,5 @@
 import React from "react";
-import { getQualifierCompetitors } from "./action";
+import { getLaneRace } from "./action";
 import { LaneRaceTable } from "./LaneRaceTable";
 
 interface LaneRacePageProps {
@@ -12,6 +12,6 @@ export default async function LaneRacePage({
   searchParams,
 }: LaneRacePageProps) {
   const raceId = searchParams.raceId;
-  const competitiors = await getQualifierCompetitors({ raceId });
-  return <LaneRaceTable competitors={competitiors} />;
+  const laneRace = await getLaneRace({ raceId });
+  return <LaneRaceTable laneRace={laneRace.data} />;
 }
