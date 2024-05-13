@@ -9,3 +9,9 @@ export const NewHeatSchema = z.object({
   max_heats: z.coerce.number(),
   race_id: z.string()
 });
+
+
+export const DeleteHeatSchema = z.object({
+  heat_index: z.coerce.number(),
+  race_id: z.string()
+});

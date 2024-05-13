@@ -6,7 +6,6 @@ export async function LaneRaceContainer() {
   return (
     <div>
       <LaneContainerDetails />
-      <h1>Lane Race Container</h1>
     </div>
   );
 }

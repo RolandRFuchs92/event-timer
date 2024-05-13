@@ -1,7 +1,7 @@
 'use server'
 
 import { action } from "@/lib/safeAction";
-import { LaneRaceSchema, NewHeatSchema } from "./schema";
+import { DeleteHeatSchema, LaneRaceSchema, NewHeatSchema } from "./schema";
 import { _db } from "@/lib/db";
 import { max, omit } from "lodash";
 import { revalidatePath } from "next/cache";
@@ -98,4 +98,37 @@ export const createNewHeat = action(NewHeatSchema, async (data) => {
 })
 
 
-export const deleteHeat = action();
+export const deleteHeat = action(DeleteHeatSchema, async ({ heat_index, race_id }) => {
+  const race = await _db.races.findFirst({
+    where: {
+      id: race_id
+    }
+  });
+
+  if (!race)
+    throw new Error("Unable to find that race.");
+
+  let heatName = "";
+  const newRace = {
+    ...omit(race, 'id'),
+    heat_containers: race.heat_containers.filter(i => {
+      if (i.heat_index === heat_index) {
+        heatName = i.name;
+        return false;
+      }
+      return true;
+    })
+  }
+
+  const result = await _db.races.update({
+    data: newRace,
+    where: {
+      id: race_id
+    }
+  });
+
+  revalidatePath("");
+  return {
+    message: `Successfully removed heat ${heatName}`
+  }
+});

@@ -7,7 +7,6 @@ type T = NonNullable<
   Awaited<ReturnType<typeof getLaneRace>>["data"]
 >["heat_containers"][0];
 
-
 interface LaneRacerTileProps {
   heat_container: T;
   onDelete: (data: T) => Promise<void>;
@@ -27,7 +26,7 @@ export function LaneRaceTile({ heat_container, onDelete }: LaneRacerTileProps) {
   };
 
   return (
-    <div className="flex flex-row items-center justify-between gap-2">
+    <div className="flex flex-row items-center justify-between gap-2 [&_b]:hover:font-extrabold">
       <div
         className="flex grow cursor-pointer flex-row items-center gap-2 rounded-md border border-white bg-black p-2"
         onClick={onClick}
