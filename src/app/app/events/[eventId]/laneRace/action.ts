@@ -99,6 +99,9 @@ export const createNewHeat = action(NewHeatSchema, async (data) => {
 
 
 export const deleteHeat = action(DeleteHeatSchema, async ({ heat_index, race_id }) => {
+  if (heat_index === 0)
+    throw new Error("You may not delete the qualifier heat. Please rather delete the entire race.");
+
   const race = await _db.races.findFirst({
     where: {
       id: race_id
