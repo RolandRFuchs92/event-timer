@@ -2,21 +2,21 @@
 
 import React from "react";
 
-import { FInput, Input } from "@/components/FormElements/input";
-import { FormProvider, useForm } from "react-hook-form";
+import { FInput } from "@/components/FormElements/input";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/FormElements/button";
 import { Form, FormErrors } from "@/components/FormElements/form";
 import { FormTitle } from "@/components/FormElements/formTitle";
-import { createNewHeat } from "./action";
+import { createNewRound } from "./action";
 import { useLaneRaceId } from "./hook";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { NewHeatSchema } from "./schema";
+import { NewRoundSchema } from "./schema";
 import toast from "react-hot-toast";
 
-export function LaneNewHeat() {
+export function LaneNewRound() {
   const raceId = useLaneRaceId();
   const form = useForm({
-    resolver: zodResolver(NewHeatSchema),
+    resolver: zodResolver(NewRoundSchema),
     defaultValues: {
       race_id: raceId,
       name: "",
@@ -25,7 +25,7 @@ export function LaneNewHeat() {
   });
 
   const handleSubmit = form.handleSubmit(async (data) => {
-    const result = await createNewHeat(data);
+    const result = await createNewRound(data);
     if (result.serverError) {
       toast.error(result.serverError);
       return;

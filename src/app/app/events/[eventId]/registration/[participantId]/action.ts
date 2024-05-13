@@ -4,6 +4,7 @@ import { DefaultRegistration, RegistrationSchema } from "./schema";
 import { z } from "zod";
 import { participant } from "@prisma/client";
 import { revalidatePath, unstable_noStore } from "next/cache";
+import { omit, uniq } from "lodash";
 
 export async function mutateParticipant(
   eventId: string,
@@ -29,7 +30,7 @@ export async function mutateParticipant(
         return {
           race_type: race.race_type,
           race_id: race.id,
-          race_name: race.name
+          race_name: race.name,
         };
       }),
     batches: participant.batches
@@ -66,6 +67,23 @@ export async function mutateParticipant(
       id,
     },
   });
+
+  const laneRaces = races.filter((i) => i.race_type === "LaneRace");
+  await _db.$transaction(
+    laneRaces.map((i) => {
+      i.heat_containers[0].all_participant_ids = uniq([...i.heat_containers[0].all_participant_ids, id])
+
+      return _db.races.update({
+        data: {
+          ...omit(i, "id"),
+          heat_containers: i.heat_containers,
+        },
+        where: {
+          id: i.id,
+        },
+      });
+    }),
+  );
 
   revalidatePath(`/app/events/${eventId}/participants`);
 

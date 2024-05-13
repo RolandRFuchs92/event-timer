@@ -1,16 +1,17 @@
 'use server'
 
 import { action } from "@/lib/safeAction";
-import { DeleteHeatSchema, LaneRaceSchema, NewHeatSchema } from "./schema";
+import { DeleteHeatSchema, LaneRaceSchema, NewHeatSchema, NewRoundSchema } from "./schema";
 import { _db } from "@/lib/db";
 import { max, omit } from "lodash";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_noStore } from "next/cache";
 
 export const assignCompetitors = action(LaneRaceSchema, async () => { });
 
 export const getQualifierCompetitors = action(
   LaneRaceSchema,
   async ({ raceId }) => {
+    unstable_noStore();
     const competitors = await _db.participant.findMany({
       where: {
         races: {
@@ -26,6 +27,7 @@ export const getQualifierCompetitors = action(
 );
 
 export const getLaneRace = action(LaneRaceSchema, async ({ raceId }) => {
+  unstable_noStore();
   const race = await _db.races.findFirst({
     where: {
       id: raceId
@@ -59,7 +61,7 @@ export const getLaneRace = action(LaneRaceSchema, async ({ raceId }) => {
   return finalRace
 })
 
-export const createNewHeat = action(NewHeatSchema, async (data) => {
+export const createNewRound = action(NewRoundSchema, async (data) => {
   const race = await _db.races.findFirst({
     where: {
       id: data.race_id
@@ -123,7 +125,7 @@ export const deleteHeat = action(DeleteHeatSchema, async ({ heat_index, race_id 
     })
   }
 
-  const result = await _db.races.update({
+  await _db.races.update({
     data: newRace,
     where: {
       id: race_id
@@ -133,5 +135,41 @@ export const deleteHeat = action(DeleteHeatSchema, async ({ heat_index, race_id 
   revalidatePath("");
   return {
     message: `Successfully removed heat ${heatName}`
+  }
+});
+
+export const createNewHeat = action(NewHeatSchema, async ({ race_id, heat_index }) => {
+  const race = await _db.races.findFirst({
+    where: {
+      id: race_id
+    }
+  });
+
+  if (!race)
+    throw new Error("Unable to find that race!");
+
+  const round = race?.heat_containers[heat_index];
+  if (!round)
+    throw new Error("unable to find that round!");
+
+  round.heats.push({
+    index: round.heats.length,
+    participants: [],
+    is_closed: false,
+    start_time: null
+  });
+
+  await _db.races.update({
+    data: omit(race, 'id'),
+    where: {
+      id: race_id
+    }
+  });
+
+
+  revalidatePath("");
+
+  return {
+    message: "New heat has been created!"
   }
 });

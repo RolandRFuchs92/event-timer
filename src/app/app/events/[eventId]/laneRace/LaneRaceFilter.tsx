@@ -5,7 +5,7 @@ import { deleteHeat, getLaneRace } from "./action";
 import TwDialog from "@/components/Dialog/Dialog";
 import { LaneRaceTile } from "./LaneRacerTile";
 import { Button } from "@/components/FormElements/button";
-import { LaneNewHeat } from "./LaneNewHeat";
+import { LaneNewRound } from "./LaneNewRound";
 import { useLaneRaceId } from "./hook";
 import toast from "react-hot-toast";
 
@@ -48,10 +48,10 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
         };
         return (
           <TwDialog<{}>
-            body={(i) => <LaneNewHeat />}
+            body={(i) => <LaneNewRound />}
             disableButtons
             title={""}
-            onYes={async (i) => {}}
+            onYes={async (i) => { }}
           >
             {(setData, toggle) => {
               return (
