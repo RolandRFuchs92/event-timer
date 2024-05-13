@@ -2,7 +2,6 @@
 
 import { useForm } from "react-hook-form";
 import { deleteHeat, getLaneRace } from "./action";
-import { usePathname, useRouter } from "next/navigation";
 import TwDialog from "@/components/Dialog/Dialog";
 import { LaneRaceTile } from "./LaneRacerTile";
 import { Button } from "@/components/FormElements/button";
@@ -57,7 +56,7 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
             {(setData, toggle) => {
               return (
                 <div className="flex w-64 flex-col gap-2">
-                  <div className="flex flex-row items-center gap-2">
+                  <div className="flex flex-row items-center justify-between gap-2">
                     <h3>{laneRace?.name}</h3>
                     <Button
                       label="Add"

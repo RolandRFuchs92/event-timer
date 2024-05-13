@@ -1,22 +1,19 @@
-import React from 'react';
+import React from "react";
 import { LaneRaceContainer } from "./LaneRaceContainer";
 import { getLaneRace } from "./action";
-import { LaneRaceFilter } from './LaneRaceFilter';
+import { LaneRaceFilter } from "./LaneRaceFilter";
 
 interface LaneRaceTableProps {
   laneRace: Awaited<ReturnType<typeof getLaneRace>>["data"];
 }
 
 export function LaneRaceTable({ laneRace }: LaneRaceTableProps) {
-
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-row gap-4">
       <LaneRaceFilter laneRace={laneRace} />
-      <div>
-        <React.Suspense fallback="Loading...">
-          <LaneRaceContainer />
-        </React.Suspense>
-      </div>
+      <React.Suspense fallback="Loading...">
+        <LaneRaceContainer laneRace={laneRace} />
+      </React.Suspense>
     </div>
   );
 }
