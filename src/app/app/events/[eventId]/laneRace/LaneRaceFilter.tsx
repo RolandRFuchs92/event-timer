@@ -1,13 +1,14 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { deleteHeat, getLaneRace } from "./action";
+import toast from "react-hot-toast";
+
 import TwDialog from "@/components/Dialog/Dialog";
-import { LaneRaceTile } from "./LaneRacerTile";
 import { Button } from "@/components/FormElements/button";
+
+import { LaneRaceTile } from "./LaneRacerTile";
+import { deleteHeat, getLaneRace } from "./action";
 import { LaneNewRound } from "./LaneNewRound";
 import { useLaneRaceId } from "./hook";
-import toast from "react-hot-toast";
 
 interface LaneRaceFilterProps {
   laneRace: Awaited<ReturnType<typeof getLaneRace>>["data"];
@@ -18,7 +19,6 @@ type T = NonNullable<
 >["heat_containers"][0];
 
 export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
-  const form = useForm();
   const raceId = useLaneRaceId();
 
   return (
@@ -57,7 +57,7 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
               return (
                 <div className="flex w-64 flex-col gap-2">
                   <div className="flex flex-row items-center justify-between gap-2">
-                    <h3>{laneRace?.name}</h3>
+                    <h3>Race: {laneRace?.name}</h3>
                     <Button
                       label="Add"
                       onClick={() => {
@@ -66,6 +66,7 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
                       }}
                     />
                   </div>
+                  <h3>Rounds</h3>
                   {laneRace?.heat_containers.map((i) => {
                     return (
                       <LaneRaceTile

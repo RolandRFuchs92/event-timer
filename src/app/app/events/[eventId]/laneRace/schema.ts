@@ -21,3 +21,7 @@ export const NewHeatSchema = z.object({
   race_id: z.coerce.string(),
   heat_index: z.coerce.number()
 });
+
+export const HeatFilterSchema = z.object({
+  heat_index: z.coerce.number()
+});

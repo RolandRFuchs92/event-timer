@@ -13,5 +13,6 @@ export default async function LaneRacePage({
 }: LaneRacePageProps) {
   const raceId = searchParams.raceId;
   const laneRace = await getLaneRace({ raceId });
+
   return <LaneRaceTable laneRace={laneRace.data} />;
 }

@@ -3,26 +3,28 @@
 import React from "react";
 
 import { getLaneRace } from "./action";
-import { useHeatIndex } from "./hook";
+import { useRoundIndex } from "./hook";
 import { HeatFilter } from "./HeatFilter";
 
-export type LaneRaceType = NonNullable<Awaited<ReturnType<typeof getLaneRace>>["data"]>
+export type LaneRaceType = NonNullable<
+  Awaited<ReturnType<typeof getLaneRace>>["data"]
+>;
 
 interface LaneRaceContainerProps {
   laneRace: Awaited<ReturnType<typeof getLaneRace>>["data"];
 }
 
 export async function LaneRaceContainer({ laneRace }: LaneRaceContainerProps) {
-  const heatIndex = useHeatIndex();
-  const heat = laneRace?.heat_containers[heatIndex];
+  const roundIndex = useRoundIndex();
+  const round = laneRace?.heat_containers[roundIndex];
 
   return (
     <div>
       <div className="text-middle flex h-10 flex-row items-center justify-between">
-        <h3>Round: {heat?.name}</h3>
+        <h3>Round: {round?.name}</h3>
       </div>
-      <HeatFilter heats={heat?.heats ?? []} />
-      <AllParticipants participants={heat?.all_participants ?? []} />
+      <HeatFilter heats={round?.heats ?? []} />
+      <AllParticipants participants={round?.all_participants ?? []} />
     </div>
   );
 }
@@ -37,7 +39,7 @@ function AllParticipants({ participants }: AllParticipantsProps) {
   return (
     <div>
       <h3 className="font-bold">Competitors</h3>
-      <ul className="flex flex-col gap-2 w-64">
+      <ul className="flex w-64 flex-col gap-2">
         {participants.map((i) => {
           return (
             <li
