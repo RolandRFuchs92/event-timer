@@ -17,7 +17,7 @@ export function LaneHeat({ laneRace }: LaneHeatProps) {
   const heat = round.heats[0];
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       <HeatInteractions laneRace={laneRace} />
       <HeatDisplay laneRace={laneRace} />
     </div>

@@ -25,3 +25,11 @@ export const NewHeatSchema = z.object({
 export const HeatFilterSchema = z.object({
   heat_index: z.coerce.number()
 });
+
+
+export const LaneCompetitorSchema = z.object({
+  participant_id: z.string(),
+  race_id: z.string(),
+  round_index: z.number(),
+  heat_index: z.coerce.number()
+})

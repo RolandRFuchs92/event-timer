@@ -86,7 +86,7 @@ export function RaceTable({ data }: RaceTableProps) {
                           onClick={() => {
                             if (i.row.original.race_type === "LaneRace") {
                               push(
-                                `/app/events/${eventId}/laneRace?raceId=${i.row.original.id}`,
+                                `/app/events/${eventId}/laneRace?raceId=${i.row.original.id}&roundIndex=0`,
                               );
                               return;
                             }
