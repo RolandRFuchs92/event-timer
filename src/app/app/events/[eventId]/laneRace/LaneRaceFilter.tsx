@@ -6,7 +6,7 @@ import TwDialog from "@/components/Dialog/Dialog";
 import { Button } from "@/components/FormElements/button";
 
 import { LaneRaceTile } from "./LaneRacerTile";
-import { deleteHeat, getLaneRace } from "./action";
+import { deleteRound, getLaneRace } from "./action";
 import { LaneNewRound } from "./LaneNewRound";
 import { useLaneRaceId } from "./hook";
 
@@ -28,7 +28,7 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
         `Really delete this ${i.name}? All containing data will be deleted.`
       }
       onYes={async (i) => {
-        const result = await deleteHeat({
+        const result = await deleteRound({
           race_id: raceId,
           heat_index: i.heat_index,
         });

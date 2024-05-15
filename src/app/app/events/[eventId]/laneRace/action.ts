@@ -3,13 +3,15 @@
 import { action } from "@/lib/safeAction";
 import {
   DeleteHeatSchema,
+  LaneCloseSchema,
+  LaneCompetitorHeatSchema,
   LaneCompetitorSchema,
   LaneRaceSchema,
   NewHeatSchema,
   NewRoundSchema,
 } from "./schema";
 import { _db } from "@/lib/db";
-import { max, omit, partialRight, uniqBy } from "lodash";
+import { max, omit, uniqBy } from "lodash";
 import { revalidatePath, unstable_noStore } from "next/cache";
 
 export const assignCompetitors = action(LaneRaceSchema, async () => {});
@@ -107,7 +109,7 @@ export const createNewRound = action(NewRoundSchema, async (data) => {
   };
 });
 
-export const deleteHeat = action(
+export const deleteRound = action(
   DeleteHeatSchema,
   async ({ heat_index, race_id }) => {
     if (heat_index === 0)
@@ -252,5 +254,94 @@ export const addLaneCompetitor = action(LaneCompetitorSchema, async (input) => {
   return {
     result,
     message: "Successfully added new participant",
+  };
+});
+
+export const startLaneRace = action(LaneCompetitorHeatSchema, async (input) => {
+  const race = await _db.races.findFirst({
+    where: {
+      id: input.race_id,
+    },
+  });
+
+  if (!race) throw new Error("Unable to find that race.");
+
+  const round = race.heat_containers[input.round_index];
+  if (!round) throw new Error("Unable to find that round.");
+
+  const heat = round.heats[input.heat_index];
+  heat.start_time = input.start_date;
+  if (!input.start_date) {
+    heat.is_closed = false;
+  }
+
+  const raceResult = await _db.races.update({
+    data: omit(race, "id"),
+    where: {
+      id: input.race_id,
+    },
+  });
+
+  revalidatePath("");
+
+  return {
+    message: input.start_date === null ? "Race reset" : `Race started!`,
+  };
+});
+
+export const closeLaneRace = action(LaneCloseSchema, async (input) => {
+  const race = await _db.races.findFirst({
+    where: {
+      id: input.race_id,
+    },
+  });
+
+  if (!race) throw new Error("Unable to find that race.");
+
+  const round = race.heat_containers[input.round_index];
+  if (!round) throw new Error("Unable to find that round.");
+
+  const heat = round.heats[input.heat_index];
+  heat.is_closed = true;
+
+  const result = await _db.races.update({
+    data: omit(race, "id"),
+    where: {
+      id: input.race_id,
+    },
+  });
+
+  revalidatePath("");
+  return {
+    result,
+    message: `Successfully closed heat ${input.heat_index + 1}`,
+  };
+});
+
+export const deleteHeat = action(LaneCloseSchema, async (input) => {
+  const race = await _db.races.findFirst({
+    where: {
+      id: input.race_id,
+    },
+  });
+
+  if (!race) throw new Error("Unable to find that race.");
+
+  const round = race.heat_containers[input.round_index];
+  if (!round) throw new Error("Unable to find that round.");
+
+  const [_] = round.heats.splice(input.heat_index, 1);
+
+  const result = await _db.races.update({
+    data: omit(race, "id"),
+    where: {
+      id: input.race_id,
+    },
+  });
+
+  revalidatePath("");
+  return {
+    result,
+    message: "Successfully deleted that heat.",
   };
 });

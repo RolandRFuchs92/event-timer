@@ -12,6 +12,8 @@ export function HeatDisplay({ laneRace }: HeatDisplayProps) {
   const heatIndex = useHeatIndexs();
   const heat = round.heats[heatIndex];
 
+  if (!heat) return null;
+
   const participantA = heat.participants[0];
   const participantB = heat.participants[1];
 
