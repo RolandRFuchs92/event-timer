@@ -43,3 +43,19 @@ export const LaneCompetitorHeatSchema = z.object({
   heat_index: z.coerce.number(),
   start_date: z.coerce.date().nullable()
 });
+
+export const FinishLaneRaceSchema = z.object({
+  race_id: z.string(),
+  round_index: z.number(),
+  heat_index: z.number(),
+  finish_date: z.coerce.date(),
+  participant_id: z.string()
+});
+
+export const HeatFormSchema = z.object({
+  race_id: z.string(),
+  round_index: z.number(),
+  heat_index: z.number(),
+  finish_date: z.coerce.date(),
+  participant_id: z.string()
+});

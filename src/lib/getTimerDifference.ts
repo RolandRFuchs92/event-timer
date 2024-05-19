@@ -2,6 +2,10 @@ import { differenceInMilliseconds } from "date-fns";
 
 export function getTimerDifference(startTime: Date, endTime: Date) {
   const diffMilliSeconds = differenceInMilliseconds(endTime, startTime);
+  return millisecondsToHumanFormat(diffMilliSeconds)
+}
+
+export function millisecondsToHumanFormat(diffMilliSeconds: number) {
   const diffSeconds = Math.floor(diffMilliSeconds / 1000);
 
   const milliSeconds = diffMilliSeconds % 1000;

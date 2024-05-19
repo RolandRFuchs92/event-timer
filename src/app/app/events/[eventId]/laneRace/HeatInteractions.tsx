@@ -1,6 +1,11 @@
 "use client";
 import React from "react";
-import { closeLaneRace, deleteHeat, getLaneRace, startLaneRace } from "./action";
+import {
+  closeLaneRace,
+  deleteHeat,
+  getLaneRace,
+  startLaneRace,
+} from "./action";
 import { useHeatIndexs, useLaneRaceId, useRoundIndex } from "./hook";
 import { Button } from "@/components/FormElements/button";
 import { timeOnly } from "@/lib/DateTimeUtils";
@@ -53,7 +58,7 @@ export function HeatInteractions({ laneRace }: HeatInteractionsProps) {
     const result = await deleteHeat({
       round_index: roundIndex,
       race_id: raceId,
-      heat_index: heatIndex
+      heat_index: heatIndex,
     });
 
     if (result.serverError) {
@@ -62,7 +67,7 @@ export function HeatInteractions({ laneRace }: HeatInteractionsProps) {
     }
 
     toast.success(result.data!.message);
-  }
+  };
 
   if (!heat) return null;
 
@@ -72,6 +77,10 @@ export function HeatInteractions({ laneRace }: HeatInteractionsProps) {
       <div>
         <h3>
           Start Time:{" "}
+          {heat.start_time ? timeOnly(heat.start_time) : "Not started"}
+        </h3>
+        <h3>
+          End Time:{" "}
           {heat.start_time ? timeOnly(heat.start_time) : "Not started"}
         </h3>
         <h3>Is Closed: {heat.is_closed ? "Yes" : "No"}</h3>

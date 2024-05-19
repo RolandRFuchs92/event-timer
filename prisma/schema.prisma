@@ -71,9 +71,17 @@ type heat_participant {
   index          Int
   participant_id String    @db.ObjectId
   name           String
-  is_winner      Boolean
+  status         ParticipantHeatStatus
   end_time       DateTime?
   total_time_ms  String?
+}
+
+enum ParticipantHeatStatus {
+  NotStarted
+  Winner
+  RunnerUp
+  Disqualified
+  DidNotFinish
 }
 
 model participant {

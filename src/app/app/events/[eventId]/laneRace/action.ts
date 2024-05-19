@@ -3,6 +3,7 @@
 import { action } from "@/lib/safeAction";
 import {
   DeleteHeatSchema,
+  FinishLaneRaceSchema,
   LaneCloseSchema,
   LaneCompetitorHeatSchema,
   LaneCompetitorSchema,
@@ -13,6 +14,11 @@ import {
 import { _db } from "@/lib/db";
 import { max, omit, uniqBy } from "lodash";
 import { revalidatePath, unstable_noStore } from "next/cache";
+import {
+  getTimerDifference,
+  millisecondsToHumanFormat,
+} from "@/lib/getTimerDifference";
+import { differenceInMilliseconds } from "date-fns";
 
 export const assignCompetitors = action(LaneRaceSchema, async () => {});
 
@@ -343,5 +349,126 @@ export const deleteHeat = action(LaneCloseSchema, async (input) => {
   return {
     result,
     message: "Successfully deleted that heat.",
+  };
+});
+
+export const finishLaneRace = action(FinishLaneRaceSchema, async (input) => {
+  const currentRace = await _db.races.findFirst({
+    where: {
+      id: input.race_id,
+    },
+  });
+
+  if (!currentRace) throw new Error("Unable to find that race.");
+
+  const heat =
+    currentRace.heat_containers[input.round_index].heats[input.heat_index];
+
+  const thisParticipantData = heat.participants.find(
+    (i) => i.participant_id === input.participant_id,
+  );
+
+  if (!thisParticipantData)
+    throw new Error("Unable to find that participant for that heat.");
+
+  const competitorData = heat.participants.find(
+    (i) => i.participant_id !== input.participant_id,
+  );
+  console.log(competitorData);
+
+  let isWinner = competitorData === null;
+  if (competitorData?.end_time === null) isWinner = true;
+  else
+    isWinner =
+      (thisParticipantData?.end_time ?? 0) < (competitorData?.end_time ?? 0);
+
+  let timeTakenMs = 0;
+  if (heat.start_time) {
+    timeTakenMs = differenceInMilliseconds(input.finish_date, heat.start_time);
+  }
+
+  const thisCompetitorStuff = await _db.races.update({
+    data: {
+      heat_containers: {
+        updateMany: {
+          data: {
+            heats: {
+              updateMany: {
+                data: {
+                  participants: {
+                    updateMany: {
+                      data: {
+                        end_time: input.finish_date,
+                        total_time_ms: timeTakenMs.toString(),
+                        is_winner: isWinner,
+                      },
+                      where: {
+                        participant_id: input.participant_id,
+                      },
+                    },
+                  },
+                },
+                where: {
+                  index: input.heat_index,
+                },
+              },
+            },
+          },
+          where: {
+            heat_index: input.round_index,
+          },
+        },
+      },
+    },
+    where: {
+      id: input.race_id,
+    },
+  });
+
+  if (competitorData)
+    await _db.races.update({
+      data: {
+        heat_containers: {
+          updateMany: {
+            data: {
+              heats: {
+                updateMany: {
+                  data: {
+                    participants: {
+                      updateMany: {
+                        data: {
+                          is_winner: !isWinner,
+                        },
+                        where: {
+                          participant_id: competitorData.participant_id,
+                        },
+                      },
+                    },
+                  },
+                  where: {
+                    index: input.heat_index,
+                  },
+                },
+              },
+            },
+            where: {
+              heat_index: input.round_index,
+            },
+          },
+        },
+      },
+      where: {
+        id: input.race_id,
+      },
+    });
+
+  revalidatePath("");
+  const message =
+    heat.start_time === null
+      ? `Race finishing time logged, but the heat was not started.`
+      : `Racer finishing time was ${millisecondsToHumanFormat(timeTakenMs)}`;
+
+  return {
+    message: message,
   };
 });
