@@ -1,7 +1,8 @@
 import React from "react";
 import { getLaneRace } from "./action";
 import { TrashIcon } from "@/components/Icons/TrashIcon";
-import { useSetRoundIndex } from "./hook";
+import { useRoundIndex, useSetRoundIndex } from "./hook";
+import { cn } from "@/lib/styles";
 
 type T = NonNullable<
   Awaited<ReturnType<typeof getLaneRace>>["data"]
@@ -13,12 +14,20 @@ interface LaneRacerTileProps {
 }
 
 export function LaneRaceTile({ heat_container, onDelete }: LaneRacerTileProps) {
+  const roundIndex = useRoundIndex();
   const setRoundIndex = useSetRoundIndex();
 
   return (
-    <div className="flex flex-row items-center justify-between gap-2 [&_b]:hover:font-extrabold">
+    <div
+      className={cn(
+        "flex flex-row items-center justify-between gap-2 [&_b]:hover:font-extrabold",
+      )}
+    >
       <div
-        className="flex grow cursor-pointer flex-row items-center gap-2 rounded-md border border-white bg-black p-2"
+        className={cn(
+          "flex grow cursor-pointer flex-row items-center gap-2 rounded-md border border-white bg-black p-2",
+          heat_container.heat_index === roundIndex ? "bg-white text-black" : "",
+        )}
         onClick={() => setRoundIndex(heat_container.heat_index)}
       >
         <div className="flex flex-col gap-2">
