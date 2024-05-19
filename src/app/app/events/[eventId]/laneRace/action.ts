@@ -89,7 +89,6 @@ export const createNewRound = action(NewRoundSchema, async (data) => {
 
   const newRace = await _db.races.update({
     data: {
-      ...omit(race, "id"),
       heat_containers: [
         ...race.heat_containers,
         {
@@ -186,7 +185,18 @@ export const createNewHeat = action(
     });
 
     await _db.races.update({
-      data: omit(race, "id"),
+      data: {
+        heat_containers: {
+          updateMany: {
+            data: {
+              heats: round.heats
+            },
+            where: {
+              heat_index: heat_index
+            }
+          }
+        }
+      },
       where: {
         id: race_id,
       },
@@ -256,8 +266,29 @@ export const addLaneCompetitor = action(LaneCompetitorSchema, async (input) => {
     0,
     2,
   );
+
   const result = await _db.races.update({
-    data: omit(race, "id"),
+    data: {
+      heat_containers: {
+        updateMany: {
+          where: {
+            heat_index: input.round_index
+          },
+          data: {
+            heats: {
+              updateMany: {
+                data: {
+                  participants: heatRef.participants
+                },
+                where: {
+                  index: input.heat_index
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     where: {
       id: race.id,
     },
@@ -368,10 +399,24 @@ export const deleteHeat = action(LaneCloseSchema, async (input) => {
   const round = race.heat_containers[input.round_index];
   if (!round) throw new Error("Unable to find that round.");
 
-  const [_] = round.heats.splice(input.heat_index, 1);
-
   const result = await _db.races.update({
-    data: omit(race, "id"),
+    data: {
+      heat_containers: {
+        updateMany: {
+          data: {
+            heats: round.heats
+              .filter((i) => i.index !== input.heat_index)
+              .map((i, heatIndex) => ({
+                ...i,
+                index: heatIndex,
+              })),
+          },
+          where: {
+            heat_index: input.round_index,
+          },
+        },
+      },
+    },
     where: {
       id: input.race_id,
     },
