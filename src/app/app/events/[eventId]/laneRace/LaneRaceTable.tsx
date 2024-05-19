@@ -15,11 +15,7 @@ export function LaneRaceTable({ laneRace }: LaneRaceTableProps) {
       <React.Suspense fallback="Loading...">
         <LaneRaceContainer laneRace={laneRace} />
       </React.Suspense>
-      {
-        laneRace
-          ? <LaneHeat laneRace={laneRace} />
-          : null
-      }
+      {laneRace ? <LaneHeat laneRace={laneRace} /> : null}
     </div>
   );
 }

@@ -1,9 +1,18 @@
 "use server";
 
+import { differenceInMilliseconds } from "date-fns";
+import { revalidatePath, unstable_noStore } from "next/cache";
+import { max, omit, uniqBy } from "lodash";
+import { ParticipantHeatStatusEnum } from "@prisma/client";
+
 import { action } from "@/lib/safeAction";
+import { _db } from "@/lib/db";
+import { millisecondsToHumanFormat } from "@/lib/getTimerDifference";
+
 import {
   DeleteHeatSchema,
   FinishLaneRaceSchema,
+  HeatParticipantSchema,
   LaneCloseSchema,
   LaneCompetitorHeatSchema,
   LaneCompetitorSchema,
@@ -11,16 +20,8 @@ import {
   NewHeatSchema,
   NewRoundSchema,
 } from "./schema";
-import { _db } from "@/lib/db";
-import { max, omit, uniqBy } from "lodash";
-import { revalidatePath, unstable_noStore } from "next/cache";
-import {
-  getTimerDifference,
-  millisecondsToHumanFormat,
-} from "@/lib/getTimerDifference";
-import { differenceInMilliseconds } from "date-fns";
 
-export const assignCompetitors = action(LaneRaceSchema, async () => {});
+export const assignCompetitors = action(LaneRaceSchema, async () => { });
 
 export const getQualifierCompetitors = action(
   LaneRaceSchema,
@@ -132,19 +133,25 @@ export const deleteRound = action(
     if (!race) throw new Error("Unable to find that race.");
 
     let heatName = "";
-    const newRace = {
-      ...omit(race, "id"),
-      heat_containers: race.heat_containers.filter((i) => {
+    const rounds = race.heat_containers
+      .filter((i) => {
         if (i.heat_index === heat_index) {
           heatName = i.name;
           return false;
         }
         return true;
-      }),
-    };
+      })
+      .map((data, index) => {
+        return {
+          ...data,
+          heat_index: index,
+        };
+      });
 
     await _db.races.update({
-      data: newRace,
+      data: {
+        heat_containers: rounds,
+      },
       where: {
         id: race_id,
       },
@@ -238,7 +245,7 @@ export const addLaneCompetitor = action(LaneCompetitorSchema, async (input) => {
 
   participants.unshift({
     participant_id: input.participant_id,
-    is_winner: false,
+    status: ParticipantHeatStatusEnum.NotStarted,
     name: `${participant.first_name} ${participant.last_name} [${participant.race_number}]`,
     index: 0,
     end_time: null,
@@ -276,13 +283,37 @@ export const startLaneRace = action(LaneCompetitorHeatSchema, async (input) => {
   if (!round) throw new Error("Unable to find that round.");
 
   const heat = round.heats[input.heat_index];
-  heat.start_time = input.start_date;
-  if (!input.start_date) {
-    heat.is_closed = false;
-  }
+  const newParticipants = heat.participants.map((i) => ({
+    ...i,
+    status: null,
+    end_time: null,
+    total_time_ms: null,
+  }));
 
   const raceResult = await _db.races.update({
-    data: omit(race, "id"),
+    data: {
+      heat_containers: {
+        updateMany: {
+          data: {
+            heats: {
+              updateMany: {
+                data: {
+                  is_closed: false,
+                  start_time: input.start_date,
+                  participants: newParticipants,
+                },
+                where: {
+                  index: input.heat_index,
+                },
+              },
+            },
+          },
+          where: {
+            heat_index: input.round_index,
+          },
+        },
+      },
+    },
     where: {
       id: input.race_id,
     },
@@ -330,6 +361,7 @@ export const deleteHeat = action(LaneCloseSchema, async (input) => {
       id: input.race_id,
     },
   });
+  console.log(input);
 
   if (!race) throw new Error("Unable to find that race.");
 
@@ -368,23 +400,31 @@ export const finishLaneRace = action(FinishLaneRaceSchema, async (input) => {
     (i) => i.participant_id === input.participant_id,
   );
 
+  let timeTakenMs = 0;
+  if (heat.start_time) {
+    timeTakenMs = differenceInMilliseconds(input.finish_date, heat.start_time);
+  }
   if (!thisParticipantData)
     throw new Error("Unable to find that participant for that heat.");
+
+  if (thisParticipantData.status !== null) {
+    return {
+      message: "A time was already captured for this competitor.",
+    };
+  }
 
   const competitorData = heat.participants.find(
     (i) => i.participant_id !== input.participant_id,
   );
-  console.log(competitorData);
 
-  let isWinner = competitorData === null;
-  if (competitorData?.end_time === null) isWinner = true;
-  else
-    isWinner =
-      (thisParticipantData?.end_time ?? 0) < (competitorData?.end_time ?? 0);
-
-  let timeTakenMs = 0;
-  if (heat.start_time) {
-    timeTakenMs = differenceInMilliseconds(input.finish_date, heat.start_time);
+  let participantStatusEnum: ParticipantHeatStatusEnum | null = null;
+  if (competitorData?.total_time_ms === null) {
+    participantStatusEnum = ParticipantHeatStatusEnum.Winner;
+  } else {
+    participantStatusEnum =
+      timeTakenMs < +(competitorData?.total_time_ms ?? 0)
+        ? ParticipantHeatStatusEnum.Winner
+        : ParticipantHeatStatusEnum.RunnerUp;
   }
 
   const thisCompetitorStuff = await _db.races.update({
@@ -395,12 +435,13 @@ export const finishLaneRace = action(FinishLaneRaceSchema, async (input) => {
             heats: {
               updateMany: {
                 data: {
+                  is_closed: competitorData?.status !== null,
                   participants: {
                     updateMany: {
                       data: {
                         end_time: input.finish_date,
                         total_time_ms: timeTakenMs.toString(),
-                        is_winner: isWinner,
+                        status: participantStatusEnum,
                       },
                       where: {
                         participant_id: input.participant_id,
@@ -425,8 +466,42 @@ export const finishLaneRace = action(FinishLaneRaceSchema, async (input) => {
     },
   });
 
-  if (competitorData)
-    await _db.races.update({
+  revalidatePath("");
+  const message =
+    heat.start_time === null
+      ? `Race finishing time logged, but the heat was not started.`
+      : `Racer finishing time was ${millisecondsToHumanFormat(timeTakenMs)}`;
+
+  return {
+    message: message,
+  };
+});
+
+export const editHeatParticipant = action(
+  HeatParticipantSchema,
+  async (input) => {
+    const currentRace = await _db.races.findFirst({
+      where: {
+        id: input.race_id,
+      },
+    });
+
+    if (!currentRace) throw new Error("Unable to find that race.");
+
+    const heat =
+      currentRace.heat_containers[input.round_index].heats[input.heat_index];
+
+    const thisParticipantData = heat.participants.find(
+      (i) => i.participant_id === input.participant_id,
+    );
+
+    const endTime = new Date(`${new Date().toDateString()} ${input.end_time}`);
+    let timeTakenMs = 0;
+    if (heat.start_time) {
+      timeTakenMs = differenceInMilliseconds(endTime!, heat.start_time);
+    }
+
+    const thisCompetitorStuff = await _db.races.update({
       data: {
         heat_containers: {
           updateMany: {
@@ -437,10 +512,12 @@ export const finishLaneRace = action(FinishLaneRaceSchema, async (input) => {
                     participants: {
                       updateMany: {
                         data: {
-                          is_winner: !isWinner,
+                          end_time: endTime,
+                          total_time_ms: timeTakenMs.toString(),
+                          status: input.status,
                         },
                         where: {
-                          participant_id: competitorData.participant_id,
+                          participant_id: input.participant_id,
                         },
                       },
                     },
@@ -462,13 +539,10 @@ export const finishLaneRace = action(FinishLaneRaceSchema, async (input) => {
       },
     });
 
-  revalidatePath("");
-  const message =
-    heat.start_time === null
-      ? `Race finishing time logged, but the heat was not started.`
-      : `Racer finishing time was ${millisecondsToHumanFormat(timeTakenMs)}`;
+    revalidatePath("");
 
-  return {
-    message: message,
-  };
-});
+    return {
+      message: "Successfully updated that participant!",
+    };
+  },
+);

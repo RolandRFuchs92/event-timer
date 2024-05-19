@@ -21,8 +21,7 @@ export function Dropdown<T>({
   name,
   ...props
 }: DropdownProps<T>) {
-  console.log("options");
-  console.log(options);
+
   return (
     <Controller
       name={name!}

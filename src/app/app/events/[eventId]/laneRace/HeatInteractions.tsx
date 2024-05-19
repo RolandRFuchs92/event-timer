@@ -6,11 +6,17 @@ import {
   getLaneRace,
   startLaneRace,
 } from "./action";
-import { useHeatIndexs, useLaneRaceId, useRoundIndex } from "./hook";
+import {
+  useHeatIndexs,
+  useLaneRaceId,
+  useRoundIndex,
+  useSetHeatIndex,
+} from "./hook";
 import { Button } from "@/components/FormElements/button";
 import { timeOnly } from "@/lib/DateTimeUtils";
 import toast from "react-hot-toast";
 import TwDialog from "@/components/Dialog/Dialog";
+import { BatchElapsedTime } from "@/components/time/TimeElapsed";
 
 interface HeatInteractionsProps {
   laneRace: Awaited<ReturnType<typeof getLaneRace>>["data"];
@@ -19,9 +25,12 @@ interface HeatInteractionsProps {
 export function HeatInteractions({ laneRace }: HeatInteractionsProps) {
   const raceId = useLaneRaceId();
   const roundIndex = useRoundIndex();
+  const setHeatIndex = useSetHeatIndex();
   const round = laneRace!.heat_containers[roundIndex];
   const heatIndex = useHeatIndexs();
-  const heat = round.heats[heatIndex];
+  const heat = round?.heats[heatIndex];
+
+  if (!heat) return null;
 
   const handleStartClick = async (startDate: Date | null) => {
     const result = await startLaneRace({
@@ -66,6 +75,7 @@ export function HeatInteractions({ laneRace }: HeatInteractionsProps) {
       return;
     }
 
+    setHeatIndex(null);
     toast.success(result.data!.message);
   };
 
@@ -79,10 +89,9 @@ export function HeatInteractions({ laneRace }: HeatInteractionsProps) {
           Start Time:{" "}
           {heat.start_time ? timeOnly(heat.start_time) : "Not started"}
         </h3>
-        <h3>
-          End Time:{" "}
-          {heat.start_time ? timeOnly(heat.start_time) : "Not started"}
-        </h3>
+        <div>
+          Elapsed Time: <BatchElapsedTime startTime={heat.start_time} />
+        </div>
         <h3>Is Closed: {heat.is_closed ? "Yes" : "No"}</h3>
       </div>
       <div className="grid grid-cols-2 gap-2">

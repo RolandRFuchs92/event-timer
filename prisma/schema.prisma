@@ -71,12 +71,12 @@ type heat_participant {
   index          Int
   participant_id String    @db.ObjectId
   name           String
-  status         ParticipantHeatStatus
+  status         ParticipantHeatStatusEnum?
   end_time       DateTime?
   total_time_ms  String?
 }
 
-enum ParticipantHeatStatus {
+enum ParticipantHeatStatusEnum {
   NotStarted
   Winner
   RunnerUp

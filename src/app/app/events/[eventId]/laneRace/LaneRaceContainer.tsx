@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
+import toast from "react-hot-toast";
 
 import { addLaneCompetitor, getLaneRace } from "./action";
 import { useHeatIndexs, useLaneRaceId, useRoundIndex } from "./hook";
 import { HeatFilter } from "./HeatFilter";
-import toast from "react-hot-toast";
 
 export type LaneRaceType = NonNullable<
   Awaited<ReturnType<typeof getLaneRace>>["data"]
@@ -38,7 +38,8 @@ function AllParticipants({ round }: AllParticipantsProps) {
   const roundIndex = useRoundIndex();
   const heatIndex = useHeatIndexs();
   const raceId = useLaneRaceId();
-  const participants = round.all_participants;
+  const participants = round?.all_participants;
+  if (!participants) return null;
 
   const handleParticipantAdd = async (participantId: string) => {
     const result = await addLaneCompetitor({
@@ -60,29 +61,28 @@ function AllParticipants({ round }: AllParticipantsProps) {
     <div>
       <h3 className="font-bold">Competitors</h3>
       <ul className="flex w-64 flex-col gap-2">
-        {participants
-          .map((i) => {
-            const currentHeat = round.heats.find((r) =>
-              r.participants.some((p) => p.participant_id === i.id),
-            );
+        {participants.map((i) => {
+          const currentHeat = round.heats.find((r) =>
+            r.participants.some((p) => p.participant_id === i.id),
+          );
 
-            return (
-              <li
-                key={i.id}
-                className="cursor-pointer rounded-md border border-white p-2 text-xs hover:font-extrabold"
-                onClick={() => handleParticipantAdd(i.id)}
-              >
-                <p>
-                  {i.first_name} {i.last_name} [{i.race_number}]
-                </p>
-                <sub>
-                  {currentHeat
-                    ? `Heat ${currentHeat!.index + 1}`
-                    : `Not assigned to a heat yet.`}
-                </sub>
-              </li>
-            );
-          })}
+          return (
+            <li
+              key={i.id}
+              className="cursor-pointer rounded-md border border-white p-2 text-xs hover:font-extrabold"
+              onClick={() => handleParticipantAdd(i.id)}
+            >
+              <p>
+                {i.first_name} {i.last_name} [{i.race_number}]
+              </p>
+              <sub>
+                {currentHeat
+                  ? `Heat ${currentHeat!.index + 1}`
+                  : `Not assigned to a heat yet.`}
+              </sub>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

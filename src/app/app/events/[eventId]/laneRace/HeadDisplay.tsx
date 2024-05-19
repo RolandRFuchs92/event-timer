@@ -1,11 +1,14 @@
 import React from "react";
-import { finishLaneRace, getLaneRace } from "./action";
-import { useHeatIndexs, useRoundIndex } from "./hook";
-import { Button } from "@/components/FormElements/button";
 import toast from "react-hot-toast";
+
+import { Button } from "@/components/FormElements/button";
 import { timeOnly } from "@/lib/DateTimeUtils";
 import { millisecondsToHumanFormat } from "@/lib/getTimerDifference";
 import TwDialog from "@/components/Dialog/Dialog";
+
+import { finishLaneRace, getLaneRace } from "./action";
+import { useHeatIndexs, useRoundIndex } from "./hook";
+import { HeatForm } from "./HeatForm";
 
 interface HeatDisplayProps {
   laneRace: Awaited<ReturnType<typeof getLaneRace>>["data"];
@@ -15,7 +18,7 @@ export function HeatDisplay({ laneRace }: HeatDisplayProps) {
   const roundIndex = useRoundIndex();
   const round = laneRace!.heat_containers[roundIndex];
   const heatIndex = useHeatIndexs();
-  const heat = round.heats[heatIndex];
+  const heat = round?.heats[heatIndex];
 
   if (!heat) return null;
 
@@ -44,10 +47,10 @@ export function HeatDisplay({ laneRace }: HeatDisplayProps) {
 
 interface DisplayParticipantProps {
   participant:
-  | NonNullable<
-    HeatDisplayProps["laneRace"]
-  >["heat_containers"][0]["heats"][0]["participants"][0]
-  | null;
+    | NonNullable<
+        HeatDisplayProps["laneRace"]
+      >["heat_containers"][0]["heats"][0]["participants"][0]
+    | null;
   title: string;
   race_id: string;
   round_index: number;
@@ -80,39 +83,51 @@ function DisplayParticipant({
 
   return (
     <TwDialog<NonNullable<typeof participant>>
-      title={i => `Edit ${participant?.name ?? (`${title} details`)}`}
-      body={null}
-      onYes={async () => { }}
+      title={(i) => `Edit ${participant?.name ?? `${title} details`}`}
+      body={<HeatForm participant={participant!} />}
+      onYes={async () => {}}
       disableButtons
     >
       {(setData, toggle) => {
-        return <div className="rounded-md border border-white p-2">
-          <b>{title}</b>
-          {participant ? (
-            <div>
-              <b>{participant.name}</b>
+        return (
+          <div className="rounded-md border border-white p-2">
+            <b>{title}</b>
+            {participant ? (
               <div>
-                Finish Time:{" "}
-                {participant.end_time
-                  ? timeOnly(participant.end_time)
-                  : "Not finished"}
+                <b>{participant.name}</b>
+                <div>
+                  Finish Time:{" "}
+                  {participant.end_time
+                    ? timeOnly(participant.end_time)
+                    : "Not finished"}
+                </div>
+                <div>Status: {participant.status}</div>
+                <div>
+                  Time Taken:{" "}
+                  {participant.total_time_ms
+                    ? millisecondsToHumanFormat(+participant.total_time_ms)
+                    : "Not finished"}
+                </div>
+                <div className="flex grow flex-row gap-2">
+                  <Button
+                    label="Finish"
+                    onClick={handleStop}
+                    disabled={participant.status !== null}
+                  />
+                  <Button
+                    label="Edit"
+                    onClick={() => {
+                      setData(participant);
+                      toggle();
+                    }}
+                  />
+                </div>
               </div>
-              <div>Status: {participant.is_winner ? "Win" : "Lose"}</div>
-              <div>
-                Time Taken:{" "}
-                {participant.total_time_ms
-                  ? millisecondsToHumanFormat(+participant.total_time_ms)
-                  : "Not finished"}
-              </div>
-              <div className="flex grow flex-row gap-2">
-                <Button label="Finish" onClick={handleStop} />
-                <Button label="Edit" onClick={() => setData(participant)} />
-              </div>
-            </div>
-          ) : (
-            "No participant Set"
-          )}
-        </div>
+            ) : (
+              "No participant Set"
+            )}
+          </div>
+        );
       }}
     </TwDialog>
   );

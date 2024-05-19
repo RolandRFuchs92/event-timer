@@ -26,7 +26,7 @@ export function useSetRoundIndex() {
 
 export function useRoundIndex() {
   const searchParams = useSearchParams();
-  const roundIndex = searchParams.get('roundIndex');
+  const roundIndex = searchParams.get("roundIndex");
 
   if (!roundIndex) return 0;
   return +roundIndex;
@@ -37,12 +37,14 @@ export function useSetHeatIndex() {
   const { replace } = useRouter();
   const pathname = usePathname();
 
-  function handleSetHeatIndex(index: number) {
+  function handleSetHeatIndex(heatIndex: number | null) {
     const newSearchParams = new URLSearchParams();
     newSearchParams.set("raceId", searchParams.get("raceId")!);
     newSearchParams.set("roundIndex", searchParams.get("roundIndex")!);
-    newSearchParams.set("heatIndex", index.toString());
-    const newUrl = `${pathname}?${newSearchParams.toString()}`
+    if (heatIndex)
+      newSearchParams.set("heatIndex", heatIndex.toString());
+
+    const newUrl = `${pathname}?${newSearchParams.toString()}`;
     replace(newUrl);
   }
 

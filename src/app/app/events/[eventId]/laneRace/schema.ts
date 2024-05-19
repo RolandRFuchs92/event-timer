@@ -1,3 +1,4 @@
+import { ParticipantHeatStatusEnum } from "@prisma/client";
 import z from "zod";
 
 export const LaneRaceSchema = z.object({
@@ -41,7 +42,7 @@ export const LaneCompetitorHeatSchema = z.object({
   race_id: z.string(),
   round_index: z.number(),
   heat_index: z.coerce.number(),
-  start_date: z.coerce.date().nullable()
+  start_date: z.coerce.date().nullable(),
 });
 
 export const FinishLaneRaceSchema = z.object({
@@ -49,7 +50,7 @@ export const FinishLaneRaceSchema = z.object({
   round_index: z.number(),
   heat_index: z.number(),
   finish_date: z.coerce.date(),
-  participant_id: z.string()
+  participant_id: z.string(),
 });
 
 export const HeatFormSchema = z.object({
@@ -57,5 +58,14 @@ export const HeatFormSchema = z.object({
   round_index: z.number(),
   heat_index: z.number(),
   finish_date: z.coerce.date(),
-  participant_id: z.string()
+  participant_id: z.string(),
+});
+
+export const HeatParticipantSchema = z.object({
+  race_id: z.string(),
+  round_index: z.number(),
+  heat_index: z.number(),
+  end_time: z.string().nullable(),
+  participant_id: z.string(),
+  status: z.nativeEnum(ParticipantHeatStatusEnum),
 });

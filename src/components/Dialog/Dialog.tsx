@@ -72,7 +72,11 @@ export default function TwDialog<T extends object>({
                             {typeof title === "function" ? title(data) : title}
                           </Dialog.Title>
                           <div className="mt-2">
-                            {typeof body === "function" ? body(data, () => setOpen(i => !i)) : body}
+                            {typeof body === "function"
+                              ? body(data, () => setOpen((i) => !i))
+                              : !body
+                                ? null
+                                : body}
                           </div>
                         </div>
                       </div>
