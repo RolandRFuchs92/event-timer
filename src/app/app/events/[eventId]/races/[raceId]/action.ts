@@ -44,7 +44,6 @@ export const mutateRace = action(RaceSchema, async ({ id, ...rawRace }) => {
       {
         name: "Qualifier",
         heats: [],
-        is_closed: false,
         round_index: 0,
         is_qualifier: true,
         all_participant_ids: [],
@@ -52,7 +51,7 @@ export const mutateRace = action(RaceSchema, async ({ id, ...rawRace }) => {
     ]
     : [];
 
-  const batches: Omit<races, "id">["batches"] = isLaneRace
+  const batches: Omit<races, "id">["batches"] = !isLaneRace
     ? rawRace.batches.map((i) => ({
       ...i,
       batch_id: newObjectId().toString(),
@@ -66,6 +65,7 @@ export const mutateRace = action(RaceSchema, async ({ id, ...rawRace }) => {
     rounds: heatContainers,
     batches,
   };
+  console.log(batches);
 
   const result = await _db.races.create({
     data: race,
