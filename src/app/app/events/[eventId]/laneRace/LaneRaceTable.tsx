@@ -1,5 +1,6 @@
 import React from "react";
-import { LaneRaceContainer } from "./LaneRaceContainer";
+
+import { RoundColumn } from "./RoundColumn";
 import { getLaneRace } from "./action";
 import { LaneRaceFilter } from "./LaneRaceFilter";
 import { LaneHeat } from "./LaneHeat";
@@ -13,7 +14,7 @@ export function LaneRaceTable({ laneRace }: LaneRaceTableProps) {
     <div className="grid grid-cols-3 gap-4">
       <LaneRaceFilter laneRace={laneRace} />
       <React.Suspense fallback="Loading...">
-        <LaneRaceContainer laneRace={laneRace} />
+        <RoundColumn laneRace={laneRace} />
       </React.Suspense>
       {laneRace ? <LaneHeat laneRace={laneRace} /> : null}
     </div>

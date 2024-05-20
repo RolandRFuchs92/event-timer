@@ -89,9 +89,11 @@ export function HeatInteractions({ laneRace }: HeatInteractionsProps) {
           Start Time:{" "}
           {heat.start_time ? timeOnly(heat.start_time) : "Not started"}
         </h3>
-        <div>
-          Elapsed Time: <BatchElapsedTime startTime={heat.start_time} />
-        </div>
+        {heat.is_closed === false ? (
+          <div>
+            Elapsed Time: <BatchElapsedTime startTime={heat.start_time} />
+          </div>
+        ) : null}
         <h3>Is Closed: {heat.is_closed ? "Yes" : "No"}</h3>
       </div>
       <div className="grid grid-cols-2 gap-2">

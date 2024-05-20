@@ -20,6 +20,7 @@ import {
   MoveWinersSchema,
   NewHeatSchema,
   NewRoundSchema,
+  RemoveCompetitorSchema,
 } from "./schema";
 
 export const assignCompetitors = action(LaneRaceSchema, async () => {});
@@ -657,3 +658,48 @@ export const getWinnersFrom = action(MoveWinersSchema, async (input) => {
     message: `Successfully moved ${newParticipantCount} participants to ${thisRound.name}`,
   };
 });
+
+export const removeCompetitorFromPool = action(
+  RemoveCompetitorSchema,
+  async (input) => {
+    const race = await _db.races.findFirst({
+      where: {
+        id: input.race_id,
+      },
+    });
+
+    if (!race) throw new Error("Unable to find that race.");
+
+    const round = race.heat_containers[input.round_index];
+
+    if (!round) throw new Error("Unable to find that round.");
+
+    const newParticipantIds = round.all_participant_ids.filter(
+      (i) => i !== input.participant_id,
+    );
+
+    await _db.races.update({
+      data: {
+        heat_containers: {
+          updateMany: {
+            data: {
+              all_participant_ids: newParticipantIds,
+            },
+            where: {
+              heat_index: input.round_index,
+            },
+          },
+        },
+      },
+      where: {
+        id: input.race_id,
+      },
+    });
+
+    revalidatePath("");
+
+    return {
+      message: "Successfully removed that competitor",
+    };
+  },
+);

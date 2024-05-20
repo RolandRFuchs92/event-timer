@@ -74,3 +74,9 @@ export const MoveWinersSchema = z.object({
   race_id: z.string(),
   round_index: z.number()
 });
+
+export const RemoveCompetitorSchema = z.object({
+  race_id: z.string(),
+  round_index: z.number(),
+  participant_id: z.string()
+});
