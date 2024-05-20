@@ -1,10 +1,7 @@
-'use client';
-
 import { ObjectId } from "bson";
 import { snakeCase, startCase } from "lodash";
 
 export function enumToOptions(enumerable: object) {
-  console.log(enumerable);
   if (!enumerable) return [];
 
   return Object.keys(enumerable).map((i) => ({

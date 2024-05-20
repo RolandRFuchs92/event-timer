@@ -11,14 +11,14 @@ export const NewRoundSchema = z.object({
   race_id: z.string(),
 });
 
-export const DeleteHeatSchema = z.object({
-  heat_index: z.coerce.number(),
+export const DeleteRoundSchema = z.object({
+  round_index: z.coerce.number(),
   race_id: z.string(),
 });
 
 export const NewHeatSchema = z.object({
   race_id: z.coerce.string(),
-  heat_index: z.coerce.number(),
+  round_index: z.coerce.number(),
 });
 
 export const HeatFilterSchema = z.object({

@@ -21,7 +21,7 @@ import { timeOnly } from "@/lib/DateTimeUtils";
 interface HeatFormProps {
   participant: NonNullable<
     Awaited<ReturnType<typeof getLaneRace>>["data"]
-  >["heat_containers"][0]["heats"][0]["participants"][0];
+  >["rounds"][0]["heats"][0]["participants"][0];
 }
 
 export function HeatForm({ participant }: HeatFormProps) {

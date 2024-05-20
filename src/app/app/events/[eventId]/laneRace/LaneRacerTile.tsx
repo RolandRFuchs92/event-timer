@@ -6,14 +6,14 @@ import { cn } from "@/lib/styles";
 
 type T = NonNullable<
   Awaited<ReturnType<typeof getLaneRace>>["data"]
->["heat_containers"][0];
+>["rounds"][0];
 
 interface LaneRacerTileProps {
-  heat_container: T;
+  round: T;
   onDelete: (data: T) => Promise<void>;
 }
 
-export function LaneRaceTile({ heat_container, onDelete }: LaneRacerTileProps) {
+export function LaneRaceTile({ round, onDelete }: LaneRacerTileProps) {
   const roundIndex = useRoundIndex();
   const setRoundIndex = useSetRoundIndex();
 
@@ -26,17 +26,17 @@ export function LaneRaceTile({ heat_container, onDelete }: LaneRacerTileProps) {
       <div
         className={cn(
           "flex grow cursor-pointer flex-row items-center gap-2 rounded-md border border-white bg-black p-2",
-          heat_container.heat_index === roundIndex ? "bg-white text-black" : "",
+          round.round_index === roundIndex ? "bg-white text-black" : "",
         )}
-        onClick={() => setRoundIndex(heat_container.heat_index)}
+        onClick={() => setRoundIndex(round.round_index)}
       >
         <div className="flex flex-col gap-2">
-          <b className="text-xs">{heat_container.name}</b>
+          <b className="text-xs">{round.name}</b>
         </div>
       </div>
       <TrashIcon
         className="h-7 w-7 cursor-pointer transition-all duration-150 hover:stroke-primary"
-        onClick={() => onDelete(heat_container)}
+        onClick={() => onDelete(round)}
       />
     </div>
   );

@@ -3,14 +3,14 @@
 import { differenceInMilliseconds } from "date-fns";
 import { revalidatePath, unstable_noStore } from "next/cache";
 import { max, omit, uniqBy } from "lodash";
-import { ParticipantHeatStatusEnum } from "@prisma/client";
+import { ParticipantHeatStatusEnum, round } from "@prisma/client";
 
 import { action } from "@/lib/safeAction";
 import { _db } from "@/lib/db";
 import { millisecondsToHumanFormat } from "@/lib/getTimerDifference";
 
 import {
-  DeleteHeatSchema,
+  DeleteRoundSchema,
   FinishLaneRaceSchema,
   HeatParticipantSchema,
   LaneCloseSchema,
@@ -23,7 +23,7 @@ import {
   RemoveCompetitorSchema,
 } from "./schema";
 
-export const assignCompetitors = action(LaneRaceSchema, async () => {});
+export const assignCompetitors = action(LaneRaceSchema, async () => { });
 
 export const getQualifierCompetitors = action(
   LaneRaceSchema,
@@ -56,25 +56,23 @@ export const getLaneRace = action(LaneRaceSchema, async ({ raceId }) => {
   const participants = await _db.participant.findMany({
     where: {
       id: {
-        in: race.heat_containers[0].all_participant_ids.map((i) => i),
+        in: race.rounds[0].all_participant_ids.map((i) => i),
       },
     },
   });
 
   const finalRace = {
     ...omit(race, "batches"),
-    heat_containers: race.heat_containers.map(
-      ({ all_participant_ids, ...i }) => {
-        return {
-          ...i,
-          all_participants: participants
-            .filter((i) => all_participant_ids.some((ap) => ap === i.id))
-            .map(({ batches, races, ...p }) => {
-              return p;
-            }),
-        };
-      },
-    ),
+    rounds: race.rounds.map(({ all_participant_ids, ...i }) => {
+      return {
+        ...i,
+        all_participants: participants
+          .filter((i) => all_participant_ids.some((ap) => ap === i.id))
+          .map(({ batches, races, ...p }) => {
+            return p;
+          }),
+      };
+    }),
   };
 
   return finalRace;
@@ -91,17 +89,15 @@ export const createNewRound = action(NewRoundSchema, async (data) => {
 
   const newRace = await _db.races.update({
     data: {
-      heat_containers: [
-        ...race.heat_containers,
+      rounds: [
+        ...race.rounds,
         {
           name: data.name,
-          max_heats: data.max_heats,
           is_qualifier: false,
           heats: [],
           is_closed: false,
           all_participant_ids: [],
-          heat_index:
-            (max(race.heat_containers.map((i) => i.heat_index)) ?? 0) + 1,
+          round_index: (max(race.rounds.map((i) => i.round_index)) ?? 0) + 1,
         },
       ],
     },
@@ -118,9 +114,9 @@ export const createNewRound = action(NewRoundSchema, async (data) => {
 });
 
 export const deleteRound = action(
-  DeleteHeatSchema,
-  async ({ heat_index, race_id }) => {
-    if (heat_index === 0)
+  DeleteRoundSchema,
+  async ({ round_index, race_id }) => {
+    if (round_index === 0)
       throw new Error(
         "You may not delete the qualifier heat. Please rather delete the entire race.",
       );
@@ -134,9 +130,9 @@ export const deleteRound = action(
     if (!race) throw new Error("Unable to find that race.");
 
     let heatName = "";
-    const rounds = race.heat_containers
+    const rounds: round[] = race.rounds
       .filter((i) => {
-        if (i.heat_index === heat_index) {
+        if (i.round_index === round_index) {
           heatName = i.name;
           return false;
         }
@@ -145,13 +141,13 @@ export const deleteRound = action(
       .map((data, index) => {
         return {
           ...data,
-          heat_index: index,
+          round_index: index,
         };
       });
 
     await _db.races.update({
       data: {
-        heat_containers: rounds,
+        rounds,
       },
       where: {
         id: race_id,
@@ -167,7 +163,7 @@ export const deleteRound = action(
 
 export const createNewHeat = action(
   NewHeatSchema,
-  async ({ race_id, heat_index }) => {
+  async ({ race_id, round_index }) => {
     const race = await _db.races.findFirst({
       where: {
         id: race_id,
@@ -176,7 +172,7 @@ export const createNewHeat = action(
 
     if (!race) throw new Error("Unable to find that race!");
 
-    const round = race?.heat_containers[heat_index];
+    const round = race?.rounds[round_index];
     if (!round) throw new Error("unable to find that round!");
 
     round.heats.push({
@@ -188,13 +184,13 @@ export const createNewHeat = action(
 
     await _db.races.update({
       data: {
-        heat_containers: {
+        rounds: {
           updateMany: {
             data: {
               heats: round.heats,
             },
             where: {
-              heat_index: heat_index,
+              round_index: round_index,
             },
           },
         },
@@ -221,7 +217,7 @@ export const addLaneCompetitor = action(LaneCompetitorSchema, async (input) => {
 
   if (!race) throw new Error("Unable to find that race.");
 
-  const roundRef = race.heat_containers[input.round_index];
+  const roundRef = race.rounds[input.round_index];
   const heatRef = roundRef.heats[input.heat_index];
 
   if (heatRef.is_closed)
@@ -271,10 +267,10 @@ export const addLaneCompetitor = action(LaneCompetitorSchema, async (input) => {
 
   const result = await _db.races.update({
     data: {
-      heat_containers: {
+      rounds: {
         updateMany: {
           where: {
-            heat_index: input.round_index,
+            round_index: input.round_index,
           },
           data: {
             heats: {
@@ -312,7 +308,7 @@ export const startLaneRace = action(LaneCompetitorHeatSchema, async (input) => {
 
   if (!race) throw new Error("Unable to find that race.");
 
-  const round = race.heat_containers[input.round_index];
+  const round = race.rounds[input.round_index];
   if (!round) throw new Error("Unable to find that round.");
 
   const heat = round.heats[input.heat_index];
@@ -325,7 +321,7 @@ export const startLaneRace = action(LaneCompetitorHeatSchema, async (input) => {
 
   const raceResult = await _db.races.update({
     data: {
-      heat_containers: {
+      rounds: {
         updateMany: {
           data: {
             heats: {
@@ -342,7 +338,7 @@ export const startLaneRace = action(LaneCompetitorHeatSchema, async (input) => {
             },
           },
           where: {
-            heat_index: input.round_index,
+            round_index: input.round_index,
           },
         },
       },
@@ -368,7 +364,7 @@ export const closeLaneRace = action(LaneCloseSchema, async (input) => {
 
   if (!race) throw new Error("Unable to find that race.");
 
-  const round = race.heat_containers[input.round_index];
+  const round = race.rounds[input.round_index];
   if (!round) throw new Error("Unable to find that round.");
 
   const heat = round.heats[input.heat_index];
@@ -398,12 +394,12 @@ export const deleteHeat = action(LaneCloseSchema, async (input) => {
 
   if (!race) throw new Error("Unable to find that race.");
 
-  const round = race.heat_containers[input.round_index];
+  const round = race.rounds[input.round_index];
   if (!round) throw new Error("Unable to find that round.");
 
   const result = await _db.races.update({
     data: {
-      heat_containers: {
+      rounds: {
         updateMany: {
           data: {
             heats: round.heats
@@ -414,7 +410,7 @@ export const deleteHeat = action(LaneCloseSchema, async (input) => {
               })),
           },
           where: {
-            heat_index: input.round_index,
+            round_index: input.round_index,
           },
         },
       },
@@ -440,8 +436,7 @@ export const finishLaneRace = action(FinishLaneRaceSchema, async (input) => {
 
   if (!currentRace) throw new Error("Unable to find that race.");
 
-  const heat =
-    currentRace.heat_containers[input.round_index].heats[input.heat_index];
+  const heat = currentRace.rounds[input.round_index].heats[input.heat_index];
 
   const thisParticipantData = heat.participants.find(
     (i) => i.participant_id === input.participant_id,
@@ -476,7 +471,7 @@ export const finishLaneRace = action(FinishLaneRaceSchema, async (input) => {
 
   const thisCompetitorStuff = await _db.races.update({
     data: {
-      heat_containers: {
+      rounds: {
         updateMany: {
           data: {
             heats: {
@@ -503,7 +498,7 @@ export const finishLaneRace = action(FinishLaneRaceSchema, async (input) => {
             },
           },
           where: {
-            heat_index: input.round_index,
+            round_index: input.round_index,
           },
         },
       },
@@ -535,8 +530,7 @@ export const editHeatParticipant = action(
 
     if (!currentRace) throw new Error("Unable to find that race.");
 
-    const heat =
-      currentRace.heat_containers[input.round_index].heats[input.heat_index];
+    const heat = currentRace.rounds[input.round_index].heats[input.heat_index];
 
     const thisParticipantData = heat.participants.find(
       (i) => i.participant_id === input.participant_id,
@@ -550,7 +544,7 @@ export const editHeatParticipant = action(
 
     const thisCompetitorStuff = await _db.races.update({
       data: {
-        heat_containers: {
+        rounds: {
           updateMany: {
             data: {
               heats: {
@@ -576,7 +570,7 @@ export const editHeatParticipant = action(
               },
             },
             where: {
-              heat_index: input.round_index,
+              round_index: input.round_index,
             },
           },
         },
@@ -603,11 +597,11 @@ export const getWinnersFrom = action(MoveWinersSchema, async (input) => {
 
   if (!race) throw new Error("Unable to find that race.");
 
-  const previousRound = race.heat_containers.find(
-    (i) => i.heat_index === input.round_index - 1,
+  const previousRound = race.rounds.find(
+    (i) => i.round_index === input.round_index - 1,
   );
-  const thisRound = race.heat_containers.find(
-    (i) => i.heat_index === input.round_index,
+  const thisRound = race.rounds.find(
+    (i) => i.round_index === input.round_index,
   );
 
   if (!previousRound || !thisRound)
@@ -634,7 +628,7 @@ export const getWinnersFrom = action(MoveWinersSchema, async (input) => {
 
   const result = await _db.races.update({
     data: {
-      heat_containers: {
+      rounds: {
         updateMany: {
           data: {
             all_participant_ids: currentParticipants.map(
@@ -642,7 +636,7 @@ export const getWinnersFrom = action(MoveWinersSchema, async (input) => {
             ),
           },
           where: {
-            heat_index: input.round_index,
+            round_index: input.round_index,
           },
         },
       },
@@ -670,7 +664,7 @@ export const removeCompetitorFromPool = action(
 
     if (!race) throw new Error("Unable to find that race.");
 
-    const round = race.heat_containers[input.round_index];
+    const round = race.rounds[input.round_index];
 
     if (!round) throw new Error("Unable to find that round.");
 
@@ -680,13 +674,13 @@ export const removeCompetitorFromPool = action(
 
     await _db.races.update({
       data: {
-        heat_containers: {
+        rounds: {
           updateMany: {
             data: {
               all_participant_ids: newParticipantIds,
             },
             where: {
-              heat_index: input.round_index,
+              round_index: input.round_index,
             },
           },
         },

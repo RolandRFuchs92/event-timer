@@ -1,10 +1,13 @@
 "use server";
-import { MONGO_UPSERT_HACK, _db } from "@/lib/db";
-import { DefaultRegistration, RegistrationSchema } from "./schema";
+
 import { z } from "zod";
 import { participant } from "@prisma/client";
-import { revalidatePath, unstable_noStore } from "next/cache";
 import { omit, uniq } from "lodash";
+import { revalidatePath, unstable_noStore } from "next/cache";
+
+import { MONGO_UPSERT_HACK, _db } from "@/lib/db";
+
+import { DefaultRegistration, RegistrationSchema } from "./schema";
 
 export async function mutateParticipant(
   eventId: string,
@@ -71,12 +74,12 @@ export async function mutateParticipant(
   const laneRaces = races.filter((i) => i.race_type === "LaneRace");
   await _db.$transaction(
     laneRaces.map((i) => {
-      i.heat_containers[0].all_participant_ids = uniq([...i.heat_containers[0].all_participant_ids, id])
+      i.rounds[0].all_participant_ids = uniq([...i.rounds[0].all_participant_ids, id])
 
       return _db.races.update({
         data: {
           ...omit(i, "id"),
-          heat_containers: i.heat_containers,
+          rounds: i.rounds,
         },
         where: {
           id: i.id,

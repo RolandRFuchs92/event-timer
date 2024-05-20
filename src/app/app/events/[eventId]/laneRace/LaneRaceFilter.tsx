@@ -16,13 +16,13 @@ interface LaneRaceFilterProps {
 
 type T = NonNullable<
   Awaited<ReturnType<typeof getLaneRace>>["data"]
->["heat_containers"][0];
+>["rounds"][0];
 
 export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
   const raceId = useLaneRaceId();
   const roundIndex = useRoundIndex();
 
-  const round = laneRace?.heat_containers[roundIndex - 1];
+  const round = laneRace?.rounds[roundIndex - 1];
 
   const handleMoveWinnersFromPrev = async () => {
     const result = await getWinnersFrom({
@@ -47,7 +47,7 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
       onYes={async (i) => {
         const result = await deleteRound({
           race_id: raceId,
-          heat_index: i.heat_index,
+          heat_index: i.round_index,
         });
 
         if (result.serverError) {
@@ -68,7 +68,7 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
             body={(i) => <LaneNewRound />}
             disableButtons
             title={""}
-            onYes={async (i) => {}}
+            onYes={async (i) => { }}
           >
             {(setData, toggle) => {
               return (
@@ -92,11 +92,11 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
                     ) : null}
                   </div>
                   <h3>Rounds</h3>
-                  {laneRace?.heat_containers.map((i) => {
+                  {laneRace?.rounds.map((i) => {
                     return (
                       <LaneRaceTile
-                        key={i.heat_index.toString()}
-                        heat_container={i}
+                        key={i.round_index.toString()}
+                        round={i}
                         onDelete={handleDelete}
                       />
                     );

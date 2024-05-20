@@ -1,11 +1,13 @@
 "use server";
 
-import { _db } from "@/lib/db";
-import { DefaultRace, RaceSchema } from "./schema";
+import { round, races } from "@prisma/client";
 import { revalidatePath, unstable_noStore } from "next/cache";
+
+import { _db } from "@/lib/db";
 import { newObjectId } from "@/lib/helper";
-import { heat_container, races } from "@prisma/client";
 import { action } from "@/lib/safeAction";
+
+import { DefaultRace, RaceSchema } from "./schema";
 
 export async function getRace(raceId: string) {
   if (raceId === "null") return DefaultRace;
@@ -37,14 +39,13 @@ export const mutateRace = action(RaceSchema, async ({ id, ...rawRace }) => {
     }
   }
 
-  const heatContainers: heat_container[] = isLaneRace
+  const heatContainers: round[] = isLaneRace
     ? [
       {
         name: "Qualifier",
         heats: [],
         is_closed: false,
-        max_heats: 0,
-        heat_index: 0,
+        round_index: 0,
         is_qualifier: true,
         all_participant_ids: [],
       },
@@ -62,7 +63,7 @@ export const mutateRace = action(RaceSchema, async ({ id, ...rawRace }) => {
 
   const race: Omit<races, "id"> = {
     ...rawRace,
-    heat_containers: heatContainers,
+    rounds: heatContainers,
     batches,
   };
 

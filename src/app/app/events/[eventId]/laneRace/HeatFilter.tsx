@@ -1,7 +1,7 @@
 import { Dropdown } from "@/components/SelectGroup/Dropdown";
 import React from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { LaneRaceType } from "./LaneRaceContainer";
+import { LaneRaceType } from "./RoundColumn";
 import { Button } from "@/components/FormElements/button";
 import TwDialog from "@/components/Dialog/Dialog";
 import { useRoundIndex, useLaneRaceId, useSetHeatIndex } from "./hook";
@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { HeatFilterSchema } from "./schema";
 
 interface HeatFilterProps {
-  heats: LaneRaceType["heat_containers"][0]["heats"];
+  heats: LaneRaceType["rounds"][0]["heats"];
 }
 
 export function HeatFilter({ heats }: HeatFilterProps) {
@@ -45,7 +45,7 @@ export function HeatFilter({ heats }: HeatFilterProps) {
   };
 
   return (
-    <TwDialog<{}> body="" onYes={async () => { }} title="">
+    <TwDialog<{}> body="" onYes={async () => {}} title="">
       {(setData, toggle) => {
         return (
           <FormProvider {...form}>

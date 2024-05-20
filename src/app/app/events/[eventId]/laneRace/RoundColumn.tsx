@@ -3,6 +3,9 @@
 import React from "react";
 import toast from "react-hot-toast";
 
+import { TrashIcon } from "@/components/Icons/TrashIcon";
+import TwDialog from "@/components/Dialog/Dialog";
+
 import {
   addLaneCompetitor,
   getLaneRace,
@@ -10,8 +13,6 @@ import {
 } from "./action";
 import { useHeatIndexs, useLaneRaceId, useRoundIndex } from "./hook";
 import { HeatFilter } from "./HeatFilter";
-import { TrashIcon } from "@/components/Icons/TrashIcon";
-import TwDialog from "@/components/Dialog/Dialog";
 
 export type LaneRaceType = NonNullable<
   Awaited<ReturnType<typeof getLaneRace>>["data"]
@@ -23,7 +24,7 @@ interface LaneRaceContainerProps {
 
 export async function RoundColumn({ laneRace }: LaneRaceContainerProps) {
   const roundIndex = useRoundIndex();
-  const round = laneRace?.heat_containers[roundIndex];
+  const round = laneRace?.rounds[roundIndex];
 
   return (
     <div>
@@ -37,7 +38,7 @@ export async function RoundColumn({ laneRace }: LaneRaceContainerProps) {
 }
 
 interface AllParticipantsProps {
-  round: NonNullable<LaneRaceContainerProps["laneRace"]>["heat_containers"][0];
+  round: NonNullable<LaneRaceContainerProps["laneRace"]>["rounds"][0];
 }
 
 function AllParticipants({ round }: AllParticipantsProps) {
@@ -79,7 +80,7 @@ function AllParticipants({ round }: AllParticipantsProps) {
   };
 
   return (
-    <TwDialog<(typeof round.all_participants)[0]>
+    <TwDialog<round["all_participants"][0]>
       title={(i) => `Remove competitor from pool`}
       body={(i) => `Are you sure you want to remove this competitor?`}
       onYes={async (i) => {

@@ -1,5 +1,13 @@
 "use client";
+
 import React from "react";
+import toast from "react-hot-toast";
+
+import { Button } from "@/components/FormElements/button";
+import { timeOnly } from "@/lib/DateTimeUtils";
+import TwDialog from "@/components/Dialog/Dialog";
+import { BatchElapsedTime } from "@/components/time/TimeElapsed";
+
 import {
   closeLaneRace,
   deleteHeat,
@@ -12,11 +20,6 @@ import {
   useRoundIndex,
   useSetHeatIndex,
 } from "./hook";
-import { Button } from "@/components/FormElements/button";
-import { timeOnly } from "@/lib/DateTimeUtils";
-import toast from "react-hot-toast";
-import TwDialog from "@/components/Dialog/Dialog";
-import { BatchElapsedTime } from "@/components/time/TimeElapsed";
 
 interface HeatInteractionsProps {
   laneRace: Awaited<ReturnType<typeof getLaneRace>>["data"];
@@ -26,7 +29,7 @@ export function HeatInteractions({ laneRace }: HeatInteractionsProps) {
   const raceId = useLaneRaceId();
   const roundIndex = useRoundIndex();
   const setHeatIndex = useSetHeatIndex();
-  const round = laneRace!.heat_containers[roundIndex];
+  const round = laneRace!.rounds[roundIndex];
   const heatIndex = useHeatIndexs();
   const heat = round?.heats[heatIndex];
 
