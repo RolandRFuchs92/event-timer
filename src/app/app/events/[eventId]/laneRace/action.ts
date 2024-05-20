@@ -95,7 +95,6 @@ export const createNewRound = action(NewRoundSchema, async (data) => {
           name: data.name,
           is_qualifier: false,
           heats: [],
-          is_closed: false,
           all_participant_ids: [],
           round_index: (max(race.rounds.map((i) => i.round_index)) ?? 0) + 1,
         },

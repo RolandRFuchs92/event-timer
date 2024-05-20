@@ -33,7 +33,7 @@ export function HeatFilter({ heats }: HeatFilterProps) {
   const onNewHeatClick = async () => {
     const result = await createNewHeat({
       race_id: raceId,
-      heat_index: heatIndex,
+      round_index: heatIndex,
     });
 
     if (result.serverError) {
@@ -45,31 +45,21 @@ export function HeatFilter({ heats }: HeatFilterProps) {
   };
 
   return (
-    <TwDialog<{}> body="" onYes={async () => {}} title="">
-      {(setData, toggle) => {
-        return (
-          <FormProvider {...form}>
-            <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
-              <Dropdown
-                options={heats}
-                getKey={(i) => i.index.toString()}
-                getLabel={(i) => `Heat - ${i.index + 1}`}
-                label="Heat"
-                name="heat_index"
-              />
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  label="New Heat"
-                  type="button"
-                  onClick={onNewHeatClick}
-                />
+    <FormProvider {...form}>
+      <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
+        <Dropdown
+          options={heats}
+          getKey={(i) => i.index.toString()}
+          getLabel={(i) => `Heat - ${i.index + 1}`}
+          label="Heat"
+          name="heat_index"
+        />
+        <div className="grid grid-cols-2 gap-2">
+          <Button label="New Heat" type="button" onClick={onNewHeatClick} />
 
-                <Button label="Set Heat" />
-              </div>
-            </form>
-          </FormProvider>
-        );
-      }}
-    </TwDialog>
+          <Button label="Set Heat" />
+        </div>
+      </form>
+    </FormProvider>
   );
 }

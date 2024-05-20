@@ -55,7 +55,6 @@ type round {
   round_index         Int
   is_qualifier        Boolean
   heats               heat[]
-  is_closed           Boolean
   all_participant_ids String[]
 }
 

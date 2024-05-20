@@ -20,7 +20,6 @@ export function LaneNewRound() {
     defaultValues: {
       race_id: raceId,
       name: "",
-      max_heats: 1,
     },
   });
 
@@ -37,7 +36,6 @@ export function LaneNewRound() {
     <Form formMethods={form} formTitle={<FormTitle label="Create Heat" />}>
       <FormErrors />
       <FInput label={"New heat name"} name="name" />
-      <FInput label={"Max competitors"} type="number" name="max_heats" />
       <Button label="Submit" onClick={handleSubmit} />
     </Form>
   );

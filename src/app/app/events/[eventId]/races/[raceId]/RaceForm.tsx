@@ -71,10 +71,12 @@ export function RaceForm({ race, raceTypes }: RaceFormProps) {
       />
 
       <FInput name="name" label="Race Name" />
-      <div>
-        <h3>Batches</h3>
-        <Button type="button" label="Add Batch" onClick={insertBatch} />
-      </div>
+      {isLaneRace ? null : (
+        <div>
+          <h3>Batches</h3>
+          <Button type="button" label="Add Batch" onClick={insertBatch} />
+        </div>
+      )}
       {isLaneRace ? null : (
         <div className="flex flex-wrap gap-2">
           {batchRows.fields.map((i, index) => {

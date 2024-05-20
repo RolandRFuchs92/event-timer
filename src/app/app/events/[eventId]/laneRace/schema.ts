@@ -7,7 +7,6 @@ export const LaneRaceSchema = z.object({
 
 export const NewRoundSchema = z.object({
   name: z.string(),
-  max_heats: z.coerce.number(),
   race_id: z.string(),
 });
 

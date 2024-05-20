@@ -1,3 +1,19 @@
-export default async function ResultsPage() {
-  return <h1>Results Page</h1>;
+import React, { Suspense } from "react";
+
+import { LaneRaceResults } from "./LaneRaceResults";
+
+interface ResultsPageProps {
+  params: {
+    eventId: string;
+  };
+}
+
+export default async function ResultsPage({ params }: ResultsPageProps) {
+  return (
+    <div>
+      <Suspense fallback="Loading...">
+        <LaneRaceResults eventId={params.eventId} />
+      </Suspense>
+    </div>
+  );
 }
