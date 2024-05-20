@@ -8,20 +8,19 @@ interface DropdownProps<T>
   label: string;
   icon?: React.ReactNode;
   getKey: T extends object ? (i: T) => string : undefined;
-  getValue?: T extends object ? (i: T) => string : undefined;
+  getLabel?: T extends object ? (i: T) => string : undefined;
   name: string;
 }
 
 export function Dropdown<T>({
   options,
   getKey,
-  getValue,
+  getLabel,
   label,
   icon = null,
   name,
   ...props
 }: DropdownProps<T>) {
-
   return (
     <Controller
       name={name!}
@@ -54,7 +53,7 @@ export function Dropdown<T>({
                   const key =
                     typeof i === "object" ? getKey!(i) : (i as string);
                   const value =
-                    typeof i === "object" ? getValue!(i) : (i as string);
+                    typeof i === "object" ? getLabel!(i) : (i as string);
 
                   return (
                     <option

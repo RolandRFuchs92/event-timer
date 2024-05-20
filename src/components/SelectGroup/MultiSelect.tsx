@@ -11,7 +11,7 @@ interface MultiSelectProps<T>
   name: string;
   icon?: React.ReactNode;
   getKey?: T extends object ? (i: T) => string : undefined;
-  getValue?: T extends object ? (i: T) => string : undefined;
+  getLabel?: T extends object ? (i: T) => string : undefined;
 }
 
 export function MultiSelect<T>({
@@ -19,11 +19,10 @@ export function MultiSelect<T>({
   label,
   icon,
   getKey,
-  getValue,
+  getLabel,
   name,
   ...props
 }: MultiSelectProps<T>) {
-  console.log(options);
 
   return (
     <Controller

@@ -50,7 +50,7 @@ export function FinishersForm({ FinisherStatusOptions }: FinisherFormProp) {
         name="finish_status"
         options={FinisherStatusOptions}
         getKey={(i) => i.value}
-        getValue={(i) => i.label}
+        getLabel={(i) => i.label}
       />
       <Button label="Submit" />
     </Form>

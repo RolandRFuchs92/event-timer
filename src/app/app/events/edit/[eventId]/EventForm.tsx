@@ -68,7 +68,7 @@ export function EventForm({ event, clients, opts }: EventFormProps) {
         name="client_id"
         options={clients}
         getKey={(i) => i.value}
-        getValue={(i) => i.label}
+        getLabel={(i) => i.label}
         label="Client"
       />
       <MultiSelect name="event_type" options={opts} label="Type" />

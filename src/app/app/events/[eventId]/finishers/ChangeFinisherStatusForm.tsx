@@ -59,7 +59,7 @@ export function ChangeFinisherStatusForm({
       <Dropdown
         options={finisherStatusOptions}
         name="newFinishStatus"
-        getValue={(i) => i.label}
+        getLabel={(i) => i.label}
         getKey={(i) => i.value}
         label="New Finish Status"
       />

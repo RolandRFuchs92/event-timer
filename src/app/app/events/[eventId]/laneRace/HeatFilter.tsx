@@ -45,7 +45,7 @@ export function HeatFilter({ heats }: HeatFilterProps) {
   };
 
   return (
-    <TwDialog<{}> body="" onYes={async () => {}} title="">
+    <TwDialog<{}> body="" onYes={async () => { }} title="">
       {(setData, toggle) => {
         return (
           <FormProvider {...form}>
@@ -53,7 +53,7 @@ export function HeatFilter({ heats }: HeatFilterProps) {
               <Dropdown
                 options={heats}
                 getKey={(i) => i.index.toString()}
-                getValue={(i) => `Heat - ${i.index + 1}`}
+                getLabel={(i) => `Heat - ${i.index + 1}`}
                 label="Heat"
                 name="heat_index"
               />

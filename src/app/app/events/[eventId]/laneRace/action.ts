@@ -22,7 +22,7 @@ import {
   NewRoundSchema,
 } from "./schema";
 
-export const assignCompetitors = action(LaneRaceSchema, async () => { });
+export const assignCompetitors = action(LaneRaceSchema, async () => {});
 
 export const getQualifierCompetitors = action(
   LaneRaceSchema,
@@ -617,7 +617,6 @@ export const getWinnersFrom = action(MoveWinersSchema, async (input) => {
     .filter((i) => i.status === ParticipantHeatStatusEnum.Winner);
 
   const currentParticipants = thisRound.heats.flatMap((i) => i.participants);
-
 
   let newParticipantCount = 0;
   for (const winner of previousWinners) {

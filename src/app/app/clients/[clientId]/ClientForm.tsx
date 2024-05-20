@@ -46,7 +46,7 @@ export function ClientForm({ accountOptions, client }: ClientFormProps) {
       <FormRow>
         <Dropdown
           getKey={(i) => i.value}
-          getValue={(i) => i.label}
+          getLabel={(i) => i.label}
           name="account_id"
           options={accountOptions}
           label="Account"

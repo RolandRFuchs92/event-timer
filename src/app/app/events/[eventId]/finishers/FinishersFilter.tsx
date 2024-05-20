@@ -57,7 +57,7 @@ export function FinishersFilter({ races, raceTypes }: FinishersFilterProps) {
         options={raceTypes}
         label="Race Type"
         getKey={(i) => i.value}
-        getValue={(i) => i.label}
+        getLabel={(i) => i.label}
         name="race_type"
       />
 
@@ -69,7 +69,7 @@ export function FinishersFilter({ races, raceTypes }: FinishersFilterProps) {
           })
           .map((i) => ({ value: i.id, label: i.name }))}
         getKey={(i) => i.value}
-        getValue={(i) => i.label}
+        getLabel={(i) => i.label}
         name="races"
         label="Races"
       />

@@ -106,7 +106,7 @@ function BatchFieldArray({ form, races }: BatchFieldArrayProps) {
           <div key={i.id} className="flex flex-row gap-2">
             <Dropdown
               options={remainingRaceOptions}
-              getValue={(i) => i.name}
+              getLabel={(i) => i.name}
               getKey={(i) => i.id}
               label="Race"
               name={`batches.${index}.race_id`}
@@ -114,7 +114,7 @@ function BatchFieldArray({ form, races }: BatchFieldArrayProps) {
             {!isLaneRace && selectedRace ? (
               <Dropdown
                 options={batchOptions}
-                getValue={(i) => i.name}
+                getLabel={(i) => i.name}
                 getKey={(i) => i.batch_id}
                 label="Batch"
                 name={`batches.${index}.batch_id`}

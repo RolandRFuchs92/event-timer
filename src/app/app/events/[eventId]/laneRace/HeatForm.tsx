@@ -73,7 +73,7 @@ export function HeatForm({ participant }: HeatFormProps) {
         label="Status"
         name="status"
         getKey={(i) => i.value}
-        getValue={(i) => i.label}
+        getLabel={(i) => i.label}
       />
       <div className="flex flex-row gap-2">
         <Button label="Reset" type="reset" />

@@ -1,18 +1,20 @@
 "use client";
 
+import { useFieldArray, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/FormElements/button";
 import { Form, FormData, FormErrors } from "@/components/FormElements/form";
 import { FormTitle } from "@/components/FormElements/formTitle";
 import { FInput } from "@/components/FormElements/input";
-import { useFieldArray, useForm } from "react-hook-form";
-import { getRace, mutateRace } from "./action";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { RaceSchema } from "./schema";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import { useEventId } from "../../eventUtils";
 import { Dropdown } from "@/components/SelectGroup/Dropdown";
 import { enumToOptions } from "@/lib/helper";
+
+import { getRace, mutateRace } from "./action";
+import { RaceSchema } from "./schema";
+import { useEventId } from "../../eventUtils";
 
 interface RaceFormProps {
   race: Awaited<ReturnType<typeof getRace>>;
@@ -36,7 +38,11 @@ export function RaceForm({ race, raceTypes }: RaceFormProps) {
 
   const handleSubmit = form.handleSubmit(async (data) => {
     const result = await mutateRace(data);
-    toast.success(result.message);
+    if (result.serverError) {
+      toast.error(result.serverError);
+      return;
+    }
+    toast.success(result.data!.message);
     replace("./");
   });
 
@@ -60,7 +66,7 @@ export function RaceForm({ race, raceTypes }: RaceFormProps) {
         options={raceTypes}
         label="Race Type"
         getKey={(i) => i.value}
-        getValue={(i) => i.label}
+        getLabel={(i) => i.label}
         name="race_type"
       />
 
