@@ -60,7 +60,7 @@ function AllParticipants({ round }: AllParticipantsProps) {
   return (
     <div>
       <h3 className="font-bold">Competitors</h3>
-      <ul className="flex w-64 flex-col gap-2">
+      <ul className="flex flex-col gap-2">
         {participants.map((i) => {
           const currentHeat = round.heats.find((r) =>
             r.participants.some((p) => p.participant_id === i.id),
@@ -69,7 +69,7 @@ function AllParticipants({ round }: AllParticipantsProps) {
           return (
             <li
               key={i.id}
-              className="cursor-pointer rounded-md border border-white p-2 text-xs hover:font-extrabold"
+              className="grow cursor-pointer rounded-md border border-white p-2 text-xs hover:font-extrabold"
               onClick={() => handleParticipantAdd(i.id)}
             >
               <p>

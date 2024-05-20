@@ -69,3 +69,8 @@ export const HeatParticipantSchema = z.object({
   participant_id: z.string(),
   status: z.nativeEnum(ParticipantHeatStatusEnum),
 });
+
+export const MoveWinersSchema = z.object({
+  race_id: z.string(),
+  round_index: z.number()
+});

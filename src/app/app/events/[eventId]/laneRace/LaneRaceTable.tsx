@@ -10,7 +10,7 @@ interface LaneRaceTableProps {
 
 export function LaneRaceTable({ laneRace }: LaneRaceTableProps) {
   return (
-    <div className="flex flex-row gap-4">
+    <div className="grid grid-cols-3 gap-4">
       <LaneRaceFilter laneRace={laneRace} />
       <React.Suspense fallback="Loading...">
         <LaneRaceContainer laneRace={laneRace} />

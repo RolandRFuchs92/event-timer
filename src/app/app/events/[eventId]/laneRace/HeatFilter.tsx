@@ -45,7 +45,7 @@ export function HeatFilter({ heats }: HeatFilterProps) {
   };
 
   return (
-    <TwDialog<{}> body="" onYes={async () => { }} title="">
+    <TwDialog<{}> body="" onYes={async () => {}} title="">
       {(setData, toggle) => {
         return (
           <FormProvider {...form}>

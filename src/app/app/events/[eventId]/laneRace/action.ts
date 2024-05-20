@@ -17,6 +17,7 @@ import {
   LaneCompetitorHeatSchema,
   LaneCompetitorSchema,
   LaneRaceSchema,
+  MoveWinersSchema,
   NewHeatSchema,
   NewRoundSchema,
 } from "./schema";
@@ -189,13 +190,13 @@ export const createNewHeat = action(
         heat_containers: {
           updateMany: {
             data: {
-              heats: round.heats
+              heats: round.heats,
             },
             where: {
-              heat_index: heat_index
-            }
-          }
-        }
+              heat_index: heat_index,
+            },
+          },
+        },
       },
       where: {
         id: race_id,
@@ -272,22 +273,22 @@ export const addLaneCompetitor = action(LaneCompetitorSchema, async (input) => {
       heat_containers: {
         updateMany: {
           where: {
-            heat_index: input.round_index
+            heat_index: input.round_index,
           },
           data: {
             heats: {
               updateMany: {
                 data: {
-                  participants: heatRef.participants
+                  participants: heatRef.participants,
                 },
                 where: {
-                  index: input.heat_index
-                }
-              }
-            }
-          }
-        }
-      }
+                  index: input.heat_index,
+                },
+              },
+            },
+          },
+        },
+      },
     },
     where: {
       id: race.id,
@@ -463,7 +464,7 @@ export const finishLaneRace = action(FinishLaneRaceSchema, async (input) => {
   );
 
   let participantStatusEnum: ParticipantHeatStatusEnum | null = null;
-  if (competitorData?.total_time_ms === null) {
+  if (!competitorData || competitorData?.total_time_ms === null) {
     participantStatusEnum = ParticipantHeatStatusEnum.Winner;
   } else {
     participantStatusEnum =
@@ -591,3 +592,69 @@ export const editHeatParticipant = action(
     };
   },
 );
+
+export const getWinnersFrom = action(MoveWinersSchema, async (input) => {
+  const race = await _db.races.findFirst({
+    where: {
+      id: input.race_id,
+    },
+  });
+
+  if (!race) throw new Error("Unable to find that race.");
+
+  const previousRound = race.heat_containers.find(
+    (i) => i.heat_index === input.round_index - 1,
+  );
+  const thisRound = race.heat_containers.find(
+    (i) => i.heat_index === input.round_index,
+  );
+
+  if (!previousRound || !thisRound)
+    throw new Error("Unalbe to find rounds required for winner transfer");
+
+  const previousWinners = previousRound.heats
+    .flatMap((i) => i.participants)
+    .filter((i) => i.status === ParticipantHeatStatusEnum.Winner);
+
+  const currentParticipants = thisRound.heats.flatMap((i) => i.participants);
+
+
+  let newParticipantCount = 0;
+  for (const winner of previousWinners) {
+    if (
+      currentParticipants.some(
+        (i) => i.participant_id === winner.participant_id,
+      )
+    )
+      continue;
+
+    newParticipantCount = newParticipantCount + 1;
+    currentParticipants.push(winner);
+  }
+
+  const result = await _db.races.update({
+    data: {
+      heat_containers: {
+        updateMany: {
+          data: {
+            all_participant_ids: currentParticipants.map(
+              (i) => i.participant_id,
+            ),
+          },
+          where: {
+            heat_index: input.round_index,
+          },
+        },
+      },
+    },
+    where: {
+      id: input.race_id,
+    },
+  });
+
+  revalidatePath("");
+
+  return {
+    message: `Successfully moved ${newParticipantCount} participants to ${thisRound.name}`,
+  };
+});

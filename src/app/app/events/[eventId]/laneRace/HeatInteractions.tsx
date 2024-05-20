@@ -83,7 +83,7 @@ export function HeatInteractions({ laneRace }: HeatInteractionsProps) {
 
   return (
     <div>
-      <b className="text-lg border-b-black">Heat {heatIndex + 1} </b>
+      <b className="border-b-black text-lg">Heat {heatIndex + 1} </b>
       <div>
         <h3>
           Start Time:{" "}
@@ -112,6 +112,7 @@ export function HeatInteractions({ laneRace }: HeatInteractionsProps) {
               <div>
                 <Button
                   label="Delete"
+                  className="w-full"
                   onClick={() => {
                     setData({});
                     toggle();
@@ -121,7 +122,11 @@ export function HeatInteractions({ laneRace }: HeatInteractionsProps) {
             );
           }}
         </TwDialog>
-        <Button label="Close" onClick={handleCloseLaneRace} />
+        <Button
+          label="Close"
+          onClick={handleCloseLaneRace}
+          disabled={heat.is_closed}
+        />
       </div>
     </div>
   );
