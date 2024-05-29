@@ -121,6 +121,13 @@ function DisplayParticipant({
                       toggle();
                     }}
                   />
+                  <Button
+                    label="Delete"
+                    onClick={() => {
+                      setData(participant);
+                      toggle();
+                    }}
+                  />
                 </div>
               </div>
             ) : (

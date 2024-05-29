@@ -3,7 +3,7 @@
 import { differenceInMilliseconds } from "date-fns";
 import { revalidatePath, unstable_noStore } from "next/cache";
 import { max, omit, uniqBy } from "lodash";
-import { ParticipantHeatStatusEnum, round } from "@prisma/client";
+import { ParticipantHeatStatusEnum, heat, round } from "@prisma/client";
 
 import { action } from "@/lib/safeAction";
 import { _db } from "@/lib/db";
@@ -91,7 +91,7 @@ export const createNewRound = action(NewRoundSchema, async (data) => {
 
   if (!race) throw new Error("Unable to find that race.");
 
-  const newRound = {
+  const newRound: round = {
     name: data.name,
     is_qualifier: false,
     heats: [],
@@ -102,8 +102,8 @@ export const createNewRound = action(NewRoundSchema, async (data) => {
   const newRace = await _db.races.update({
     data: {
       rounds: {
-        push: newRound
-      }
+        push: newRound,
+      },
     },
     where: {
       id: data.race_id,
@@ -135,9 +135,8 @@ export const deleteRound = action(
 
     let heatName = "";
     let newIndex = -1;
-    var oldIndexMaps: Parameters<typeof deleteRoundCommand>[0]["oldIndexMaps"] = race
-      .rounds
-      .map((i, index) => {
+    var oldIndexMaps: Parameters<typeof deleteRoundCommand>[0]["oldIndexMaps"] =
+      race.rounds.map((i, index) => {
         let isOldPosition = i.round_index === round_index;
         if (!isOldPosition) newIndex++;
 
@@ -174,19 +173,21 @@ export const createNewHeat = action(
     const round = race?.rounds[round_index];
     if (!round) throw new Error("unable to find that round!");
 
-    round.heats.push({
+    const newHeat: heat = {
       index: round.heats.length,
       participants: [],
       is_closed: false,
       start_time: null,
-    });
+    };
 
     await _db.races.update({
       data: {
         rounds: {
           updateMany: {
             data: {
-              heats: round.heats,
+              heats: {
+                push: newHeat,
+              },
             },
             where: {
               round_index: round_index,
@@ -222,6 +223,14 @@ export const addLaneCompetitor = action(LaneCompetitorSchema, async (input) => {
   if (heatRef.is_closed)
     throw new Error("Cannot change participants of a heat when its closed.");
 
+  if (
+    heatRef.participants.some((i) => i.participant_id === input.participant_id)
+  )
+    throw new Error(`That user is already part of heat ${heatRef.index + 1}`);
+
+  if (heatRef.participants.length === 2)
+    throw new Error(`Please remove a participant from heat ${heatRef.index + 1} first.`);
+
   const participantsInHeats = roundRef.heats.flatMap((h) =>
     h.participants.map((p) => {
       return {
@@ -248,21 +257,15 @@ export const addLaneCompetitor = action(LaneCompetitorSchema, async (input) => {
 
   if (!participant) throw new Error("Unable to find that participant.");
 
-  const participants = [...heatRef.participants];
 
-  participants.unshift({
+  const newParticipant = {
     participant_id: input.participant_id,
     status: ParticipantHeatStatusEnum.NotStarted,
     name: `${participant.first_name} ${participant.last_name} [${participant.race_number}]`,
     index: 0,
     end_time: null,
     total_time_ms: null,
-  });
-
-  heatRef.participants = uniqBy(participants, (i) => i.participant_id).slice(
-    0,
-    2,
-  );
+  };
 
   const result = await _db.races.update({
     data: {
@@ -275,7 +278,9 @@ export const addLaneCompetitor = action(LaneCompetitorSchema, async (input) => {
             heats: {
               updateMany: {
                 data: {
-                  participants: heatRef.participants,
+                  participants: {
+                    push: newParticipant
+                  }
                 },
                 where: {
                   index: input.heat_index,
