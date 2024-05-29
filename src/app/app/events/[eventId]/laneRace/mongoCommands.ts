@@ -3,7 +3,7 @@
 import { _db } from "@/lib/db";
 import { toMongoEpoch } from "@/lib/epochDate";
 import { ParticipantHeatStatusEnum } from "@prisma/client";
-import { mongoDeleteCommand } from '@/lib/mongoDeleteCommand';
+import { mongoDeleteCommand } from "@/lib/mongoDeleteCommand";
 
 interface UpdateParticipantTimeProps {
   raceId: string;
@@ -83,15 +83,15 @@ export async function deleteRoundCommand(input: DeleteRoundCommandProps) {
           },
           u: [
             {
-              $set: mongoDeleteCommand('rounds', input.roundIndexToRemove)
-            }
+              $set: mongoDeleteCommand("rounds", input.roundIndexToRemove),
+            },
           ],
         },
       ],
     });
-
-    console.log(result);
   } catch (e) {
     console.error(e);
   }
 }
+
+

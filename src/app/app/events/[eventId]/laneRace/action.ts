@@ -323,7 +323,7 @@ export const startLaneRace = action(LaneCompetitorHeatSchema, async (input) => {
     total_time_ms: null,
   }));
 
-  const raceResult = await _db.races.update({
+  await _db.races.update({
     data: {
       rounds: {
         updateMany: {
@@ -371,11 +371,29 @@ export const closeLaneRace = action(LaneCloseSchema, async (input) => {
   const round = race.rounds[input.round_index];
   if (!round) throw new Error("Unable to find that round.");
 
-  const heat = round.heats[input.heat_index];
-  heat.is_closed = true;
 
   const result = await _db.races.update({
-    data: omit(race, "id"),
+    data: {
+      rounds: {
+        updateMany: {
+          data: {
+            heats: {
+              updateMany: {
+                data: {
+                  is_closed: true
+                },
+                where: {
+                  index: input.heat_index
+                }
+              }
+            }
+          },
+          where: {
+            round_index: input.round_index
+          }
+        }
+      }
+    },
     where: {
       id: input.race_id,
     },
@@ -394,7 +412,6 @@ export const deleteHeat = action(LaneCloseSchema, async (input) => {
       id: input.race_id,
     },
   });
-  console.log(input);
 
   if (!race) throw new Error("Unable to find that race.");
 
@@ -649,6 +666,7 @@ export const removeCompetitorFromPool = action(
       (i) => i !== input.participant_id,
     );
 
+    /// Needs to be changed out so that multiple people can work on this at a time
     await _db.races.update({
       data: {
         rounds: {

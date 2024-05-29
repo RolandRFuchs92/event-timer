@@ -9,6 +9,7 @@ import { LaneRaceTile } from "./LaneRacerTile";
 import { deleteRound, getLaneRace, getWinnersFrom } from "./action";
 import { LaneNewRound } from "./LaneNewRound";
 import { useLaneRaceId, useRoundIndex } from "./hook";
+import { AssignRacersInteraction } from "./AssignRacersInteraction";
 
 interface LaneRaceFilterProps {
   laneRace: Awaited<ReturnType<typeof getLaneRace>>["data"];
@@ -25,17 +26,6 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
   const round = laneRace?.rounds[roundIndex - 1];
 
   const handleMoveWinnersFromPrev = async () => {
-    const result = await getWinnersFrom({
-      round_index: roundIndex,
-      race_id: raceId,
-    });
-
-    if (result.serverError) {
-      toast.error(result.serverError);
-      return;
-    }
-
-    toast.success(result.data!.message);
   };
 
   return (
@@ -84,12 +74,7 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
                         toggle();
                       }}
                     />
-                    {roundIndex > 0 ? (
-                      <Button
-                        label={`Get Winners from ${round?.name}`}
-                        onClick={handleMoveWinnersFromPrev}
-                      />
-                    ) : null}
+                    <AssignRacersInteraction laneRace={laneRace} />
                   </div>
                   <h3>Rounds</h3>
                   {laneRace?.rounds.map((i) => {

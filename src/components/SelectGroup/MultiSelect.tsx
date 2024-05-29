@@ -23,7 +23,6 @@ export function MultiSelect<T>({
   name,
   ...props
 }: MultiSelectProps<T>) {
-
   return (
     <Controller
       name={name}
@@ -36,7 +35,16 @@ export function MultiSelect<T>({
             <div className="relative z-20 bg-transparent dark:bg-form-input">
               <Select
                 primaryColor="indigo"
-                options={options as Options}
+                options={
+                  getKey && getLabel
+                    ? options.map((i) => {
+                      return {
+                        label: getLabel(i),
+                        value: getKey(i),
+                      };
+                    })
+                    : (options as Options)
+                }
                 onChange={(i) => field.onChange(i)}
                 isClearable
                 isMultiple
