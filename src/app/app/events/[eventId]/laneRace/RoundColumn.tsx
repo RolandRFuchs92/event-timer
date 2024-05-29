@@ -80,7 +80,7 @@ function AllParticipants({ round }: AllParticipantsProps) {
   };
 
   return (
-    <TwDialog<round["all_participants"][0]>
+    <TwDialog<typeof round["all_participants"][0]>
       title={(i) => `Remove competitor from pool`}
       body={(i) => `Are you sure you want to remove this competitor?`}
       onYes={async (i) => {

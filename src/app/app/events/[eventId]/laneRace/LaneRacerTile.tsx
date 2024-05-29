@@ -34,10 +34,12 @@ export function LaneRaceTile({ round, onDelete }: LaneRacerTileProps) {
           <b className="text-xs">{round.name}</b>
         </div>
       </div>
-      <TrashIcon
-        className="h-7 w-7 cursor-pointer transition-all duration-150 hover:stroke-primary"
-        onClick={() => onDelete(round)}
-      />
+      {round.round_index !== roundIndex && (
+        <TrashIcon
+          className="h-7 w-7 cursor-pointer transition-all duration-150 hover:stroke-primary"
+          onClick={() => onDelete(round)}
+        />
+      )}
     </div>
   );
 }
