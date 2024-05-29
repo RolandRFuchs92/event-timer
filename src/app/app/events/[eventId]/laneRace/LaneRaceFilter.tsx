@@ -47,7 +47,7 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
       onYes={async (i) => {
         const result = await deleteRound({
           race_id: raceId,
-          heat_index: i.round_index,
+          round_index: i.round_index
         });
 
         if (result.serverError) {

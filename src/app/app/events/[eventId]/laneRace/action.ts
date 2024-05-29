@@ -22,6 +22,10 @@ import {
   NewRoundSchema,
   RemoveCompetitorSchema,
 } from "./schema";
+import {
+  deleteRoundCommand,
+  updateParticipantTimeCommand,
+} from "./mongoCommands";
 
 export const assignCompetitors = action(LaneRaceSchema, async () => { });
 
@@ -87,18 +91,19 @@ export const createNewRound = action(NewRoundSchema, async (data) => {
 
   if (!race) throw new Error("Unable to find that race.");
 
+  const newRound = {
+    name: data.name,
+    is_qualifier: false,
+    heats: [],
+    all_participant_ids: [],
+    round_index: (max(race.rounds.map((i) => i.round_index)) ?? 0) + 1,
+  };
+
   const newRace = await _db.races.update({
     data: {
-      rounds: [
-        ...race.rounds,
-        {
-          name: data.name,
-          is_qualifier: false,
-          heats: [],
-          all_participant_ids: [],
-          round_index: (max(race.rounds.map((i) => i.round_index)) ?? 0) + 1,
-        },
-      ],
+      rounds: {
+        push: newRound
+      }
     },
     where: {
       id: data.race_id,
@@ -129,28 +134,23 @@ export const deleteRound = action(
     if (!race) throw new Error("Unable to find that race.");
 
     let heatName = "";
-    const rounds: round[] = race.rounds
-      .filter((i) => {
-        if (i.round_index === round_index) {
-          heatName = i.name;
-          return false;
-        }
-        return true;
-      })
-      .map((data, index) => {
+    let newIndex = -1;
+    var oldIndexMaps: Parameters<typeof deleteRoundCommand>[0]["oldIndexMaps"] = race
+      .rounds
+      .map((i, index) => {
+        let isOldPosition = i.round_index === round_index;
+        if (!isOldPosition) newIndex++;
+
         return {
-          ...data,
-          round_index: index,
+          indexPosition: index,
+          newPropertyIndex: isOldPosition ? -1 : newIndex,
         };
       });
 
-    await _db.races.update({
-      data: {
-        rounds,
-      },
-      where: {
-        id: race_id,
-      },
+    await deleteRoundCommand({
+      oldIndexMaps: oldIndexMaps.filter((i) => i.newPropertyIndex > -1),
+      roundIndexToRemove: round_index,
+      raceId: race_id,
     });
 
     revalidatePath("");
@@ -437,9 +437,11 @@ export const finishLaneRace = action(FinishLaneRaceSchema, async (input) => {
 
   const heat = currentRace.rounds[input.round_index].heats[input.heat_index];
 
-  const thisParticipantData = heat.participants.find(
+  const thisParticipantIndex = heat.participants.findIndex(
     (i) => i.participant_id === input.participant_id,
   );
+
+  const thisParticipantData = heat.participants[thisParticipantIndex];
 
   let timeTakenMs = 0;
   if (heat.start_time) {
@@ -468,43 +470,14 @@ export const finishLaneRace = action(FinishLaneRaceSchema, async (input) => {
         : ParticipantHeatStatusEnum.RunnerUp;
   }
 
-  const thisCompetitorStuff = await _db.races.update({
-    data: {
-      rounds: {
-        updateMany: {
-          data: {
-            heats: {
-              updateMany: {
-                data: {
-                  is_closed: competitorData?.status !== null,
-                  participants: {
-                    updateMany: {
-                      data: {
-                        end_time: input.finish_date,
-                        total_time_ms: timeTakenMs.toString(),
-                        status: participantStatusEnum,
-                      },
-                      where: {
-                        participant_id: input.participant_id,
-                      },
-                    },
-                  },
-                },
-                where: {
-                  index: input.heat_index,
-                },
-              },
-            },
-          },
-          where: {
-            round_index: input.round_index,
-          },
-        },
-      },
-    },
-    where: {
-      id: input.race_id,
-    },
+  await updateParticipantTimeCommand({
+    raceId: input.race_id,
+    roundIndex: input.round_index,
+    heatIndex: input.heat_index,
+    participantIndex: thisParticipantIndex,
+    finishTime: input.finish_date,
+    status: participantStatusEnum,
+    timeMs: timeTakenMs.toString(),
   });
 
   revalidatePath("");
