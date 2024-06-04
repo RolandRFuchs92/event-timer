@@ -79,7 +79,6 @@ export const assignParticipants = action(AssignRacersToRound, async (input) => {
   });
 
   const newRound = race.rounds[input.roundIndex];
-  console.log("BOOP");
 
   revalidatePath("");
   return {
