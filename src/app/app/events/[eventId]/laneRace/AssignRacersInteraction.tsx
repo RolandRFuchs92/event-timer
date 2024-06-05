@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 import TwDialog from "@/components/Dialog/Dialog";
@@ -9,10 +9,10 @@ import { Dropdown } from "@/components/SelectGroup/Dropdown";
 import { MultiSelect } from "@/components/SelectGroup/MultiSelect";
 
 import { getLaneRace } from "./action";
-import { getTopTimesOverMultipleRounds } from './assignParticipantsAction';
-import { useLaneRaceId } from './hook';
-import toast from 'react-hot-toast';
-import { AssignRacersForm } from './AssignRacersForm';
+import { getTopTimesOverMultipleRounds } from "./assignParticipantsAction";
+import { useLaneRaceId } from "./hook";
+import toast from "react-hot-toast";
+import { AssignRacersForm } from "./AssignRacersForm";
 
 interface AssignRacersInteractionProps {
   laneRace: Awaited<ReturnType<typeof getLaneRace>>["data"];
@@ -25,7 +25,7 @@ export function AssignRacersInteraction({
     <TwDialog<{}>
       body={(i) => <SelectRoundsForm rounds={laneRace!.rounds} />}
       title={(i) => `Really delete this All containing data will be deleted.`}
-      onYes={async () => { }}
+      onYes={async () => {}}
       disableButtons
     >
       {(setData, toggle) => {
@@ -57,10 +57,10 @@ function SelectRoundsForm({ rounds }: SelectRoundsFormProps) {
     },
   });
 
-  const handleGetTopTimes = formMethods.handleSubmit(async data => {
+  const handleGetTopTimes = formMethods.handleSubmit(async (data) => {
     const result = await getTopTimesOverMultipleRounds({
-      rounds: data.rounds.map(i => +i.value),
-      race_id: raceId
+      rounds: data.rounds.map((i) => +i.value),
+      race_id: raceId,
     });
 
     if (result.serverError) {
@@ -70,39 +70,46 @@ function SelectRoundsForm({ rounds }: SelectRoundsFormProps) {
 
     toast.success(result.data!.message);
     setRacers(result.data!.result);
-    setIsSelecting(true)
+    setIsSelecting(true);
   });
 
   const selectedRounds = formMethods.watch("rounds");
+  /*
+   *
+   * Okay, we need to add 2 more features.
+   * 1. Get winners from previoud round.
+   * 2. Get all participants from one round and send them to a chosen round
+   * 3. Get best times from several rounds and assign them to a chosen round
+   * */
 
   return (
     <div className="flex w-full grow flex-col">
-      {
-        isSelecting
-          ? <AssignRacersForm
-            racers={racers}
-            setIsSelecting={() => setIsSelecting(false)}
-            rounds={
-              rounds.filter(i => {
-                const isSelected = selectedRounds.every(sr => +sr.value !== i.round_index);
-                return isSelected;
-              })
-            }
-          />
-          : <FormProvider {...formMethods}>
-            <div className="[&_select]:!bg-white [&_label]:!text-black">
-              <MultiSelect
-                className="grow"
-                options={rounds}
-                getKey={(i) => i.round_index.toString()}
-                getLabel={(i) => i.name}
-                name="rounds"
-                label="Select Rounds"
-              />
-              <Button label="Get Top Times" onClick={handleGetTopTimes} />
-            </div>
-          </FormProvider >
-      }
-    </div >
+      {isSelecting ? (
+        <AssignRacersForm
+          racers={racers}
+          setIsSelecting={() => setIsSelecting(false)}
+          rounds={rounds.filter((i) => {
+            const isSelected = selectedRounds.every(
+              (sr) => +sr.value !== i.round_index,
+            );
+            return isSelected;
+          })}
+        />
+      ) : (
+        <FormProvider {...formMethods}>
+          <div className="[&_label]:!text-black [&_select]:!bg-white">
+            <MultiSelect
+              className="grow"
+              options={rounds}
+              getKey={(i) => i.round_index.toString()}
+              getLabel={(i) => i.name}
+              name="rounds"
+              label="Select Rounds"
+            />
+            <Button label="Get Top Times" onClick={handleGetTopTimes} />
+          </div>
+        </FormProvider>
+      )}
+    </div>
   );
 }
