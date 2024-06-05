@@ -1,3 +1,24 @@
-export default function All() {
-  return <h1>All</h1>
+import { Dropdown } from "@/components/SelectGroup/Dropdown";
+import { MultiSelect } from "@/components/SelectGroup/MultiSelect";
+import { getLaneRace } from "../../action";
+import { TransferAllForm } from "./TranserAllForm";
+
+interface AllProps {
+  params: {
+    eventId: string;
+    raceId: string;
+  };
+}
+
+export default async function All({ params }: AllProps) {
+  const race = await getLaneRace({ raceId: params.raceId });
+
+  return (
+    <div>
+      <TransferAllForm
+        raceId={params.raceId}
+        rounds={race.data?.rounds ?? []}
+      />
+    </div>
+  );
 }
