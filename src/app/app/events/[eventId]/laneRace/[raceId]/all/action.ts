@@ -63,7 +63,7 @@ export const transferAllParticipants = action(
 
     return {
       result,
-      message: `Successfully moved participants to new round.`,
+      message: `Successfully moved participants to ${toRound.name}.`,
     };
   },
 );
