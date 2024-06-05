@@ -15,8 +15,8 @@ export default function DefaultLayout({
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
   const sidebarButtonClassname = !!isSidebarVisible
-    ? "right-[22rem] top-[26px] "
-    : "right-[3rem] top-5";
+    ? "xl:right-[22rem] xl:top-[26px] right-1/2 top-6"
+    : "xl:right-[3rem] xl:top-5 right-0 top-7";
 
   return (
     <>
