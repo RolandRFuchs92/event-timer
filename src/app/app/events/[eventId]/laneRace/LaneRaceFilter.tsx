@@ -3,13 +3,13 @@
 import toast from "react-hot-toast";
 
 import TwDialog from "@/components/Dialog/Dialog";
-import { Button } from "@/components/FormElements/button";
+import { Button, LinkButton } from "@/components/FormElements/button";
 
 import { LaneRaceTile } from "./LaneRacerTile";
-import { deleteRound, getLaneRace, getWinnersFrom } from "./action";
+import { deleteRound, getLaneRace } from "./action";
 import { LaneNewRound } from "./LaneNewRound";
-import { useLaneRaceId, useRoundIndex } from "./hook";
-import { AssignRacersInteraction } from "./AssignRacersInteraction";
+import { useLaneRaceId } from "./hook";
+import { usePathname } from "next/navigation";
 
 interface LaneRaceFilterProps {
   laneRace: Awaited<ReturnType<typeof getLaneRace>>["data"];
@@ -21,12 +21,7 @@ type T = NonNullable<
 
 export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
   const raceId = useLaneRaceId();
-  const roundIndex = useRoundIndex();
-
-  const round = laneRace?.rounds[roundIndex - 1];
-
-  const handleMoveWinnersFromPrev = async () => {
-  };
+  const pathname = usePathname();
 
   return (
     <TwDialog<T>
@@ -37,7 +32,7 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
       onYes={async (i) => {
         const result = await deleteRound({
           race_id: raceId,
-          round_index: i.round_index
+          round_index: i.round_index,
         });
 
         if (result.serverError) {
@@ -58,7 +53,7 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
             body={(i) => <LaneNewRound />}
             disableButtons
             title={""}
-            onYes={async (i) => { }}
+            onYes={async (i) => {}}
           >
             {(setData, toggle) => {
               return (
@@ -68,13 +63,16 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <Button
-                      label="Add"
+                      label="Add Round"
                       onClick={() => {
                         setData({});
                         toggle();
                       }}
                     />
-                    <AssignRacersInteraction laneRace={laneRace} />
+                    <LinkButton
+                      href={`${pathname}/${raceId}`}
+                      label="Move racers"
+                    />
                   </div>
                   <h3>Rounds</h3>
                   {laneRace?.rounds.map((i) => {

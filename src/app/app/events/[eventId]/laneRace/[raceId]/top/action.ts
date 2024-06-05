@@ -1,17 +1,20 @@
 "use server";
 
+import { uniqBy } from "lodash";
+import { revalidatePath, unstable_noStore } from "next/cache";
+
 import { action } from "@/lib/safeAction";
+import { _db } from "@/lib/db";
+
 import {
   AssignRacersToRound,
   GetTopTimesOverMultipleRoundsSchema,
 } from "./schema";
-import { _db } from "@/lib/db";
-import { uniqBy } from "lodash";
-import { revalidatePath } from "next/cache";
 
 export const getTopTimesOverMultipleRounds = action(
   GetTopTimesOverMultipleRoundsSchema,
   async (input) => {
+    unstable_noStore();
     var race = await _db.races.findFirst({
       where: {
         id: input.race_id,
@@ -47,7 +50,6 @@ export const assignParticipants = action(AssignRacersToRound, async (input) => {
     where: {
       id: input.race_id,
     },
-
   });
 
   if (!race) throw new Error("Unable to find that race!");
@@ -55,7 +57,7 @@ export const assignParticipants = action(AssignRacersToRound, async (input) => {
   const currentRacers = race.rounds[input.roundIndex].all_participant_ids;
 
   const newRacers = input.racers.filter(
-    (i) => !currentRacers.includes(i.participant_id) && i.isSelected === true
+    (i) => !currentRacers.includes(i.participant_id) && i.isSelected === true,
   );
 
   await _db.races.update({
@@ -64,13 +66,13 @@ export const assignParticipants = action(AssignRacersToRound, async (input) => {
         updateMany: {
           data: {
             all_participant_ids: {
-              push: newRacers.map(i => i.participant_id)
-            }
+              push: newRacers.map((i) => i.participant_id),
+            },
           },
           where: {
-            round_index: input.roundIndex
-          }
-        }
+            round_index: input.roundIndex,
+          },
+        },
       },
     },
     where: {
@@ -82,6 +84,6 @@ export const assignParticipants = action(AssignRacersToRound, async (input) => {
 
   revalidatePath("");
   return {
-    message: `Successfully added new participants to ${newRound.name}`
-  }
+    message: `Successfully added new participants to ${newRound.name}`,
+  };
 });
