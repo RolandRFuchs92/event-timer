@@ -18,18 +18,23 @@ import { AssignRacersToRound } from "./schema";
 import { useLaneRaceId } from "../../hook";
 import { assignParticipants } from "./action";
 import { usePathname, useRouter } from "next/navigation";
+import { useEventId } from "../../../eventUtils";
 
 interface AssignRacersFormProps {
   racers: NonNullable<heat["participants"][0]>[];
   rounds: NonNullable<
     Awaited<ReturnType<typeof getLaneRace>>["data"]
   >["rounds"];
-  raceId: string
+  raceId: string;
 }
 
-export function AssignRacersForm({ racers, rounds, raceId }: AssignRacersFormProps) {
-  const pathname = usePathname();
+export function AssignRacersForm({
+  racers,
+  rounds,
+  raceId,
+}: AssignRacersFormProps) {
   const { replace } = useRouter();
+  const eventId = useEventId();
   const form = useForm<z.infer<typeof AssignRacersToRound>>({
     resolver: zodResolver(AssignRacersToRound),
     defaultValues: {
@@ -50,14 +55,17 @@ export function AssignRacersForm({ racers, rounds, raceId }: AssignRacersFormPro
   });
 
   const handleSubmit = form.handleSubmit(async (data) => {
-    alert("MEEP");
     const result = await assignParticipants(data);
     if (result.serverError) {
       toast.error(result.serverError);
       return;
     }
-
     toast.success(result.data?.message ?? "");
+
+    const newUrlParams = new URLSearchParams();
+    newUrlParams.set("raceId", raceId);
+    newUrlParams.set("roundIndex", data.roundIndex.toString());
+    replace(`/app/events/${eventId}/laneRace?${newUrlParams.toString()}`);
   });
 
   return (

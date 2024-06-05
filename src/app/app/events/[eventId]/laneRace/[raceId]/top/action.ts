@@ -31,7 +31,7 @@ export const getTopTimesOverMultipleRounds = action(
     );
     var filteredParticipants = allParticipants.filter((i) => !!i.total_time_ms);
     var orderedParticipantTimes = filteredParticipants.sort(
-      (a, b) => +b.total_time_ms! - +a.total_time_ms!,
+      (a, b) => +a.total_time_ms! - +b.total_time_ms!,
     );
     var participantBestTimes = uniqBy(
       orderedParticipantTimes,

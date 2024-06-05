@@ -5,14 +5,14 @@ import { usePathname } from "next/navigation";
 interface LayoutProps {
   children: React.ReactNode;
   params: {
-    event_id: string;
+    eventId: string;
     raceId: string;
   };
 }
 
 export default function Layout({ children, params }: LayoutProps) {
   const pathname = usePathname();
-  const baseUrl = `/app/events/${params.event_id}/laneRace/${params.raceId}`;
+  const baseUrl = `/app/events/${params.eventId}/laneRace/${params.raceId}`;
 
   const splitPath = pathname.split("/");
   splitPath.reverse();

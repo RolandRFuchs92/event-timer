@@ -53,7 +53,7 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
             body={(i) => <LaneNewRound />}
             disableButtons
             title={""}
-            onYes={async (i) => {}}
+            onYes={async (i) => { }}
           >
             {(setData, toggle) => {
               return (
@@ -71,7 +71,7 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
                     />
                     <LinkButton
                       href={`${pathname}/${raceId}`}
-                      label="Move racers"
+                      label="Move Racers"
                     />
                   </div>
                   <h3>Rounds</h3>
