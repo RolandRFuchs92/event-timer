@@ -79,10 +79,10 @@ export function RaceTable({ data }: RaceTableProps) {
                   accessorKey: "actions",
                   header: "Actions",
                   cell: (i) => (
-                    <div className="flex items-center space-x-3.5">
+                    <div className="flex flex-col items-center space-y-2 lg:flex-row lg:space-x-3.5">
                       <button className="hover:text-primary">
                         <BatchIcon
-                          className="h-4 w-4"
+                          className="h-7 w-7 lg:h-4 lg:w-4"
                           onClick={() => {
                             if (i.row.original.race_type === "LaneRace") {
                               push(
@@ -98,7 +98,7 @@ export function RaceTable({ data }: RaceTableProps) {
                       </button>
                       <button className="hover:text-primary">
                         <TrashIcon
-                          className="h-4 w-4"
+                          className="h-7 w-7 lg:h-4 lg:w-4"
                           onClick={() => {
                             setData(i.row.original);
                             toggle();
@@ -113,7 +113,9 @@ export function RaceTable({ data }: RaceTableProps) {
                           )
                         }
                       >
-                        <EditIcon />
+                        <div className=" h-7 w-7 lg:h-4 lg:w-4">
+                          <EditIcon removeDimensions />
+                        </div>
                       </button>
                     </div>
                   ),

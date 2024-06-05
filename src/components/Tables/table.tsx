@@ -23,7 +23,7 @@ export function Table<T extends object>({
   });
 
   return (
-    <div className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+    <div className="rounded-sm border border-stroke bg-white px-2 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark md:px-7.5 lg:px-5 xl:pb-1">
       <div className="max-w-full overflow-x-auto">
         <div className="mb-2 flex flex-row justify-between justify-items-center">
           {typeof heading === "string" ? <div>{heading}</div> : heading}
@@ -42,7 +42,7 @@ export function Table<T extends object>({
                       <th
                         key={header.id}
                         colSpan={header.colSpan}
-                        className="min-w-[220px] p-4 font-medium text-black dark:text-white xl:pl-11"
+                        className="p-4 font-medium text-black dark:text-white lg:min-w-[220px] lg:pl-11"
                       >
                         {flexRender(
                           header.column.columnDef.header,
@@ -60,7 +60,7 @@ export function Table<T extends object>({
               <tr className="tr" key={row.id}>
                 {row.getVisibleCells().map((cell) => (
                   <td
-                    className="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11"
+                    className="border-b border-[#eee] px-4 py-6 dark:border-strokedark lg:py-5 lg:pl-9 xl:pl-11"
                     key={cell.id}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

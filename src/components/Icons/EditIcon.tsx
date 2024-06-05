@@ -1,4 +1,8 @@
-export function EditIcon() {
+type EditIconProps = {
+  removeDimensions?: boolean;
+};
+
+export function EditIcon({ removeDimensions = false }: EditIconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -6,8 +10,8 @@ export function EditIcon() {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      width="20"
-      height="20"
+      width={!removeDimensions ? "20" : ""}
+      height={!removeDimensions ? "20" : ""}
     >
       <path
         strokeLinecap="round"

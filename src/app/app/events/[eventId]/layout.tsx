@@ -71,7 +71,7 @@ export default function EventHomeLayout({
           },
         ]}
       />
-      <div className="bg-gray-50 text-medium text-gray-500 dark:text-gray-400 dark:bg-gray-800 w-full rounded-lg p-6">
+      <div className="bg-gray-50 text-medium text-gray-500 dark:text-gray-400 dark:bg-gray-800 w-full rounded-lg pt-4 md:p-1 lg:p-6">
         {children}
       </div>
     </div>

@@ -37,7 +37,7 @@ export function Tabs({ options }: TabProps) {
               <Link
                 key={text}
                 className={cn(
-                  "hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group inline-flex items-center justify-center gap-2 rounded-t-lg border-b-2 border-transparent p-4 transition-all duration-150 hover:bg-blue-100 dark:hover:bg-boxdark/40",
+                  "hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent p-3 transition-all  duration-150 hover:bg-blue-100 dark:hover:bg-boxdark/40 lg:gap-2 lg:p-4",
                   className,
                   isSelected ? "bg-blue-200 dark:bg-boxdark" : "",
                 )}
