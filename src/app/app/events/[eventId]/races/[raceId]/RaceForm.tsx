@@ -24,6 +24,7 @@ interface RaceFormProps {
 export function RaceForm({ race, raceTypes }: RaceFormProps) {
   const eventId = useEventId();
   const { replace } = useRouter();
+
   const form = useForm({
     defaultValues: {
       ...race,
@@ -31,6 +32,7 @@ export function RaceForm({ race, raceTypes }: RaceFormProps) {
     },
     resolver: zodResolver(RaceSchema),
   });
+
   const batchRows = useFieldArray({
     name: "batches",
     control: form.control,

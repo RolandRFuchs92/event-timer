@@ -11,6 +11,7 @@ import { TrashIcon } from "@heroicons/react/24/outline";
 import { useEventId } from "../eventUtils";
 import { BatchIcon } from "@/components/Icons/BatchIcon";
 import { startCase } from "lodash";
+import { batch } from "@prisma/client";
 
 interface RaceTableProps {
   data: Awaited<ReturnType<typeof getEventRaces>>;
@@ -72,7 +73,7 @@ export function RaceTable({ data }: RaceTableProps) {
                   cell: (p) =>
                     p
                       .getValue()
-                      .map((i) => i.name)
+                      .map((i: batch) => i.name)
                       .join(", "),
                 },
                 {

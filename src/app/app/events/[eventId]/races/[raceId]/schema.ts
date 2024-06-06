@@ -9,7 +9,6 @@ export const RaceSchema = z.object({
   race_type: z.nativeEnum(RaceTypeEnum),
   batches: z.array(
     z.object({
-      batch_id: z.string().nullish(),
       name: z.string(),
       start_on: z.coerce.date().nullish(),
     }),
