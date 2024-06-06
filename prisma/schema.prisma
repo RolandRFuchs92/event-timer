@@ -95,9 +95,10 @@ model participant {
 }
 
 type participant_race {
-  race_id   String
-  race_type RaceTypeEnum
-  race_name String
+  race_id     String
+  race_type   RaceTypeEnum
+  race_name   String
+  batch_index Int?
 }
 
 type participant_batch {

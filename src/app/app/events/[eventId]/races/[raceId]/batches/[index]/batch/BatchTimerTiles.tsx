@@ -1,15 +1,17 @@
 "use client";
 import React from "react";
+import { batch } from "@prisma/client";
+import toast from "react-hot-toast";
 
 import { Button } from "@/components/FormElements/button";
 import { Time } from "@/components/time/Time";
 import { BatchElapsedTime } from "@/components/time/TimeElapsed";
 import { CurrentTime } from "@/components/time/Timer";
 import { TimerDisplay } from "@/components/time/TimerTile";
-import { batch } from "@prisma/client";
-import { resetBatchTimer, startBatchTimer } from "./action";
-import toast from "react-hot-toast";
 import TwDialog from "@/components/Dialog/Dialog";
+
+import { resetBatchTimer, startBatchTimer } from "./action";
+import { useBatchRaceId } from "../../hook";
 
 interface BatchTimerTile {
   batch?: batch;
@@ -17,13 +19,15 @@ interface BatchTimerTile {
 
 export function BatchTimerTile({ batch }: BatchTimerTile) {
   const [batchTime, setBatchTime] = React.useState(batch?.start_on ?? null);
+  const raceId = useBatchRaceId();
 
   const handleStartBatch = async () => {
     const startTime = new Date();
     setBatchTime(startTime);
     try {
       const result = await startBatchTimer({
-        batchId: batch?.batch_id!,
+        batchIndex: batch!.index,
+        raceId,
         startTime,
       });
       toast.success(result.data!.message);
@@ -34,7 +38,10 @@ export function BatchTimerTile({ batch }: BatchTimerTile) {
 
   const handleResetBatch = async () => {
     setBatchTime(null);
-    const result = await resetBatchTimer({ batchId: batch!.batch_id });
+    const result = await resetBatchTimer({
+      raceId,
+      batchIndex: batch!.index,
+    });
     if (result.serverError) {
       toast.error(result.serverError);
       return;
