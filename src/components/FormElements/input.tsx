@@ -5,7 +5,7 @@ import { Controller } from "react-hook-form";
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   helperText?: string;
   isError?: boolean;
-  label: string;
+  label?: string;
   endIcon?: React.ReactNode;
 }
 
@@ -19,9 +19,13 @@ export function Input({
 }: InputProps) {
   return (
     <div>
-      <label className="block text-sm font-medium text-black dark:text-white">
-        {label}
-      </label>
+      {
+        label
+          ? <label className="block text-sm font-medium text-black dark:text-white">
+            {label}
+          </label>
+          : null
+      }
       <div className="relative">
         <input
           type="text"

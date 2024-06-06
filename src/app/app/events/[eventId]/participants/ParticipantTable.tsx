@@ -38,6 +38,10 @@ export function ParticipantTable({ data }: ParticpantTableProps) {
           <Table
             heading="Participant Table"
             href={`/app/events/${eventId}/registration/${MONGO_UPSERT_HACK}`}
+            searchFn={(i, search) => {
+              const reg = new RegExp(search, "gi");
+              return reg.test(i.last_name) || reg.test(i.first_name);
+            }}
             tableProps={{
               data: data,
               enableHiding: true,
