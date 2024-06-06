@@ -1,13 +1,13 @@
 "use server";
 
-import { round, races } from "@prisma/client";
+import { races } from "@prisma/client";
 import { revalidatePath, unstable_noStore } from "next/cache";
 
 import { _db } from "@/lib/db";
-import { newObjectId } from "@/lib/helper";
 import { action } from "@/lib/safeAction";
 
 import { DefaultRace, RaceSchema } from "./schema";
+import { z } from "zod";
 
 export async function getRace(raceId: string) {
   if (raceId === "null") return DefaultRace;
@@ -24,57 +24,120 @@ export async function getRace(raceId: string) {
   return result;
 }
 
-export const mutateRace = action(RaceSchema, async ({ id, ...rawRace }) => {
-  const isLaneRace = rawRace.race_type === "LaneRace";
+export const mutateRace = action(RaceSchema, async (input) => {
+  const isLaneRace = input.race_type === "LaneRace";
   const currentRace = await _db.races.findFirst({
     where: {
-      id
-    }
-  });
-
-  if (currentRace) {
-
-    return {
-      message: `Successfully mutated ${rawRace.name}!`
-    }
-  }
-
-  const heatContainers: round[] = isLaneRace
-    ? [
-      {
-        name: "Qualifier",
-        heats: [],
-        round_index: 0,
-        is_qualifier: true,
-        all_participant_ids: [],
-      },
-    ]
-    : [];
-
-  const batches: Omit<races, "id">["batches"] = !isLaneRace
-    ? rawRace.batches.map((i) => ({
-      ...i,
-      batch_id: newObjectId().toString(),
-      name: i.name,
-      start_on: null,
-    }))
-    : [];
-
-  const race: Omit<races, "id"> = {
-    ...rawRace,
-    rounds: heatContainers,
-    batches,
-  };
-  console.log(batches);
-
-  const result = await _db.races.create({
-    data: race,
+      id: input.id,
+    },
   });
 
   revalidatePath(".");
+
+  if (isLaneRace) {
+    const result = await mutateLaneRace(currentRace, input);
+
+    return {
+      result,
+      message: `Successfully created ${result.name} race!`,
+    };
+  }
+
+  const result = await mutateStandardRace(currentRace, input);
 
   return {
     result,
     message: `Successfully created ${result.name} race!`,
   };
-})
+});
+
+async function mutateStandardRace(
+  race: races | null,
+  input: z.infer<typeof RaceSchema>,
+) {
+  if (!race) {
+    const result = await _db.races.create({
+      data: {
+        name: input.name,
+        event_id: input.event_id,
+        rounds: [],
+        batches: input.batches,
+        race_type: input.race_type,
+      },
+    });
+
+    return result;
+  }
+
+  //WHAT ABOUT DELETEING A BATCH???
+  const updatedBatchesResult = await _db.$runCommandRaw({
+    update: "races",
+    updates: race.batches.map((i, index) => [
+      {
+        q: {
+          _id: {
+            $oid: race.id,
+          },
+        },
+        u: {
+          $set: {
+            [`batches.${index}.name`]: i.name,
+          },
+        },
+      },
+    ]),
+  });
+
+  const result = await _db.races.update({
+    data: {
+      name: input.name,
+      rounds: [],
+      race_type: input.race_type,
+
+    },
+    where: {
+      id: input.id,
+    },
+  });
+
+  return result;
+}
+
+async function mutateLaneRace(
+  race: races | null,
+  input: z.infer<typeof RaceSchema>,
+) {
+  if (!race) {
+    const result = await _db.races.create({
+      data: {
+        name: input.name,
+        event_id: input.event_id,
+        rounds: [
+          {
+            name: "Qualifier",
+            heats: [],
+            round_index: 0,
+            is_qualifier: true,
+            all_participant_ids: [],
+          },
+        ],
+        batches: [],
+        race_type: input.race_type,
+      },
+    });
+    return result;
+  }
+
+  /// WHAT ABOUT DELETE
+  const result = await _db.races.update({
+    data: {
+      name: input.name,
+      race_type: input.race_type,
+      batches: []
+    },
+    where: {
+      id: input.id
+    },
+  });
+  return result;
+}

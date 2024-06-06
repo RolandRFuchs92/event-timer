@@ -2,7 +2,7 @@
 
 import { differenceInMilliseconds } from "date-fns";
 import { revalidatePath, unstable_noStore } from "next/cache";
-import { max, omit, uniqBy } from "lodash";
+import { max, omit } from "lodash";
 import { ParticipantHeatStatusEnum, heat, round } from "@prisma/client";
 
 import { action } from "@/lib/safeAction";
@@ -26,8 +26,6 @@ import {
   deleteRoundCommand,
   updateParticipantTimeCommand,
 } from "./mongoCommands";
-
-export const assignCompetitors = action(LaneRaceSchema, async () => { });
 
 export const getQualifierCompetitors = action(
   LaneRaceSchema,
@@ -229,7 +227,9 @@ export const addLaneCompetitor = action(LaneCompetitorSchema, async (input) => {
     throw new Error(`That user is already part of heat ${heatRef.index + 1}`);
 
   if (heatRef.participants.length === 2)
-    throw new Error(`Please remove a participant from heat ${heatRef.index + 1} first.`);
+    throw new Error(
+      `Please remove a participant from heat ${heatRef.index + 1} first.`,
+    );
 
   const participantsInHeats = roundRef.heats.flatMap((h) =>
     h.participants.map((p) => {
@@ -257,7 +257,6 @@ export const addLaneCompetitor = action(LaneCompetitorSchema, async (input) => {
 
   if (!participant) throw new Error("Unable to find that participant.");
 
-
   const newParticipant = {
     participant_id: input.participant_id,
     status: ParticipantHeatStatusEnum.NotStarted,
@@ -279,8 +278,8 @@ export const addLaneCompetitor = action(LaneCompetitorSchema, async (input) => {
               updateMany: {
                 data: {
                   participants: {
-                    push: newParticipant
-                  }
+                    push: newParticipant,
+                  },
                 },
                 where: {
                   index: input.heat_index,
@@ -371,7 +370,6 @@ export const closeLaneRace = action(LaneCloseSchema, async (input) => {
   const round = race.rounds[input.round_index];
   if (!round) throw new Error("Unable to find that round.");
 
-
   const result = await _db.races.update({
     data: {
       rounds: {
@@ -380,19 +378,19 @@ export const closeLaneRace = action(LaneCloseSchema, async (input) => {
             heats: {
               updateMany: {
                 data: {
-                  is_closed: true
+                  is_closed: true,
                 },
                 where: {
-                  index: input.heat_index
-                }
-              }
-            }
+                  index: input.heat_index,
+                },
+              },
+            },
           },
           where: {
-            round_index: input.round_index
-          }
-        }
-      }
+            round_index: input.round_index,
+          },
+        },
+      },
     },
     where: {
       id: input.race_id,

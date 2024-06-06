@@ -56,3 +56,4 @@ export function useHeatIndexs() {
   const heatIndex = +(searchParams.get("heatIndex") ?? 0);
   return heatIndex;
 }
+
