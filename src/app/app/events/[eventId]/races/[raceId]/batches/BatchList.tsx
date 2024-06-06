@@ -1,28 +1,22 @@
 import { LinkButton } from "@/components/FormElements/button";
 import { _db } from "@/lib/db";
 import React from "react";
+import { getBatches } from "./action";
 
 interface BatchListProps {
   raceId: string;
 }
 
 export async function BatchList({ raceId }: BatchListProps) {
-  const race = await _db.races.findFirst({
-    where: {
-      id: raceId,
-    },
-  });
+  const batches = await getBatches(raceId);
 
-  if (race === null) return <h3>There are no batches for this race.</h3>;
+  if (!batches.data?.length)
+    return <h3>There are no batches for this race.</h3>;
 
   return (
     <div className="flex flex-row gap-2">
-      {race.batches.map((i) => (
-        <LinkButton
-          key={i.batch_id}
-          href={`batches/${i.batch_id}/batch`}
-          label={i.name}
-        />
+      {batches.data.map((i, index) => (
+        <LinkButton key={index} href={`/${index}/batch`} label={i.name} />
       ))}
     </div>
   );

@@ -113,9 +113,8 @@ type participant_batch {
 }
 
 type batch {
-  batch_id String    @db.ObjectId
-  name     String
-  start_on DateTime?
+  name        String
+  start_on    DateTime?
 }
 
 enum RaceTypeEnum {
