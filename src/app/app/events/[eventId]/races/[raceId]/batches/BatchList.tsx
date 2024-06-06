@@ -16,7 +16,7 @@ export async function BatchList({ raceId }: BatchListProps) {
   if (race === null) return <h3>There are no batches for this race.</h3>;
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-row gap-2">
       {race.batches.map((i) => (
         <LinkButton
           key={i.batch_id}
