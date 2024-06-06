@@ -2,25 +2,23 @@ import { LinkButton } from "@/components/FormElements/button";
 import { _db } from "@/lib/db";
 import { cn } from "@/lib/styles";
 import React from "react";
+import { getBatchParticipants } from "./action";
 
 interface ParticipantsProps {
   params: {
-    batchId: string;
+    index: string;
+    eventId: string;
+    raceId: string;
   };
 }
 
-export default async function Participants({
-  params: { batchId },
-}: ParticipantsProps) {
-  const participants = await _db.participant.findMany({
-    where: {
-      batches: {
-        some: {
-          batch_id: batchId,
-        },
-      },
-    },
+export default async function Participants({ params }: ParticipantsProps) {
+  const batch = await getBatchParticipants({
+    race_id: params.raceId,
+    batch_index: +params.index,
   });
+
+  const participants = batch.data?.result.participants ?? [];
 
   return (
     <div className="flex flex-col gap-2">

@@ -83,16 +83,15 @@ enum ParticipantHeatStatusEnum {
 }
 
 model participant {
-  id          String              @id @default(auto()) @map("_id") @db.ObjectId
+  id          String             @id @default(auto()) @map("_id") @db.ObjectId
   first_name  String
   last_name   String
   birthdate   DateTime
   race_number String?
-  batches     participant_batch[]
   races       participant_race[]
   is_male     Boolean
-  event_id    String              @db.ObjectId
-  event       event               @relation(fields: [event_id], references: [id])
+  event_id    String             @db.ObjectId
+  event       event              @relation(fields: [event_id], references: [id])
 }
 
 type participant_race {
@@ -102,20 +101,18 @@ type participant_race {
 }
 
 type participant_batch {
-  race_id       String
-  batch_id      String
-  batch_name    String
-  race_name     String
-  finish_time   DateTime?
-  finish_status FinishStatusEnum?
-  time_taken    String?
-  time_taken_ms Int?
+  participant_id String
+  finish_time    DateTime?
+  finish_status  FinishStatusEnum?
+  time_taken     String?
+  time_taken_ms  Int?
 }
 
 type batch {
-  index     Int
-  name        String
-  start_on    DateTime?
+  index        Int
+  name         String
+  start_on     DateTime?
+  participants participant_batch[]
 }
 
 enum RaceTypeEnum {
