@@ -56,7 +56,7 @@ export function RoundNames({ data }: RoundNamesType) {
                         <p
                           className={winnerHighlightClassname}
                         >{`Status: ${participant?.status}`}</p>
-                        <p>{`Time: ${participant?.timeTakedMs}`}</p>
+                        <p>{`Time Taken: ${participant?.timeTakedMs}`}</p>
                       </div>
                     );
                   })}
