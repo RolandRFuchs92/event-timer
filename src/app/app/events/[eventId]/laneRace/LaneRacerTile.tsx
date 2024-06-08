@@ -31,7 +31,7 @@ export function LaneRaceTile({ round, onDelete }: LaneRacerTileProps) {
         onClick={() => setRoundIndex(round.round_index)}
       >
         <div className="flex flex-col gap-2">
-          <b className="text-xs">{round.name}</b>
+          <b className="text-xs text-slate-800">{round.name}</b>
         </div>
       </div>
       {round.round_index !== roundIndex && (

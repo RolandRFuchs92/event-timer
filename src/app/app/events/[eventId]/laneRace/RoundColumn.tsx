@@ -106,10 +106,10 @@ function AllParticipants({ round }: AllParticipantsProps) {
                       className="grow cursor-pointer  hover:font-extrabold"
                       onClick={() => handleParticipantAdd(i.id)}
                     >
-                      <p>
+                      <p className="text-slate-800">
                         {i.first_name} {i.last_name} [{i.race_number}]
                       </p>
-                      <sub>
+                      <sub className="text-slate-600">
                         {currentHeat
                           ? `Heat ${currentHeat!.index + 1}`
                           : `Not assigned to a heat yet.`}

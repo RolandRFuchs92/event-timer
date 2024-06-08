@@ -86,7 +86,7 @@ export function HeatInteractions({ laneRace }: HeatInteractionsProps) {
 
   return (
     <div>
-      <b className="border-b-black text-lg">Heat {heatIndex + 1} </b>
+      <b className="border-b-black text-lg ">Heat {heatIndex + 1} </b>
       <div>
         <h3>
           Start Time:{" "}

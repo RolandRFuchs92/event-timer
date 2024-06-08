@@ -16,7 +16,6 @@ export function LaneRaceTable({ laneRace }: LaneRaceTableProps) {
       <React.Suspense fallback="Loading...">
         <RoundColumn laneRace={laneRace} />
       </React.Suspense>
-      {/* <div className="border lg:border-none" /> */}
 
       {laneRace ? <LaneHeat laneRace={laneRace} /> : null}
     </div>
