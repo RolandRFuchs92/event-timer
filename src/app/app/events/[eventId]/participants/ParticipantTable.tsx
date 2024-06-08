@@ -8,7 +8,6 @@ import { EditIcon } from "@/components/Icons/EditIcon";
 import { TrashIcon } from "@/components/Icons/TrashIcon";
 import { Table } from "@/components/Tables/table";
 import { getParticipants, deleteParticipant } from "./action";
-import { defaultDateString, fullDateFormat } from "@/lib/DateTimeUtils";
 import { VisibleIcon } from "@/components/Icons/VisibleIcon";
 import { useEventId } from "../eventUtils";
 import { MONGO_UPSERT_HACK } from "@/lib/db";
@@ -20,7 +19,6 @@ interface ParticpantTableProps {
 
 export function ParticipantTable({ data }: ParticpantTableProps) {
   const eventId = useEventId();
-  const { push } = useRouter();
   const { replace } = useRouter();
 
   return (
@@ -83,14 +81,12 @@ export function ParticipantTable({ data }: ParticpantTableProps) {
                   cell: (p) => {
                     const batches = p.row.original.batches;
                     const batchResult = batches.map((i) => {
-                      return `${i.race_name}[${i.batch_name}]`;
+                      if (i.race_type === "StandardNoLaps")
+                        return `${i.race_name}[${i.batch}]`;
+                      return i.race_name;
                     });
 
-                    const laneRaces = p.row.original.races.map(
-                      (i) => i.race_name,
-                    );
-
-                    const result = [...batchResult, ...laneRaces].join(", ");
+                    const result = batchResult.join(", ");
                     return result;
                   },
                 },

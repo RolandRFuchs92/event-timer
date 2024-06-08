@@ -28,16 +28,17 @@ model client {
 }
 
 model event {
-  id          String          @id @default(auto()) @map("_id") @db.ObjectId
-  client_id   String          @db.ObjectId
-  client      client          @relation(fields: [client_id], references: [id])
-  name        String
-  start_on    DateTime
-  end_on      DateTime?
-  created_on  DateTime
-  event_type  EventTypeEnum[]
-  races       races[]
-  participant participant[]
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  client_id        String          @db.ObjectId
+  client           client          @relation(fields: [client_id], references: [id])
+  name             String
+  start_on         DateTime
+  end_on           DateTime?
+  created_on       DateTime
+  last_race_number Int
+  event_type       EventTypeEnum[]
+  races            races[]
+  participant      participant[]
 }
 
 model races {
