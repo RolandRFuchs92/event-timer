@@ -32,7 +32,7 @@ export function RoundNames({ data }: RoundNamesType) {
           ];
 
           return (
-            <div className="flex flex-col gap-2 p-2">
+            <div key={heats?.heatNumber} className="flex flex-col gap-2 p-2">
               <h1 className="font-semibold underline">
                 Heat Number: {heats?.heatNumber}
               </h1>
@@ -48,8 +48,10 @@ export function RoundNames({ data }: RoundNamesType) {
                           ? "bg-orange-300"
                           : "";
                     return (
-                      //   <div className=" border-gray-300 h-20 w-24 border-[.05rem]"></div>
-                      <div className=" outline-gray-300  flex grow flex-col  rounded-md p-2 outline-dashed outline-[1px]">
+                      <div
+                        key={participant?.name}
+                        className=" outline-gray-300  flex grow flex-col  rounded-md p-2 outline-dashed outline-[1px]"
+                      >
                         <p>{`Name: ${participant?.name}`}</p>
                         <p
                           className={winnerHighlightClassname}
