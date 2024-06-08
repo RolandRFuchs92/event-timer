@@ -5,9 +5,10 @@ import { getBatches } from "./action";
 
 interface BatchListProps {
   raceId: string;
+  eventId: string;
 }
 
-export async function BatchList({ raceId }: BatchListProps) {
+export async function BatchList({ raceId, eventId }: BatchListProps) {
   const batches = await getBatches(raceId);
 
   if (!batches.data?.length)
@@ -16,7 +17,11 @@ export async function BatchList({ raceId }: BatchListProps) {
   return (
     <div className="flex flex-row gap-2">
       {batches.data.map((i, index) => (
-        <LinkButton key={index} href={`/${index}/batch`} label={i.name} />
+        <LinkButton
+          key={index}
+          href={`/app/events/${eventId}/races/${raceId}/batches/${index}/batch`}
+          label={i.name}
+        />
       ))}
     </div>
   );
