@@ -25,7 +25,7 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
 
   return (
     <TwDialog<T>
-      body={(i) => "Reallt delete this heat?"}
+      body={(i) => "Really delete this heat?"}
       title={(i) =>
         `Really delete this ${i.name}? All containing data will be deleted.`
       }
@@ -53,11 +53,11 @@ export function LaneRaceFilter({ laneRace }: LaneRaceFilterProps) {
             body={(i) => <LaneNewRound />}
             disableButtons
             title={""}
-            onYes={async (i) => { }}
+            onYes={async (i) => {}}
           >
             {(setData, toggle) => {
               return (
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 rounded-sm p-2 outline outline-slate-300 lg:p-0 lg:px-2">
                   <div className="flex flex-row items-center justify-between gap-2">
                     <h3>Race: {laneRace?.name}</h3>
                   </div>

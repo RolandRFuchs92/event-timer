@@ -27,8 +27,8 @@ export async function RoundColumn({ laneRace }: LaneRaceContainerProps) {
   const round = laneRace?.rounds[roundIndex];
 
   return (
-    <div>
-      <div className="text-middle flex h-10 flex-row items-center justify-between">
+    <div className="rounded-sm p-2 outline outline-slate-300">
+      <div className="text-middle  flex h-10 flex-row items-center justify-between">
         <h3>Round: {round?.name}</h3>
       </div>
       <HeatFilter heats={round?.heats ?? []} />
@@ -80,7 +80,7 @@ function AllParticipants({ round }: AllParticipantsProps) {
   };
 
   return (
-    <TwDialog<typeof round["all_participants"][0]>
+    <TwDialog<(typeof round)["all_participants"][0]>
       title={(i) => `Remove competitor from pool`}
       body={(i) => `Are you sure you want to remove this competitor?`}
       onYes={async (i) => {
@@ -89,7 +89,7 @@ function AllParticipants({ round }: AllParticipantsProps) {
     >
       {(setData, toggle) => {
         return (
-          <div>
+          <div className="">
             <h3 className="font-bold">Competitors</h3>
             <ul className="flex flex-col gap-2">
               {participants.map((i) => {
@@ -100,10 +100,10 @@ function AllParticipants({ round }: AllParticipantsProps) {
                 return (
                   <li
                     key={i.id}
-                    className="flex grow flex-row items-center rounded-md border border-white p-2 text-xs"
+                    className="flex grow flex-row items-center rounded-md border border-white bg-white p-2 text-xs"
                   >
                     <div
-                      className="grow cursor-pointer hover:font-extrabold"
+                      className="grow cursor-pointer  hover:font-extrabold"
                       onClick={() => handleParticipantAdd(i.id)}
                     >
                       <p>

@@ -12,7 +12,7 @@ interface LaneHeatProps {
 
 export function LaneHeat({ laneRace }: LaneHeatProps) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-6 rounded-sm bg-white px-1 outline outline-slate-300 lg:gap-2 lg:p-2">
       <HeatInteractions laneRace={laneRace} />
       <HeatDisplay laneRace={laneRace} />
     </div>

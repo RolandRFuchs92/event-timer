@@ -25,7 +25,7 @@ export function LaneRaceTile({ round, onDelete }: LaneRacerTileProps) {
     >
       <div
         className={cn(
-          "flex grow cursor-pointer flex-row items-center gap-2 rounded-md border border-white bg-black p-2",
+          "flex grow cursor-pointer flex-row items-center gap-2 rounded-md border border-white bg-blue-200 p-2",
           round.round_index === roundIndex ? "bg-white text-black" : "",
         )}
         onClick={() => setRoundIndex(round.round_index)}
