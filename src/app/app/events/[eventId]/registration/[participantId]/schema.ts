@@ -9,7 +9,6 @@ export const RegistrationSchema = z.object({
   id: z.coerce.string(),
   first_name: z.string().min(2),
   last_name: z.string(),
-  race_number: z.string().nullable(),
   birthdate: z.coerce.date(),
   batches: z.array(
     z.object({
@@ -22,15 +21,14 @@ export const RegistrationSchema = z.object({
 
 export const DefaultRegistration: z.infer<typeof RegistrationSchema> = {
   event_id: "",
-  id: MONGO_UPSERT_HACK,
+  id: "",
   first_name: "",
   last_name: "",
   birthdate: null as any,
-  race_number: "",
   batches: [
     {
-      race_id: "" as any,
-      batch_index: "" as any,
+      race_id: "",
+      batch_index: "",
     },
   ],
   is_male: false,

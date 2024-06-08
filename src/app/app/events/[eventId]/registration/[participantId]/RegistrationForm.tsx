@@ -36,8 +36,16 @@ export function RegistrationForm({
   });
 
   const handleSubmit = form.handleSubmit(async (data) => {
-    const result = await mutateParticipant(eventId, data);
-    toast.success(result.message);
+    const result = await mutateParticipant({
+      ...data,
+    });
+
+    if (result.serverError) {
+      toast.error(result.serverError);
+      return;
+    }
+
+    toast.success(result.data!.message);
     replace(`/app/events/${eventId}/participants`);
   });
 
@@ -48,22 +56,21 @@ export function RegistrationForm({
       onSubmit={handleSubmit}
     >
       <FormData />
+      <FormErrors />
       <FormRow>
         <FInput name="first_name" label="First Name" />
         <FInput name="last_name" label="Last Name" />
       </FormRow>
-      <FInput name="race_number" label="Race Number" />
       <Checkbox name="is_male" label="Is Male" />
       <FInput type="date" name="birthdate" label="Birthdate" />
       <BatchFieldArray form={form} races={races} />
-      <FormErrors />
       <Button label="Submit" />
     </Form>
   );
 }
 
 interface BatchFieldArrayProps {
-  form: UseFormReturn<typeof DefaultRegistration>;
+  form: UseFormReturn<Awaited<ReturnType<typeof getParticipant>>>;
   races: Awaited<ReturnType<typeof getEventRaces>>;
 }
 
@@ -75,7 +82,7 @@ function BatchFieldArray({ form, races }: BatchFieldArrayProps) {
 
   const handleAddRace = () => {
     const batchCount = batchFieldArray.fields.length;
-    batchFieldArray.insert(batchCount, { batch_id: "", race_id: "" });
+    batchFieldArray.insert(batchCount, { batch_index: "", race_id: "" });
   };
 
   const removeRaceAssignment = (index: number) => {

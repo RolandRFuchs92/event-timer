@@ -38,7 +38,7 @@ export function FormData() {
   return (
     <div>
       <button onClick={() => setIsVisible((i) => !i)} type="button">
-        Show/hide
+        Show/hide (Form Data)
       </button>
       {isVisible === true ? (
         <pre>{JSON.stringify(form.watch(), null, 2)}</pre>
@@ -52,9 +52,9 @@ export function FormErrors() {
   const [isVisible, setIsVisible] = React.useState(false);
   const errors = form.formState.errors;
   return (
-    <div>
+    <div className="text-red">
       <button onClick={() => setIsVisible((i) => !i)} type="button">
-        Show/hide
+        Show/hide (Form Errors)
       </button>
       {isVisible === true ? <pre>{JSON.stringify(errors, null, 2)}</pre> : null}
     </div>
