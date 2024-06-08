@@ -11,25 +11,11 @@ import { participant, participant_batch } from "@prisma/client";
 import { z } from "zod";
 import { revalidatePath, unstable_noStore } from "next/cache";
 import { getTimerDifference } from "@/lib/getTimerDifference";
-import { omit } from "lodash";
-import { differenceInMilliseconds } from "date-fns";
+import { omit, uniq } from "lodash";
+import { differenceInMilliseconds, differenceInYears } from "date-fns";
 
 export async function getFinishers(raceIds: string[]) {
   unstable_noStore();
-  const rawParticipants = await _db.participant.findMany({
-    where: {
-      batches: {
-        some: {
-          race_id: {
-            in: raceIds,
-          },
-          finish_time: {
-            not: null,
-          },
-        },
-      },
-    },
-  });
 
   const races = await _db.races.findMany({
     where: {
@@ -39,33 +25,50 @@ export async function getFinishers(raceIds: string[]) {
     },
   });
 
-  const participants = rawParticipants.map((i) => {
-    return {
-      ...i,
-      batches: i.batches.map((b) => {
-        const race = races.find(
-          (r) =>
-            r.batches.some((rb) => rb.batch_id === b.batch_id) &&
-            r.id === b.race_id,
-        );
-        const batch = race?.batches.find((i) => i.batch_id === b.batch_id);
-
-        return {
-          finish_status: b.finish_status,
-          race_id: b.race_id,
-          batch_id: b.batch_id,
-          race_name: race?.name,
-          batch_start_on: batch?.start_on,
-          batch: batch?.name,
-          finish_time: b.finish_time,
-          time_taken: b.time_taken,
-          time_taken_ms: b.time_taken_ms,
-        };
-      }),
-    };
+  const allParticipantIds = uniq(
+    races.flatMap((i) =>
+      i.batches.flatMap((i) => i.participants.map((i) => i.participant_id)),
+    ),
+  );
+  const rawParticipants = await _db.participant.findMany({
+    where: {
+      id: {
+        in: allParticipantIds,
+      },
+    },
   });
 
-  return participants;
+  const result = races.flatMap((r) => {
+    const participants = r.batches
+      .flatMap((b) => {
+        return b.participants.map((p) => {
+          const me = rawParticipants.find((i) => i.id === p.participant_id)!;
+
+          return {
+            first_name: me.first_name,
+            last_name: me.last_name,
+            race_number: me.race_number,
+            age: differenceInYears(new Date(), me.birthdate),
+            race: r.name,
+            finish_status: p.finish_status,
+            race_id: r.id,
+            batch_index: b.index,
+            batch_start_on: b.start_on!,
+            batch: b.name!,
+            start_on: b.start_on,
+            finish_time: p.finish_time,
+            time_taken: p.time_taken,
+            time_taken_ms: p.time_taken_ms,
+          };
+        });
+      })
+      .filter((i) => !!i.start_on && !!i.finish_time)
+      .sort((a, b) => +a.finish_time! - +b.finish_time!);
+
+    return participants;
+  });
+
+  return result;
 }
 
 export const deleteFinisher = action(
