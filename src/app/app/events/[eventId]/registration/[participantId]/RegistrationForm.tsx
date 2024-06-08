@@ -13,11 +13,11 @@ import { FInput } from "@/components/FormElements/input";
 import { Form, FormData, FormErrors } from "@/components/FormElements/form";
 import { Checkbox } from "@/components/Checkboxes/CheckboxOne";
 import { Dropdown } from "@/components/SelectGroup/Dropdown";
+import { TrashIcon } from "@/components/Icons/TrashIcon";
 
 import { getEventRaces, getParticipant, mutateParticipant } from "./action";
 import { DefaultRegistration, RegistrationSchema } from "./schema";
 import { useEventId } from "../../eventUtils";
-import { TrashIcon } from "@/components/Icons/TrashIcon";
 
 interface RegistrationFormProps {
   races: Awaited<ReturnType<typeof getEventRaces>>;
@@ -115,7 +115,7 @@ function BatchFieldArray({ form, races }: BatchFieldArrayProps) {
               <Dropdown
                 options={batchOptions}
                 getLabel={(i) => i.name}
-                getKey={(i) => i.batch_id}
+                getKey={(i) => i.index.toString()}
                 label="Batch"
                 name={`batches.${index}.batch_id`}
               />

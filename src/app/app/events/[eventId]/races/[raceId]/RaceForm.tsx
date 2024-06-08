@@ -50,7 +50,7 @@ export function RaceForm({ race, raceTypes }: RaceFormProps) {
 
   const insertBatch = () => {
     const batchCount = batchRows.fields.length;
-    batchRows.insert(batchCount, { name: "" });
+    batchRows.insert(batchCount, { name: "", index: -1 });
   };
 
   const isLaneRace = form.watch("race_type") === "LaneRace";

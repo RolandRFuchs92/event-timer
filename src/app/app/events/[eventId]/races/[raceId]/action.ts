@@ -61,7 +61,12 @@ async function mutateStandardRace(
         name: input.name,
         event_id: input.event_id,
         rounds: [],
-        batches: input.batches,
+        batches: input.batches.map((i, index) => {
+          return {
+            ...i,
+            index,
+          };
+        }),
         race_type: input.race_type,
       },
     });
@@ -69,23 +74,63 @@ async function mutateStandardRace(
     return result;
   }
 
-  //WHAT ABOUT DELETEING A BATCH???
-  const updatedBatchesResult = await _db.$runCommandRaw({
-    update: "races",
-    updates: race.batches.map((i, index) => [
-      {
+  const batchesToDelete = race.batches
+    .filter((i) => !input.batches.map((i) => i.index).includes(i.index))
+    .map((i) => i.index);
+
+  if (batchesToDelete.length) {
+    await _db.$runCommandRaw({
+      update: "races",
+      updates: batchesToDelete.map((i) => ({
         q: {
           _id: {
             $oid: race.id,
           },
         },
         u: {
-          $set: {
-            [`batches.${index}.name`]: i.name,
+          $pull: {
+            batches: {
+              index: i,
+            },
           },
         },
-      },
-    ]),
+      })),
+    });
+  }
+
+  const updatedBatchesResult = await _db.$runCommandRaw({
+    update: "races",
+    updates: input.batches.flatMap((i, index) => {
+      const update = {
+        $set: {
+          [`batches.${index}.name`]: i.name,
+          [`batches.${index}.index`]: index,
+        },
+      };
+
+      const push = {
+        $push: {
+          batches: {
+            index,
+            name: i.name,
+            start_on: null,
+          },
+        },
+      };
+
+      const updateStatement = i.index === -1 ? push : update;
+
+      return [
+        {
+          q: {
+            _id: {
+              $oid: race.id,
+            },
+          },
+          u: updateStatement,
+        },
+      ];
+    }),
   });
 
   const result = await _db.races.update({
@@ -93,7 +138,6 @@ async function mutateStandardRace(
       name: input.name,
       rounds: [],
       race_type: input.race_type,
-
     },
     where: {
       id: input.id,
@@ -128,15 +172,14 @@ async function mutateLaneRace(
     return result;
   }
 
-  /// WHAT ABOUT DELETE
   const result = await _db.races.update({
     data: {
       name: input.name,
       race_type: input.race_type,
-      batches: []
+      batches: [],
     },
     where: {
-      id: input.id
+      id: input.id,
     },
   });
   return result;

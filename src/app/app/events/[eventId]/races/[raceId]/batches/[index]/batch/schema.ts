@@ -1,10 +1,12 @@
 import z from 'zod';
 
 export const BatchTimerSchema = z.object({
-  batchId: z.string(),
+  raceId: z.string(),
+  batchIndex: z.coerce.number(),
   startTime: z.coerce.date()
 });
 
 export const ResetBatchSchema = z.object({
-  batchId: z.string()
+  raceId: z.string(),
+  batchIndex: z.coerce.number()
 });
