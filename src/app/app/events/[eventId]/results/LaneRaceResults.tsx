@@ -15,7 +15,7 @@ export async function LaneRaceResults({ eventId }: LaneRaceResultsProps) {
       {!!laneResults?.data?.length &&
         laneResults?.data?.map((laneResult) => {
           return (
-            <div className="flex flex-row gap-4 overflow-x-scroll p-2">
+            <div className="flex flex-col gap-4 overflow-x-scroll p-2 lg:flex-row">
               {(!!laneResult?.length ?? 0) &&
                 laneResult?.map((heats) => {
                   return <RoundNames data={heats} />;

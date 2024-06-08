@@ -19,7 +19,7 @@ export function RoundNames({ data }: RoundNamesType) {
   if (!data) return <div>No Result Data</div>;
 
   return (
-    <div className="w-[50rem] gap-4 rounded-md bg-white p-4 text-black">
+    <div className="w-full gap-4 rounded-md bg-white p-2 text-black lg:w-[50rem] lg:p-4">
       <p className="text-md text-slate-400 ">Round Name: {data?.roundName}</p>
       {(!!data?.heats?.length ?? 0) &&
         data?.heats?.map((heats) => {
