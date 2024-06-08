@@ -71,6 +71,11 @@ export function ParticipantTable({ data }: ParticpantTableProps) {
                   cell: (p) => p.getValue(),
                 },
                 {
+                  accessorKey: "is_male",
+                  header: "Gender",
+                  cell: (p) => (p.getValue() ? "Male" : "Female"),
+                },
+                {
                   accessorKey: "birthdate",
                   header: "Age",
                   cell: (p) => differenceInYears(new Date(), p.getValue()),

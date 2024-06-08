@@ -3,7 +3,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { UseFormReturn, useFieldArray, useForm } from "react-hook-form";
+import {
+  UseFormReturn,
+  useFieldArray,
+  useForm,
+  useFormContext,
+} from "react-hook-form";
 import toast from "react-hot-toast";
 
 import { FormRow } from "@/components/FormElements/FormRow";
@@ -18,11 +23,13 @@ import { TrashIcon } from "@/components/Icons/TrashIcon";
 import { getEventRaces, getParticipant, mutateParticipant } from "./action";
 import { DefaultRegistration, RegistrationSchema } from "./schema";
 import { useEventId } from "../../eventUtils";
+import { z } from "zod";
 
 interface RegistrationFormProps {
   races: Awaited<ReturnType<typeof getEventRaces>>;
   participant: Awaited<ReturnType<typeof getParticipant>>;
 }
+
 DefaultRegistration;
 export function RegistrationForm({
   races,
@@ -30,9 +37,9 @@ export function RegistrationForm({
 }: RegistrationFormProps) {
   const { replace } = useRouter();
   const eventId = useEventId();
-  const form = useForm({
+  const form = useForm<z.infer<typeof RegistrationSchema>>({
     resolver: zodResolver(RegistrationSchema),
-    defaultValues: participant,
+    defaultValues: participant as any,
   });
 
   const handleSubmit = form.handleSubmit(async (data) => {
@@ -46,7 +53,9 @@ export function RegistrationForm({
     }
 
     toast.success(result.data!.message);
-    replace(`/app/events/${eventId}/participants`);
+    replace(
+      `/app/events/${eventId}/registration/${result.data!.result.id!.toString()}/display`,
+    );
   });
 
   return (
@@ -63,20 +72,20 @@ export function RegistrationForm({
       </FormRow>
       <Checkbox name="is_male" label="Is Male" />
       <FInput type="date" name="birthdate" label="Birthdate" />
-      <BatchFieldArray form={form} races={races} />
+      <BatchFieldArray races={races} />
       <Button label="Submit" />
     </Form>
   );
 }
 
 interface BatchFieldArrayProps {
-  form: UseFormReturn<Awaited<ReturnType<typeof getParticipant>>>;
   races: Awaited<ReturnType<typeof getEventRaces>>;
 }
 
-function BatchFieldArray({ form, races }: BatchFieldArrayProps) {
+function BatchFieldArray({ races }: BatchFieldArrayProps) {
+  const form = useFormContext<z.infer<typeof RegistrationSchema>>();
   const batchFieldArray = useFieldArray({
-    name: "batches",
+    name: "races",
     control: form.control,
   });
 
@@ -93,7 +102,7 @@ function BatchFieldArray({ form, races }: BatchFieldArrayProps) {
     <div>
       <Button label="Add Race" type="button" onClick={handleAddRace} />
       {batchFieldArray.fields.map((i, index) => {
-        const thingy = form.watch(`batches.${index}.race_id`);
+        const thingy = form.watch(`races.${index}.race_id`);
         const selectedRace = races.find((r) => r.id === thingy);
         const batchOptions = selectedRace?.batches ?? [];
         const isLaneRace = selectedRace?.race_type === "LaneRace";
@@ -116,7 +125,7 @@ function BatchFieldArray({ form, races }: BatchFieldArrayProps) {
               getLabel={(i) => i.name}
               getKey={(i) => i.id}
               label="Race"
-              name={`batches.${index}.race_id`}
+              name={`races.${index}.race_id`}
             />
             {!isLaneRace && selectedRace ? (
               <Dropdown
@@ -124,7 +133,7 @@ function BatchFieldArray({ form, races }: BatchFieldArrayProps) {
                 getLabel={(i) => i.name}
                 getKey={(i) => i.index.toString()}
                 label="Batch"
-                name={`batches.${index}.batch_id`}
+                name={`races.${index}.batch_index`}
               />
             ) : null}
             <div

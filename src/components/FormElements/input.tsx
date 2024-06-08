@@ -19,13 +19,11 @@ export function Input({
 }: InputProps) {
   return (
     <div>
-      {
-        label
-          ? <label className="block text-sm font-medium text-black dark:text-white">
-            {label}
-          </label>
-          : null
-      }
+      {label ? (
+        <label className="block text-sm font-medium text-black dark:text-white">
+          {label}
+        </label>
+      ) : null}
       <div className="relative">
         <input
           type="text"
@@ -52,7 +50,8 @@ export function FInput({ name, helperText, ...props }: FInputProps) {
       name={name}
       render={({ field, fieldState }) => {
         const isDateTimeField =
-          props.type === "datetime-local" && !!field.value;
+          props.type === "datetime-local" &&
+          !!field.value;
 
         return (
           <Input

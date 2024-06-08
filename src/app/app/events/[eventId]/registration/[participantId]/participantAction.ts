@@ -1,13 +1,12 @@
 "use server";
 
 import { z } from "zod";
+import { participant_race } from "@prisma/client";
 
 import { _db } from "@/lib/db";
 
 import { RegistrationSchema } from "./schema";
 import { mapRelatedRacesToParticipantBatchs } from "./participantMapper";
-import { participant_race } from "@prisma/client";
-import { originalPathname } from "next/dist/build/templates/app-page";
 
 export async function createNewParticipant(
   input: z.infer<typeof RegistrationSchema>,
@@ -17,7 +16,7 @@ export async function createNewParticipant(
   const relatedRaces = await _db.races.findMany({
     where: {
       id: {
-        in: input.batches.map((i) => i.race_id),
+        in: input.races.map((i) => i.race_id),
       },
     },
   });
@@ -35,7 +34,7 @@ export async function createNewParticipant(
   });
 
   for (const race of relatedRaces) {
-    const relativeRaceInput = input.batches.find((i) => i.race_id === race.id);
+    const relativeRaceInput = input.races.find((i) => i.race_id === race.id);
     if (!relativeRaceInput) continue;
 
     if (race.race_type === "StandardNoLaps") {
@@ -55,7 +54,7 @@ export async function createNewParticipant(
                 },
               },
               where: {
-                index: +relativeRaceInput.batch_index,
+                index: +relativeRaceInput.batch_index!,
               },
             },
           },
@@ -88,6 +87,7 @@ export async function createNewParticipant(
       },
     });
   }
+  return newParticipantResult;
 }
 
 async function getNewRaceNumber(eventId: string) {
@@ -118,7 +118,7 @@ export async function updateParticipant(
   const relatedRaces = await _db.races.findMany({
     where: {
       id: {
-        in: input.batches.map((i) => i.race_id),
+        in: input.races.map((i) => i.race_id),
       },
     },
   });
@@ -135,7 +135,7 @@ export async function updateParticipant(
       first_name: input.first_name,
       last_name: input.last_name,
       birthdate: input.birthdate,
-      races: mapRelatedRacesToParticipantBatchs(input, relatedRaces),
+      races: await mapRelatedRacesToParticipantBatchs(input, relatedRaces),
     },
     where: {
       id: input.id,
@@ -145,7 +145,7 @@ export async function updateParticipant(
   const participantRaces = originalParticipant!.races;
 
   for (const participantRace of participantRaces) {
-    const isStillInRace = input.batches.some(
+    const isStillInRace = input.races.some(
       (i) => i.race_id === participantRace.race_id,
     );
     if (!isStillInRace) {
@@ -153,11 +153,10 @@ export async function updateParticipant(
       continue;
     }
 
-
     ///WHat about if the batch changes?
   }
 
-  for (const incomingRace of input.batches) {
+  for (const incomingRace of input.races) {
     const originalRaceRef = originalParticipant?.races.find(
       (i) => i.race_id === incomingRace.race_id,
     );
@@ -181,7 +180,7 @@ export async function updateParticipant(
                   },
                 },
                 where: {
-                  index: +incomingRace.batch_index,
+                  index: +incomingRace.batch_index!,
                 },
               },
             },
@@ -203,7 +202,7 @@ export async function updateParticipant(
                 },
               },
               where: {
-                round_index: 0
+                round_index: 0,
               },
             },
           },
@@ -214,6 +213,8 @@ export async function updateParticipant(
       });
     }
   }
+
+  return participantResult;
 }
 
 async function pullParticipantFromRace(

@@ -9,10 +9,10 @@ export async function mapRelatedRacesToParticipantBatchs(
   races: races[],
 ) {
   const relatedRaces = races.filter((i) =>
-    input.batches.some((b) => b.race_id === i.id),
+    input.races.some((b) => b.race_id === i.id),
   );
 
-  const result = input.batches.reduce((acc, cur) => {
+  const result = input.races.reduce((acc, cur) => {
     const race = relatedRaces.find((i) => i.id === cur.race_id)!;
 
     if (race?.race_type === "StandardNoLaps")
@@ -22,7 +22,7 @@ export async function mapRelatedRacesToParticipantBatchs(
           race_id: race.id,
           race_type: race.race_type,
           race_name: race.name,
-          batch_index: +cur.batch_index,
+          batch_index: +cur.batch_index!,
         },
       ];
 
