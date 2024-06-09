@@ -17,22 +17,21 @@ import { FormTitle } from "@/components/FormElements/formTitle";
 interface ChangeFinisherStatusFormProps {
   participant: Awaited<ReturnType<typeof getFinishers>>[0];
   finisherStatusOptions: ReturnType<typeof enumToOptions>;
-  toggle: () => void
+  toggle: () => void;
 }
 
 export function ChangeFinisherStatusForm({
   participant,
   finisherStatusOptions,
-  toggle
+  toggle,
 }: ChangeFinisherStatusFormProps) {
   const raceIds = useRaceIds();
-  const status = participant.batches.find((i) =>
-    raceIds.includes(i.race_id),
-  )?.finish_status;
+  const status = participant.finish_status;
+
   const form = useForm<z.infer<typeof ChangeParticipantFinishStatusSchema>>({
     resolver: zodResolver(ChangeParticipantFinishStatusSchema),
     defaultValues: {
-      participantId: participant.id,
+      participantId: participant.participant_id,
       newFinishStatus: status as any,
       raceIds,
     },
@@ -46,7 +45,7 @@ export function ChangeFinisherStatusForm({
     }
 
     toast.success(result.data?.message ?? "");
-    toggle()
+    toggle();
   });
 
   return (
