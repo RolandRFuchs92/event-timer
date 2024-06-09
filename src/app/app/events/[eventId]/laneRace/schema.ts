@@ -81,4 +81,8 @@ export const RemoveCompetitorSchema = z.object({
 });
 
 
-
+export const ChangeRoundQualifierStatus = z.object({
+  race_id: z.string(),
+  roundIndex: z.coerce.number(),
+  qualifer: z.coerce.boolean()
+});

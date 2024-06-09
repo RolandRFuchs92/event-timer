@@ -12,18 +12,22 @@ export async function LaneRaceResults({ eventId }: LaneRaceResultsProps) {
   return (
     <div className="flex flex-col gap-4 ">
       <h1 className="text-gray-700 pl-4 text-lg">Event Results</h1>
-      {!!laneResults?.data?.length &&
-        laneResults?.data?.map((laneResult) => {
-          return (
-            <div className="flex flex-col gap-4 overflow-x-scroll p-2 lg:flex-row">
-              {(!!laneResult?.length ?? 0) &&
-                laneResult?.map((heats) => {
-                  return <RoundNames key={heats?.roundName} data={heats} />;
-                })}
-            </div>
-          );
-        })}
-      {/* <pre>{JSON.stringify(laneResults?.data, null, 2)}</pre> */}
+      <pre>{JSON.stringify(laneResults.data, null, 2)}</pre>
     </div>
   );
 }
+
+// {!!laneResults?.data?.length &&
+//   laneResults?.data?.map((laneResult, index) => {
+//     return (
+//       <div
+//         key={index}
+//         className="flex flex-col gap-4 overflow-x-scroll p-2 lg:flex-row"
+//       >
+//         {(!!laneResult?.length ?? 0) &&
+//           laneResult?.map((heats) => {
+//             return <RoundNames key={heats?.roundName} data={heats} />;
+//           })}
+//       </div>
+//     );
+//   })}

@@ -15,6 +15,7 @@ import { enumToOptions } from "@/lib/helper";
 import { getRace, mutateRace } from "./action";
 import { RaceSchema } from "./schema";
 import { useEventId } from "../../eventUtils";
+import { Checkbox } from "@/components/Checkboxes/CheckboxOne";
 
 interface RaceFormProps {
   race: Awaited<ReturnType<typeof getRace>>;

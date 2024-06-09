@@ -13,6 +13,7 @@ import {
 } from "./action";
 import { useHeatIndexs, useLaneRaceId, useRoundIndex } from "./hook";
 import { HeatFilter } from "./HeatFilter";
+import { RoundIsQualifierCheckbox } from "./RoundIsQualifierCheckbox";
 
 export type LaneRaceType = NonNullable<
   Awaited<ReturnType<typeof getLaneRace>>["data"]
@@ -31,6 +32,7 @@ export async function RoundColumn({ laneRace }: LaneRaceContainerProps) {
       <div className="text-middle  flex h-10 flex-row items-center justify-between">
         <h3>Round: {round?.name}</h3>
       </div>
+      <RoundIsQualifierCheckbox isQualifier={round?.is_qualifier ?? false} />
       <HeatFilter heats={round?.heats ?? []} />
       <AllParticipants round={round!} />
     </div>

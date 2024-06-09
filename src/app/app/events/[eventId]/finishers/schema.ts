@@ -22,6 +22,7 @@ export const DeleteFinisherSchema = z.object({
 
 export const ChangeParticipantFinishStatusSchema = z.object({
   participantId: z.string(),
-  newFinishStatus: z.nativeEnum(FinishStatusEnum),
+  finish_status: z.nativeEnum(FinishStatusEnum),
+  finish_time: z.coerce.date(),
   raceIds: z.array(z.string())
 });

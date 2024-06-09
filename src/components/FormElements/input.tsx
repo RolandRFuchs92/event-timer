@@ -50,15 +50,16 @@ export function FInput({ name, helperText, ...props }: FInputProps) {
       name={name}
       render={({ field, fieldState }) => {
         const isDateTimeField =
-          props.type === "datetime-local" &&
-          !!field.value;
+          props.type === "datetime-local" && !!field.value;
 
         return (
           <Input
             {...props}
             {...field}
             {...(isDateTimeField
-              ? { value: defaultDateTimetring(field.value) }
+              ? {
+                  value: defaultDateTimetring(field.value),
+                }
               : {})}
             name={name}
             helperText={fieldState.error?.message}

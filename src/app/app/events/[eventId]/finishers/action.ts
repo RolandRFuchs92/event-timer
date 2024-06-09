@@ -247,7 +247,8 @@ export const changeParticipantFinishStatus = action(
                 participants: {
                   updateMany: {
                     data: {
-                      finish_status: participantData.newFinishStatus,
+                      finish_status: participantData.finish_status,
+                      finish_time: participantData.finish_time
                     },
                     where: {
                       participant_id: participant.id
@@ -271,7 +272,7 @@ export const changeParticipantFinishStatus = action(
 
     revalidatePath("");
     return {
-      message: `${participant.first_name} status changed to ${participantData.newFinishStatus}`,
+      message: `${participant.first_name} status changed to ${participantData.finish_status} and time to ${participantData.finish_time}`,
     };
   },
 );

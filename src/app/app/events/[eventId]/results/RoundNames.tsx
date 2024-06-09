@@ -1,18 +1,9 @@
-import { ParticipantHeatStatusEnum } from "@prisma/client";
+import { getLaneRaceResults } from "./action";
 
 type RoundNamesType = {
-  data: {
-    roundName: string;
-    heats: {
-      heatNumber: number;
-      isClosed: boolean;
-      participants: {
-        name: string;
-        status: ParticipantHeatStatusEnum | null;
-        timeTakedMs: string | null;
-      }[];
-    }[];
-  };
+  data: NonNullable<
+    Awaited<ReturnType<typeof getLaneRaceResults>>["data"]
+  >[0][0];
 };
 
 export function RoundNames({ data }: RoundNamesType) {
@@ -56,7 +47,7 @@ export function RoundNames({ data }: RoundNamesType) {
                         <p
                           className={winnerHighlightClassname}
                         >{`Status: ${participant?.status}`}</p>
-                        <p>{`Time Taken: ${participant?.timeTakedMs}`}</p>
+                        <p>{`Time Taken: ${participant?.timeTaken}`}</p>
                       </div>
                     );
                   })}

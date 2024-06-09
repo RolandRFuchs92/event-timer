@@ -20,7 +20,7 @@ export function defaultDateString(date: Date) {
 }
 
 export function defaultDateTimetring(date: Date) {
-  const res = format(date, "yyyy-MM-dd'T'HH:mm");
+  const res = format(date, "yyyy-MM-dd'T'HH:mm:ss.SSS");
   return res;
 }
 

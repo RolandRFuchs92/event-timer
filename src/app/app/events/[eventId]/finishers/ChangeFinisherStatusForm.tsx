@@ -13,6 +13,7 @@ import { Button } from "@/components/FormElements/button";
 import toast from "react-hot-toast";
 import { Form } from "@/components/FormElements/form";
 import { FormTitle } from "@/components/FormElements/formTitle";
+import { FInput } from "@/components/FormElements/input";
 
 interface ChangeFinisherStatusFormProps {
   participant: Awaited<ReturnType<typeof getFinishers>>[0];
@@ -26,13 +27,13 @@ export function ChangeFinisherStatusForm({
   toggle,
 }: ChangeFinisherStatusFormProps) {
   const raceIds = useRaceIds();
-  const status = participant.finish_status;
 
   const form = useForm<z.infer<typeof ChangeParticipantFinishStatusSchema>>({
     resolver: zodResolver(ChangeParticipantFinishStatusSchema),
     defaultValues: {
       participantId: participant.participant_id,
-      newFinishStatus: status as any,
+      finish_time: participant.finish_time ?? (null as any),
+      finish_status: participant.finish_status as any,
       raceIds,
     },
   });
@@ -55,6 +56,7 @@ export function ChangeFinisherStatusForm({
       formTitle={<FormTitle label="Finish Status" />}
       className="w-full"
     >
+      <FInput type="datetime-local" name="finish_time" step="0.1" />
       <Dropdown
         options={finisherStatusOptions}
         name="newFinishStatus"
