@@ -1,18 +1,18 @@
 "use server";
 
+import { uniq } from "lodash";
+import { differenceInMilliseconds, differenceInYears } from "date-fns";
+import { revalidatePath, unstable_noStore } from "next/cache";
+
 import { _db } from "@/lib/db";
 import { action } from "@/lib/safeAction";
+import { getTimerDifference } from "@/lib/getTimerDifference";
+
 import {
   ChangeParticipantFinishStatusSchema,
   DeleteFinisherSchema,
   FinisherSchema,
 } from "./schema";
-import { participant, participant_batch } from "@prisma/client";
-import { z } from "zod";
-import { revalidatePath, unstable_noStore } from "next/cache";
-import { getTimerDifference } from "@/lib/getTimerDifference";
-import { omit, uniq } from "lodash";
-import { differenceInMilliseconds, differenceInYears } from "date-fns";
 
 export async function getFinishers(raceIds: string[]) {
   unstable_noStore();
@@ -49,6 +49,7 @@ export async function getFinishers(raceIds: string[]) {
             last_name: me.last_name,
             race_number: me.race_number,
             age: differenceInYears(new Date(), me.birthdate),
+            participant_id: me.id,
             race: r.name,
             finish_status: p.finish_status,
             race_id: r.id,
@@ -84,27 +85,36 @@ export const deleteFinisher = action(
       throw new Error("Unable to find that participant.");
     }
 
-    const newParticipant: participant = {
-      ...participant,
-      batches: participant.batches.map((i) => {
-        if (!race_ids.includes(i.race_id)) return i;
-
-        return {
-          ...i,
-          finish_time: null,
-          finish_status: null,
-          time_taken: null,
-          time_taken_ms: null,
-        };
-      }),
-    };
-
-    await _db.participant.update({
-      data: omit(newParticipant, "id"),
-      where: {
-        id: participantId,
+    await _db.races.updateMany({
+      data: {
+        batches: {
+          updateMany: {
+            data: {
+              participants: {
+                participant_id: participantId,
+                finish_time: null,
+                finish_status: null,
+                time_taken: null,
+                time_taken_ms: null,
+              }
+            },
+            where: {
+              participants: {
+                some: {
+                  participant_id: participantId
+                }
+              }
+            }
+          }
+        }
       },
+      where: {
+        id: {
+          in: race_ids
+        }
+      }
     });
+
 
     revalidatePath("");
     return {
@@ -120,39 +130,76 @@ export async function getRaces() {
 }
 
 export const setFinisher = action(FinisherSchema, async (payload) => {
-  const participant = await _db.participant.findFirst({
+  const races = await _db.races.findMany({
     where: {
-      batches: {
-        some: {
-          race_id: {
-            in: payload.raceIds,
-          },
-        },
+      id: {
+        in: payload.raceIds,
       },
-      race_number: payload.race_number,
     },
   });
 
-  if (!participant) {
-    throw new Error("Cannot find that participant. Time entry not saved.");
-  }
-
-  const { batches, finishTime } = await processBatchTimes(
-    participant.batches,
-    payload,
-  );
-  const newEntry: typeof participant = {
-    ...participant,
-    batches,
-  };
-
-  try {
-    const result = await _db.participant.update({
-      data: omit(newEntry, "id"),
-      where: {
-        id: participant.id,
+  const participant = (await _db.participant.findFirst({
+    where: {
+      event_id: payload.event_id,
+      race_number: {
+        equals: payload.race_number,
+        mode: "insensitive",
       },
-    });
+    },
+  }))!;
+
+  let timeTaken = "";
+  try {
+    const participantId = participant.id;
+    const possibleParticipantRaces = participant.races.filter(
+      (i) => i.race_type === "StandardNoLaps",
+    );
+
+    for (const race of possibleParticipantRaces) {
+      const actualRace = races.find((i) => i.id === race.race_id);
+      const batch = actualRace!.batches.find(
+        (i) => i.index === race.batch_index,
+      )!;
+
+      let timeTakenMs = 0;
+      if (batch.start_on) {
+        timeTaken = getTimerDifference(batch.start_on, payload.finish_time);
+        timeTakenMs = differenceInMilliseconds(
+          payload.finish_time,
+          batch.start_on,
+        );
+      }
+
+      await _db.races.update({
+        data: {
+          batches: {
+            updateMany: {
+              data: {
+                participants: {
+                  updateMany: {
+                    data: {
+                      finish_status: payload.finish_status,
+                      finish_time: payload.finish_time,
+                      time_taken: timeTaken,
+                      time_taken_ms: timeTakenMs,
+                    },
+                    where: {
+                      participant_id: participantId,
+                    },
+                  },
+                },
+              },
+              where: {
+                index: +race.batch_index!,
+              },
+            },
+          },
+        },
+        where: {
+          id: race.race_id,
+        },
+      });
+    }
   } catch (e) {
     const message = "Error updating finisher details";
     console.error(message);
@@ -163,52 +210,9 @@ export const setFinisher = action(FinisherSchema, async (payload) => {
   revalidatePath("");
 
   return {
-    message: `${participant.first_name} ${participant.last_name} finished in ${finishTime}!`,
+    message: `${participant.first_name} ${participant.last_name} finished in ${timeTaken}!`,
   };
 });
-
-async function processBatchTimes(
-  participantBatches: participant_batch[],
-  input: z.infer<typeof FinisherSchema>,
-) {
-  const races = await _db.races.findMany({
-    where: {
-      id: {
-        in: input.raceIds,
-      },
-    },
-  });
-
-  let finishTime = "";
-  const result = participantBatches.map((i) => {
-    const race = races.find((r) => r.id == i.race_id);
-    if (!race) return i;
-
-    const batch = race.batches.find((i) => i.batch_id);
-    if (!batch) return i;
-
-    const startOn = batch.start_on;
-    if (!startOn) return i;
-    const timeTaken = getTimerDifference(startOn, input.finish_time);
-    finishTime = timeTaken;
-
-    return {
-      ...i,
-      finish_time: input.finish_time,
-      finish_status: input.finish_status,
-      time_taken: timeTaken,
-      time_taken_ms: differenceInMilliseconds(
-        input.finish_time,
-        batch.start_on!,
-      ),
-    };
-  });
-
-  return {
-    batches: result,
-    finishTime,
-  };
-}
 
 export const changeParticipantFinishStatus = action(
   ChangeParticipantFinishStatusSchema,
@@ -221,22 +225,49 @@ export const changeParticipantFinishStatus = action(
 
     if (!participant) throw new Error("Unable to find that participant");
 
-    const newParticipant = await _db.participant.update({
-      data: {
-        ...omit(participant, "id"),
-        batches: participant.batches.map((i) => {
-          if (!participantData.raceIds.includes(i.race_id)) return i;
 
-          return {
-            ...i,
-            finish_status: participantData.newFinishStatus,
-          };
-        }),
-      },
+    const races = await _db.races.findMany({
       where: {
-        id: participantData.participantId,
-      },
+        id: {
+          in: participant.races.map(i => i.race_id),
+        },
+        race_type: "StandardNoLaps"
+      }
     });
+
+    for (const race of races) {
+      const participantRace = participant.races.find(i => i.race_id === race.id);
+      if (!participantRace) continue;
+
+      await _db.races.update({
+        data: {
+          batches: {
+            updateMany: {
+              data: {
+                participants: {
+                  updateMany: {
+                    data: {
+                      finish_status: participantData.newFinishStatus,
+                    },
+                    where: {
+                      participant_id: participant.id
+                    }
+                  }
+                }
+              },
+              where: {
+                index: participantRace.batch_index!
+              }
+            }
+          }
+        },
+        where: {
+          race_type: "StandardNoLaps",
+          id: race.id
+        }
+      });
+
+    }
 
     revalidatePath("");
     return {

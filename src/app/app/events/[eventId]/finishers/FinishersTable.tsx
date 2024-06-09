@@ -1,21 +1,19 @@
 "use client";
 
-import TwDialog from "@/components/Dialog/Dialog";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React from "react";
 import toast from "react-hot-toast";
+
+import TwDialog from "@/components/Dialog/Dialog";
 import { Table } from "@/components/Tables/table";
-import { EditIcon } from "@/components/Icons/EditIcon";
-import { TrashIcon } from "@heroicons/react/24/outline";
-import { useEventId, useRaceIds } from "../eventUtils";
-import { BatchIcon } from "@/components/Icons/BatchIcon";
-import { deleteFinisher, getFinishers } from "./action";
 import { LinkButton } from "@/components/FormElements/button";
 import { RecycleIcon } from "@/components/Icons/RecycleIcon";
-import { ChangeFinisherStatusForm } from "./ChangeFinisherStatusForm";
 import { FinishersIcon } from "@/components/Icons/FinisherIcon";
-import { FinishStatusEnum } from "@prisma/client";
 import { enumToOptions } from "@/lib/helper";
+
+import { deleteFinisher, getFinishers } from "./action";
+import { ChangeFinisherStatusForm } from "./ChangeFinisherStatusForm";
+import { useRaceIds } from "../eventUtils";
 
 interface FinishersTableProps {
   data: Awaited<ReturnType<typeof getFinishers>>;
@@ -53,7 +51,7 @@ export function FinishersTable({
       )}
       title={(i) => `Change ${i.first_name} finish status`}
       onYes={async (i) => {
-        handleDeleteFinisher(i.id);
+        handleDeleteFinisher(i.participant_id);
       }}
     >
       {(setStatusChangeData, toggleStatusChange) => {
@@ -64,7 +62,7 @@ export function FinishersTable({
             }
             title={"Really Reset?"}
             onYes={async (i) => {
-              handleDeleteFinisher(i.id);
+              handleDeleteFinisher(i.participant_id);
             }}
           >
             {(setData, toggle) => {
@@ -103,16 +101,12 @@ export function FinishersTable({
                         accessorKey: "time_taken",
                         header: "Race:time:status",
                         cell: (p) => {
-                          const batches = p.row.original.batches;
+                          const race = p.row.original;
                           return (
-                            <ul>
-                              {batches.map((i) => (
-                                <li key={i.batch_id}>
-                                  {i.race_name}: {i.time_taken}:{" "}
-                                  {i.finish_status}
-                                </li>
-                              ))}
-                            </ul>
+                            <div>
+                              {race.race}: {race.time_taken}:&nbsp;
+                              {race.finish_status}
+                            </div>
                           );
                         },
                       },
