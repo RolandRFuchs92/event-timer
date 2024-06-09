@@ -1,54 +1,63 @@
+"use server";
 import { RaceTypeEnum, races } from "@prisma/client";
 
 import { _db } from "@/lib/db";
 import { action } from "@/lib/safeAction";
 import { millisecondsToHumanFormat } from "@/lib/getTimerDifference";
 
-import { FinisherSchema } from "./schema";
+import { FinisherFilterSchema } from "./schema";
+import { uniqBy } from "lodash";
 
-export const getLaneRaceResults = action(FinisherSchema, async (input) => {
-  const laneRaces = await _db.races.findMany({
-    where: {
-      event_id: input.eventId,
-      race_type: RaceTypeEnum.LaneRace,
-    },
-  });
-
-  const laneResults = laneRaces.reduce(
-    (accum, curr) => {
-      const rounds = mapLaneRaceToResults(curr);
-
-      const qualifiers = rounds.filter(i => i.isQualifier);
-      const normalRounds = rounds.filter(i => !i.isQualifier);
-
-      accum.finals.push(normalRounds);
-      accum.qualifiers.push(qualifiers);
-
-      return accum;
-    },
-    { qualifiers: [], finals: [] } as LaneResultType,
-  );
-
-  const qualifierResults = laneResults.qualifiers.flatMap(q => {
-    const participants = q.flatMap(i => {
-      const result = i.heats.flatMap(h => h.participants).map(h => ({ ...h, roundName: i.roundName }));
-      return result;
+export const getQualifierLaneRaceResults = action(
+  FinisherFilterSchema,
+  async (input) => {
+    const qualifierLaneRaceResults = await _db.races.findFirst({
+      where: {
+        id: input.raceId,
+      },
     });
-    return participants;
-  }).sort((a, b) => +a.timeTakenMs! - +b.timeTaken!);
 
-  return {
-    finalResults: laneResults.finals,
-    qualifierResults
-  };
-});
+    const qualifiers = qualifierLaneRaceResults?.rounds.filter(
+      (i) => i.is_qualifier,
+    );
+    const participants = qualifiers!
+      .flatMap((q) =>
+        q.heats.flatMap((h) => h.participants.filter((i) => !!i.total_time_ms)),
+      )
+      .sort((a, b) => +a.total_time_ms! - +b.total_time_ms!)
+      .map(i => ({
+        ...i,
+        total_time_pretty: millisecondsToHumanFormat(+i.total_time_ms!)
+      }))
 
-type LaneResultType = {
-  qualifiers: RoundType[],
-  finals: RoundType[]
-}
 
-type RoundType = ReturnType<typeof mapLaneRaceToResults>
+    return uniqBy(participants, "participant_id");
+  },
+);
+
+export const getLaneRaceResults = action(
+  FinisherFilterSchema,
+  async (input) => {
+    const laneRaces = await _db.races.findMany({
+      where: {
+        id: input.raceId,
+        race_type: RaceTypeEnum.LaneRace,
+      },
+    });
+
+    const laneResults = laneRaces.reduce(
+      (accum, curr) => {
+        const rounds = mapLaneRaceToResults(curr);
+
+        accum.push(rounds);
+        return accum;
+      },
+      [] as ReturnType<typeof mapLaneRaceToResults>[],
+    );
+
+    return laneResults;
+  },
+);
 
 function mapLaneRaceToResults(race: races) {
   const rounds = race.rounds.map((r) => {
@@ -80,4 +89,3 @@ function mapLaneRaceToResults(race: races) {
 
   return rounds;
 }
-

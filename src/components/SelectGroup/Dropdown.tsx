@@ -27,7 +27,7 @@ export function Dropdown<T>({
       render={({ field, fieldState }) => {
         return (
           <div>
-            <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+            <label className="block text-sm font-medium text-black dark:text-white">
               {label}
             </label>
 

@@ -1,21 +1,45 @@
 import React, { Suspense } from "react";
 
-import { LaneRaceResults } from "./LaneRaceResults";
-import { LinkButton } from "@/components/FormElements/button";
+import { ResultsContainer } from "./ResultsFilter";
+import { _db } from "@/lib/db";
+import { z } from "zod";
+import { FinisherFilterSchema } from "./schema";
+import { RaceResultsSelector } from "./RaceResultsSelector";
+import { parse } from "path";
 
 interface ResultsPageProps {
   params: {
     eventId: string;
-  },
-  searchParams: {
-    hideLayout?: boolean
-  }
+  };
+  searchParams: z.infer<typeof FinisherFilterSchema>;
 }
 
-export default async function ResultsPage({ params, searchParams }: ResultsPageProps) {
+export default async function ResultsPage({
+  params,
+  searchParams,
+}: ResultsPageProps) {
+  const races = await _db.races.findMany({
+    where: {
+      event_id: params.eventId,
+    },
+  });
+
+  const selectedRace = races.find((i) => i.id === searchParams.raceId);
+  const parsedParams = FinisherFilterSchema.parse({
+    ...searchParams,
+    qualifier: searchParams.qualifier === ("true" as any),
+  });
+  console.log(parsedParams);
+
   return (
-    <Suspense fallback="Loading...">
-      <LaneRaceResults eventId={params.eventId} />
-    </Suspense>
+    <div>
+      <ResultsContainer races={races} />
+      {!!selectedRace ? (
+        <RaceResultsSelector
+          selectedRace={selectedRace}
+          searchParams={parsedParams}
+        />
+      ) : null}
+    </div>
   );
 }
