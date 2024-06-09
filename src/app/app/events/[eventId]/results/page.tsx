@@ -29,7 +29,6 @@ export default async function ResultsPage({
     ...searchParams,
     qualifier: searchParams.qualifier === ("true" as any),
   });
-  console.log(parsedParams);
 
   return (
     <div>

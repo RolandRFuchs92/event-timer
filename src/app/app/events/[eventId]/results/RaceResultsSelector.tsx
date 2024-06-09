@@ -6,7 +6,7 @@ import { races } from "@prisma/client";
 import { Suspense } from "react";
 import { LaneRaceQualifierResults } from "./LaneRaceQualifierResults";
 import { LaneRaceResults } from "./LaneRaceResults";
-import { useSearchParams } from "next/navigation";
+import { StandardRaceResults } from "./StandardRaceResults";
 
 interface LaneRaceResultsSelectorProps {
   searchParams: z.infer<typeof FinisherFilterSchema>;
@@ -17,7 +17,12 @@ export function RaceResultsSelector({
   selectedRace,
   searchParams,
 }: LaneRaceResultsSelectorProps) {
-  if (selectedRace.race_type === "StandardNoLaps") return <h1>Boobs.</h1>;
+  if (selectedRace.race_type === "StandardNoLaps")
+    return (
+      <Suspense key={selectedRace.id} fallback="Loading...">
+        <StandardRaceResults searchParams={searchParams} />
+      </Suspense>
+    );
 
   if (searchParams.qualifier)
     return (

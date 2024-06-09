@@ -1,6 +1,7 @@
 "use server";
 import { RaceTypeEnum, races } from "@prisma/client";
 
+import ordinal from "ordinal";
 import { _db } from "@/lib/db";
 import { action } from "@/lib/safeAction";
 import { millisecondsToHumanFormat } from "@/lib/getTimerDifference";
@@ -25,13 +26,58 @@ export const getQualifierLaneRaceResults = action(
         q.heats.flatMap((h) => h.participants.filter((i) => !!i.total_time_ms)),
       )
       .sort((a, b) => +a.total_time_ms! - +b.total_time_ms!)
-      .map(i => ({
+      .map((i, index) => ({
         ...i,
-        total_time_pretty: millisecondsToHumanFormat(+i.total_time_ms!)
-      }))
-
+        position: ordinal(index + 1),
+        total_time_pretty: millisecondsToHumanFormat(+i.total_time_ms!),
+      }));
 
     return uniqBy(participants, "participant_id");
+  },
+);
+
+export const getStandardRaceResults = action(
+  FinisherFilterSchema,
+  async (input) => {
+    const race = await _db.races.findFirst({
+      where: {
+        id: input.raceId,
+      },
+    });
+
+    const batchParticipants =
+      race?.batches
+        .flatMap((b) =>
+          b.participants
+            .map((p) => ({
+              ...p,
+              batch: b.name,
+            }))
+            .filter((i) => !!i.time_taken_ms),
+        )
+        .sort((a, b) => a.time_taken_ms! - b.time_taken_ms!) ?? [];
+
+    const rawParticipants = await _db.participant.findMany({
+      where: {
+        id: {
+          in: batchParticipants.map((i) => i.participant_id),
+        },
+      },
+    });
+
+    const participants = batchParticipants.map((bp, index) => {
+      const me = rawParticipants.find((rp) => rp.id === bp.participant_id);
+
+      return {
+        ...bp,
+        position: ordinal(index + 1),
+        name: me
+          ? `${me.first_name} ${me.last_name}[${me.race_number}]`
+          : "Unknown",
+      };
+    });
+
+    return participants;
   },
 );
 
