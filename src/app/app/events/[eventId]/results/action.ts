@@ -1,5 +1,11 @@
 "use server";
-import { RaceTypeEnum, races } from "@prisma/client";
+import {
+  ParticipantHeatStatusEnum,
+  RaceTypeEnum,
+  heat,
+  heat_participant,
+  races,
+} from "@prisma/client";
 
 import ordinal from "ordinal";
 import { _db } from "@/lib/db";
@@ -7,7 +13,7 @@ import { action } from "@/lib/safeAction";
 import { millisecondsToHumanFormat } from "@/lib/getTimerDifference";
 
 import { FinisherFilterSchema } from "./schema";
-import { uniqBy } from "lodash";
+import { groupBy, uniqBy } from "lodash";
 
 export const getQualifierLaneRaceResults = action(
   FinisherFilterSchema,
@@ -21,20 +27,64 @@ export const getQualifierLaneRaceResults = action(
     const qualifiers = qualifierLaneRaceResults?.rounds.filter(
       (i) => i.is_qualifier,
     );
-    const participants = qualifiers!
-      .flatMap((q) =>
-        q.heats.flatMap((h) => h.participants.filter((i) => !!i.total_time_ms)),
-      )
-      .sort((a, b) => +a.total_time_ms! - +b.total_time_ms!)
-      .map((i, index) => ({
-        ...i,
-        position: ordinal(index + 1),
-        total_time_pretty: millisecondsToHumanFormat(+i.total_time_ms!),
-      }));
 
-    return uniqBy(participants, "participant_id");
+    const rawParticipants = qualifiers!.flatMap((q) => {
+      const results = q.heats.flatMap((h) =>
+        h.participants.filter((i) => !!i.total_time_ms),
+      );
+
+      return results;
+    });
+
+    const groupedParticipantData = groupBy(rawParticipants, "participant_id");
+    const results = Object.entries(groupedParticipantData)
+      .reduce(
+        (acc, cur) => {
+          const [_, participantRoundData] = cur;
+          const mappedParticipant = mapEntriesToObject(participantRoundData);
+
+          acc.push(mappedParticipant);
+          return acc;
+        },
+        [] as ReturnType<typeof mapEntriesToObject>[],
+      )
+      .sort((a, b) => +a.bestTimeMs! - +b.bestTimeMs!);
+
+    return results;
   },
 );
+
+function mapEntriesToObject(participantRoundData: heat_participant[]) {
+  const row = participantRoundData
+    .filter(
+      (i) =>
+        (
+          [
+            "NotStarted",
+            "Disqualified",
+            "DidNotFinish",
+          ] as ParticipantHeatStatusEnum[]
+        ).includes(i.status!) === false,
+    )
+    .sort((a, b) => +a.total_time_ms! - +b.total_time_ms!)
+    .map((i) => ({
+      end_time: i.end_time,
+      total_time_ms: i.total_time_ms,
+      total_time_ms_pretty: millisecondsToHumanFormat(+i.total_time_ms!),
+    }));
+
+  const participant = participantRoundData[0];
+  const bestTime = row[0];
+  const result = {
+    name: participant.name,
+    participant_id: participant.participant_id,
+    bestTimeMs: bestTime.total_time_ms,
+    bestTimePretty: bestTime.total_time_ms_pretty,
+    results: row,
+  };
+
+  return result;
+}
 
 export const getStandardRaceResults = action(
   FinisherFilterSchema,
