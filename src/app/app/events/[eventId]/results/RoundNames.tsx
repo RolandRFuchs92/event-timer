@@ -11,7 +11,7 @@ export function RoundNames({ data }: RoundNamesType) {
   if (!data) return <div>No Result Data</div>;
 
   return (
-    <div className="w-full gap-4 rounded-md bg-white p-2 text-black lg:w-[50rem] lg:p-4">
+    <div className="flex w-full flex-col rounded-md bg-white p-2 text-black lg:w-[50rem] lg:p-2 ">
       <p className="text-md text-slate-400 ">Round Name: {data?.roundName}</p>
       {(!!data?.heats?.length ?? 0) &&
         data?.heats?.map((heats) => {
@@ -24,7 +24,7 @@ export function RoundNames({ data }: RoundNamesType) {
           ];
 
           return (
-            <div key={heats?.heatNumber} className="flex flex-col gap-0 p-1">
+            <div key={heats?.heatNumber} className="flex flex-col gap-0 pt-2 ">
               <h1 className="font-semibold underline">
                 Heat Number: {heats?.heatNumber}
               </h1>
@@ -32,7 +32,7 @@ export function RoundNames({ data }: RoundNamesType) {
               <p>Participants:</p>
               <div
                 id="participant"
-                className="flex flex-col gap-2 rounded-md border-[1px] border-slate-300"
+                className="flex flex-col rounded-md border-[1px] border-slate-300"
               >
                 {(heats?.participants?.length ?? 0) &&
                   reshuffleParticipantsdOrder?.map((participant) => {
@@ -49,7 +49,7 @@ export function RoundNames({ data }: RoundNamesType) {
                     return (
                       <div
                         key={participant?.name}
-                        className=" flex   grow flex-col  p-2 "
+                        className=" flex   grow flex-col  p-1 "
                       >
                         <p>{`Name: ${participant?.name}`}</p>
                         <p

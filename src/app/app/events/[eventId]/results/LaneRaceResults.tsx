@@ -20,7 +20,7 @@ export async function LaneRaceResults({ searchParams }: LaneRaceResultsProps) {
           return (
             <div
               key={index}
-              className="flex flex-col overflow-x-scroll lg:flex-row"
+              className="flex flex-col overflow-x-scroll lg:flex-row lg:gap-2"
             >
               {(!!laneResult?.length ?? 0) &&
                 laneResult?.map((heats) => {

@@ -25,7 +25,7 @@ export function Form({
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <form className={cn(className)} {...props}>
           {formTitle}
-          <div className={twMerge(`flex flex-col gap-2 `, divClassname)}>
+          <div className={twMerge(`flex  flex-col gap-2 `, divClassname)}>
             {children}
           </div>
         </form>
