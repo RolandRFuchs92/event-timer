@@ -76,7 +76,7 @@ export function ResultsContainer({ races }: ResultsContainerProps) {
           <>
             <FormData />
             <FormErrors />
-            <div className="grid grid-cols-3 items-center gap-2">
+            <div className="grid grid-cols-1 items-center gap-2 lg:grid-cols-3">
               <Dropdown
                 options={races}
                 label={"Races"}
