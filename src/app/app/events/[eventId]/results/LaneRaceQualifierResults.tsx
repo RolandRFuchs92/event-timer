@@ -11,12 +11,11 @@ export async function LaneRaceQualifierResults({
   searchParams,
 }: LaneRaceQualifierResultProps) {
   const results = await getQualifierLaneRaceResults(searchParams);
-  const ggg = results?.data;
-  const x = [...ggg!, ...ggg!];
+
   return (
     <div className="md:max-w-screen flex w-full flex-col gap-2 overflow-x-scroll  py-2 md:flex-row">
       {!!results?.data &&
-        x?.map((i) => {
+        results?.data?.map((i) => {
           return (
             <div className=" flex min-w-[18rem] flex-col gap-2 rounded-md border-[0.1rem] border-slate-600 bg-white p-2 md:w-[18rem]">
               <p className="text-lg font-bold underline">{i?.name}</p>

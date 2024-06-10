@@ -50,6 +50,7 @@ export function ResultsContainer({ races }: ResultsContainerProps) {
   return (
     <div>
       <Form
+        hidePadding={!showFilterForm}
         onSubmit={handleSubmit}
         formMethods={form}
         formTitle={

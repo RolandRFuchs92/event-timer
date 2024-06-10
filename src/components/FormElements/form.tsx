@@ -2,11 +2,13 @@ import { cn } from "@/lib/styles";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { twMerge } from "tailwind-merge";
 import z from "zod";
 
 interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   formMethods: ReturnType<typeof useForm<any>>;
   formTitle: React.ReactNode;
+  hidePadding?: boolean;
 }
 
 export function Form({
@@ -14,14 +16,18 @@ export function Form({
   formMethods,
   className,
   formTitle,
+  hidePadding = false,
   ...props
 }: FormProps) {
+  const divClassname = !!hidePadding ? "" : "p-6.5";
   return (
     <FormProvider {...formMethods}>
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <form className={cn(className)} {...props}>
           {formTitle}
-          <div className="flex flex-col gap-2 p-6.5">{children}</div>
+          <div className={twMerge(`flex flex-col gap-2 `, divClassname)}>
+            {children}
+          </div>
         </form>
       </div>
     </FormProvider>
