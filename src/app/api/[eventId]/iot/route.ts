@@ -48,9 +48,6 @@ export async function POST(req: Request, { params }: IotGetParams) {
   )!;
   const heat = round.heats.find((i) => i.index === iotSettings.heat_index)!;
 
-  const me = heat.participants.find(
-    (i) => i.participant_id === buttonParticipantId,
-  );
   const competitor = heat.participants.find(
     (i) => i.participant_id !== buttonParticipantId,
   );

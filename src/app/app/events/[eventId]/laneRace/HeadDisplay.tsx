@@ -9,6 +9,7 @@ import TwDialog from "@/components/Dialog/Dialog";
 import { finishLaneRace, getLaneRace } from "./action";
 import { useHeatIndexs, useRoundIndex } from "./hook";
 import { HeatForm } from "./HeatForm";
+import { HeatDeleteParticipant } from "./(heat)/HeatDeleteParticipant";
 
 interface HeatDisplayProps {
   laneRace: Awaited<ReturnType<typeof getLaneRace>>["data"];
@@ -122,12 +123,10 @@ function DisplayParticipant({
                       toggle();
                     }}
                   />
-                  <Button
-                    label="Delete"
-                    onClick={() => {
-                      setData(participant);
-                      toggle();
-                    }}
+                  <HeatDeleteParticipant
+                    particpant_id={participant.participant_id}
+                    round_index={round_index}
+                    heat_index={heat_index}
                   />
                 </div>
               </div>
