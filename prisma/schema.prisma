@@ -54,14 +54,17 @@ model races {
 }
 
 model iot {
-  id            String @id @default(auto()) @map("_id") @db.ObjectId
-  iot           String
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
   event_id      String? @db.ObjectId
-  event         event? @relation(fields: [event_id], references: [id])
+  event         event?  @relation(fields: [event_id], references: [id])
   race_id       String? @db.ObjectId
-  race          races? @relation(fields: [race_id], references: [id])
+  race          races?  @relation(fields: [race_id], references: [id])
   round_index   Int?
-  batch_index   Int?
+  heat_index   Int?
+  participant_a String?
+  participant_b String?
+  start_on      DateTime?
 }
 
 type round {
