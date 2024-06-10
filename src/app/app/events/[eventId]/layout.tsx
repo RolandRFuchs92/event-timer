@@ -9,6 +9,7 @@ import {
   HomeIcon,
   TrophyIcon,
 } from "@heroicons/react/24/outline";
+import { defaultFinisherUrlParams } from "./results/schema";
 
 interface EventHomeLayoutProps {
   children: React.ReactNode;
@@ -66,7 +67,7 @@ export default function EventHomeLayout({
             Icon: <TrophyIcon className="h-4 w-4" />,
             text: "Results",
             linkProps: {
-              href: `/app/events/${eventId}/results`,
+              href: `/app/events/${eventId}/results?${defaultFinisherUrlParams.toString()}`,
             },
           },
         ]}

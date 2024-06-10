@@ -39,6 +39,7 @@ model event {
   event_type       EventTypeEnum[]
   races            races[]
   participant      participant[]
+  iot              iot[]
 }
 
 model races {
@@ -49,6 +50,18 @@ model races {
   batches   batch[]
   rounds    round[]
   event     event        @relation(fields: [event_id], references: [id])
+  iot       iot[]
+}
+
+model iot {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  iot           String
+  event_id      String? @db.ObjectId
+  event         event? @relation(fields: [event_id], references: [id])
+  race_id       String? @db.ObjectId
+  race          races? @relation(fields: [race_id], references: [id])
+  round_index   Int?
+  batch_index   Int?
 }
 
 type round {
