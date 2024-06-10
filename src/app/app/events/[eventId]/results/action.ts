@@ -13,7 +13,7 @@ import { action } from "@/lib/safeAction";
 import { millisecondsToHumanFormat } from "@/lib/getTimerDifference";
 
 import { FinisherFilterSchema } from "./schema";
-import { groupBy, uniqBy } from "lodash";
+import { groupBy } from "lodash";
 
 export const getQualifierLaneRaceResults = action(
   FinisherFilterSchema,
@@ -159,6 +159,7 @@ function mapLaneRaceToResults(race: races) {
   const rounds = race.rounds.map((r) => {
     const heats = r.heats
       .filter((i) => i.is_closed)
+      .sort((a, b) => +b.start_time! - +a.start_time!)
       .map((h) => {
         return {
           heatNumber: h.index + 1,
