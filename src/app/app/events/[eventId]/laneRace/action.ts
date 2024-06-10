@@ -70,7 +70,7 @@ export const getLaneRace = action(LaneRaceSchema, async ({ raceId }) => {
         ...i,
         all_participants: participants
           .filter((i) => all_participant_ids.some((ap) => ap === i.id))
-          .map(({ batches, races, ...p }) => {
+          .map(({ races, ...p }) => {
             return p;
           }),
       };
@@ -322,6 +322,20 @@ export const startLaneRace = action(LaneCompetitorHeatSchema, async (input) => {
     total_time_ms: null,
   }));
 
+  await _db.iot.update({
+    data: {
+      round_index: input.round_index,
+      heat_index: input.heat_index,
+      race_id: input.race_id,
+      start_on: input.start_date,
+      participant_a: heat.participants[0].participant_id,
+      participant_b: heat.participants[1].participant_id,
+    },
+    where: {
+      id: process.env.IOT_ID!,
+    },
+  });
+
   await _db.races.update({
     data: {
       rounds: {
@@ -491,6 +505,7 @@ export const finishLaneRace = action(FinishLaneRaceSchema, async (input) => {
   }
 
   await updateParticipantTimeCommand({
+    is_closed: !!competitorData?.status || !competitorData,
     raceId: input.race_id,
     roundIndex: input.round_index,
     heatIndex: input.heat_index,
@@ -690,6 +705,3 @@ export const removeCompetitorFromPool = action(
     };
   },
 );
-
-
-

@@ -103,7 +103,7 @@ export async function POST(req: Request, { params }: IotGetParams) {
     },
   });
 
-  await unloadIotRound(input.iot_id);
+  if (heatIsClosed) await unloadIotRound(input.iot_id);
 
   return Response.json({
     result: participantData,

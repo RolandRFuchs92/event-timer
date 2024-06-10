@@ -13,6 +13,7 @@ interface UpdateParticipantTimeProps {
   finishTime: Date;
   timeMs: string;
   status: ParticipantHeatStatusEnum | null;
+  is_closed: boolean;
 }
 
 export async function updateParticipantTimeCommand(
@@ -36,6 +37,8 @@ export async function updateParticipantTimeCommand(
                 input.timeMs,
               [`rounds.${input.roundIndex}.heats.${input.heatIndex}.participants.${input.participantIndex}.status`]:
                 input.status,
+              [`rounds.${input.roundIndex}.heats.${input.heatIndex}.is_closed`]:
+                input.is_closed,
             },
           },
         },
@@ -93,5 +96,3 @@ export async function deleteRoundCommand(input: DeleteRoundCommandProps) {
     console.error(e);
   }
 }
-
-
