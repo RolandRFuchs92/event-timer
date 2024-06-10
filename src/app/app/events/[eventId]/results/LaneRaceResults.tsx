@@ -6,7 +6,7 @@ import { RoundNames } from "./RoundNames";
 import { FinisherFilterSchema } from "./schema";
 
 interface LaneRaceResultsProps {
-  searchParams: z.infer<typeof FinisherFilterSchema>
+  searchParams: z.infer<typeof FinisherFilterSchema>;
 }
 
 export async function LaneRaceResults({ searchParams }: LaneRaceResultsProps) {
@@ -20,7 +20,7 @@ export async function LaneRaceResults({ searchParams }: LaneRaceResultsProps) {
           return (
             <div
               key={index}
-              className="flex flex-col gap-4 overflow-x-scroll p-2 lg:flex-row"
+              className="flex flex-col overflow-x-scroll lg:flex-row"
             >
               {(!!laneResult?.length ?? 0) &&
                 laneResult?.map((heats) => {

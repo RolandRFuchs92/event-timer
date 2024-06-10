@@ -1,7 +1,7 @@
 "use client";
 
 import { races } from "@prisma/client";
-import React from "react";
+import React, { useState } from "react";
 import { z } from "zod";
 import { usePathname, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -21,6 +21,8 @@ interface ResultsContainerProps {
 }
 
 export function ResultsContainer({ races }: ResultsContainerProps) {
+  const [showFilterForm, setShowFilterForm] = useState<boolean>(true);
+
   const form = useForm<z.infer<typeof FinisherFilterSchema>>({
     defaultValues: {
       raceId: "" as any,
@@ -50,24 +52,45 @@ export function ResultsContainer({ races }: ResultsContainerProps) {
       <Form
         onSubmit={handleSubmit}
         formMethods={form}
-        formTitle={<FormTitle label="Filter Form" />}
-      >
-        <FormData />
-        <FormErrors />
-        <div className="grid grid-cols-3 items-center gap-2">
-          <Dropdown
-            options={races}
-            label={"Races"}
-            getKey={(i) => i.id}
-            getLabel={(i) => i.name}
-            name={"raceId"}
+        formTitle={
+          <FormTitle
+            label="Filter Form"
+            stateButton={
+              <div
+                className="flex cursor-pointer select-none flex-row items-center justify-center gap-2"
+                onClick={() => setShowFilterForm((prev) => !prev)}
+              >
+                <p className="text-xs text-slate-800">Show Filter List</p>
+                <input
+                  type="checkbox"
+                  checked={showFilterForm}
+                  className=" h-10 cursor-pointer rounded-md  fill-blue-400 "
+                />
+              </div>
+            }
           />
-          <FInput name="refresh" label="Refresh interval seconds" />
-          {isLaneRace ? (
-            <Checkbox label="Is Qualifier" name="qualifier" />
-          ) : null}
-        </div>
-        <Button label="Filter" />
+        }
+      >
+        {!!showFilterForm && (
+          <>
+            <FormData />
+            <FormErrors />
+            <div className="grid grid-cols-3 items-center gap-2">
+              <Dropdown
+                options={races}
+                label={"Races"}
+                getKey={(i) => i.id}
+                getLabel={(i) => i.name}
+                name={"raceId"}
+              />
+              <FInput name="refresh" label="Refresh interval seconds" />
+              {isLaneRace ? (
+                <Checkbox label="Is Qualifier" name="qualifier" />
+              ) : null}
+            </div>
+            <Button label="Filter" />
+          </>
+        )}
       </Form>
     </div>
   );

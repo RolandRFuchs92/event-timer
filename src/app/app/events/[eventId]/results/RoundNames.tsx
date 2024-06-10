@@ -1,3 +1,4 @@
+import { ParticipantHeatStatusEnum } from "@prisma/client";
 import { getLaneRaceResults } from "./action";
 
 type RoundNamesType = {
@@ -23,25 +24,32 @@ export function RoundNames({ data }: RoundNamesType) {
           ];
 
           return (
-            <div key={heats?.heatNumber} className="flex flex-col gap-2 p-2">
+            <div key={heats?.heatNumber} className="flex flex-col gap-0 p-1">
               <h1 className="font-semibold underline">
                 Heat Number: {heats?.heatNumber}
               </h1>
               <p>{`Is finished: ${heats?.isClosed}`}</p>
               <p>Participants:</p>
-              <div id="participant" className="flex flex-col gap-2">
+              <div
+                id="participant"
+                className="flex flex-col gap-2 rounded-md border-[1px] border-slate-300"
+              >
                 {(heats?.participants?.length ?? 0) &&
                   reshuffleParticipantsdOrder?.map((participant) => {
                     const winnerHighlightClassname =
-                      participant?.status == "Winner"
-                        ? "bg-yellow-400"
-                        : participant?.status == "RunnerUp"
+                      participant?.status == ParticipantHeatStatusEnum.Winner
+                        ? "bg-green-400"
+                        : ParticipantHeatStatusEnum.RunnerUp ==
+                            participant?.status
                           ? "bg-orange-300"
-                          : "";
+                          : ParticipantHeatStatusEnum.NotStarted ==
+                              participant?.status
+                            ? "bg-slate-300"
+                            : "";
                     return (
                       <div
                         key={participant?.name}
-                        className=" outline-gray-300  flex grow flex-col  rounded-md p-2 outline-dashed outline-[1px]"
+                        className=" flex   grow flex-col  p-2 "
                       >
                         <p>{`Name: ${participant?.name}`}</p>
                         <p
