@@ -61,11 +61,11 @@ export function ResultsContainer({ races }: ResultsContainerProps) {
                 className="flex cursor-pointer select-none flex-row items-center justify-center gap-2"
                 onClick={() => setShowFilterForm((prev) => !prev)}
               >
-                <p className="text-xs text-slate-800">Show Filter List</p>
+                <p className="text-md text-slate-800">Show Filter List</p>
                 <input
                   type="checkbox"
                   checked={showFilterForm}
-                  className=" h-10 cursor-pointer rounded-md  fill-blue-400 "
+                  className=" aspect-square w-5 cursor-pointer rounded-md  fill-blue-400 "
                 />
               </div>
             }
