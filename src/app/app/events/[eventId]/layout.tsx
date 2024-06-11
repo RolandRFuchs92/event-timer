@@ -1,4 +1,3 @@
-import { BatchIcon } from "@/components/Icons/BatchIcon";
 import { FinishersIcon } from "@/components/Icons/FinisherIcon";
 import { PeopleIcon } from "@/components/Icons/PeopleIcon";
 import { RaceIcon } from "@/components/Icons/RaceIcon";
@@ -10,6 +9,7 @@ import {
   TrophyIcon,
 } from "@heroicons/react/24/outline";
 import { defaultFinisherUrlParams } from "./results/schema";
+import { EmailIcon } from "@/components/Icons/EmailIcon";
 
 interface EventHomeLayoutProps {
   children: React.ReactNode;
@@ -68,6 +68,13 @@ export default function EventHomeLayout({
             text: "Results",
             linkProps: {
               href: `/app/events/${eventId}/results?${defaultFinisherUrlParams.toString()}`,
+            },
+          },
+          {
+            Icon: <EmailIcon />,
+            text: "Import",
+            linkProps: {
+              href: `/app/events/${eventId}/import`,
             },
           },
         ]}
