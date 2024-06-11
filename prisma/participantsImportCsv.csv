@@ -1,0 +1,5 @@
+first_name,last_name,birthdate,email,race_number,is_male,race_id,batch_index
+Andrew,Helm,1986/07/02,andyh3lm@gmail.com,1,TRUE,66620cb057147815ce862f8f,0
+Rhain,Hoskins,1984/11/09,rhainhoskins@gmail.com,2,TRUE,66620cb057147815ce862f8f,0
+Wynand,Hattingh,1978/09/06,wynand@avicepestcontrol.co.za,3,TRUE,66620cb057147815ce862f8f,1
+Marius,Lourens,1973/04/23,mjlourens1@gmail.com,4,TRUE,66620cb057147815ce862f8f,2

@@ -1,4 +1,3 @@
-
 import { writeToString } from "@fast-csv/format";
 import { NextResponse } from "next/server";
 
@@ -25,8 +24,7 @@ const headings = {
   birthdate: null,
   email: null,
   race_number: null,
-  has_paid: null,
   is_male: null,
-  event_batch_id: null,
-  race_ids: null,
+  race_id: null,
+  batch_index: null,
 };
