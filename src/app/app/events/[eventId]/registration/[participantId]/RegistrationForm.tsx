@@ -70,6 +70,7 @@ export function RegistrationForm({
         <FInput name="first_name" label="First Name" />
         <FInput name="last_name" label="Last Name" />
       </FormRow>
+      <FInput name="email" label="Email" />
       <Checkbox name="is_male" label="Is Male" />
       <FInput type="date" name="birthdate" label="Birthdate" />
       <BatchFieldArray races={races} />

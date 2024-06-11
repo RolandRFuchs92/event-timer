@@ -101,6 +101,7 @@ enum ParticipantHeatStatusEnum {
 
 model participant {
   id          String             @id @default(auto()) @map("_id") @db.ObjectId
+  email       String
   first_name  String
   last_name   String
   birthdate   DateTime

@@ -71,6 +71,11 @@ export function ParticipantTable({ data }: ParticpantTableProps) {
                   cell: (p) => p.getValue(),
                 },
                 {
+                  accessorKey: "email",
+                  header: "Email",
+                  cell: (p) => p.getValue().email
+                },
+                {
                   accessorKey: "is_male",
                   header: "Gender",
                   cell: (p) => (p.getValue() ? "Male" : "Female"),

@@ -3,6 +3,7 @@ import z from "zod";
 export const RegistrationSchema = z.object({
   event_id: z.string(),
   id: z.coerce.string(),
+  email: z.string(),
   first_name: z.string().min(2),
   last_name: z.string(),
   birthdate: z.coerce.date(),
@@ -19,6 +20,7 @@ export const RegistrationSchema = z.object({
 export const DefaultRegistration: z.infer<typeof RegistrationSchema> = {
   event_id: "",
   id: "",
+  email: "",
   first_name: "",
   last_name: "",
   race_number: "",
