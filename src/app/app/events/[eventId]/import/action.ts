@@ -78,7 +78,8 @@ export async function importCsv(
         [key]: {
           first_name: cur.first_name,
           last_name: cur.last_name,
-          birthdate: cur.birthdate,
+          email: cur.email,
+          birthdate: new Date(cur.birthdate),
           race_number: cur.race_number.toString(),
           is_male: cur.is_male === "true",
           event_id: input.event_id,
@@ -96,23 +97,27 @@ export async function importCsv(
     {} as { [key: string]: participant },
   );
 
-
   try {
-    const participants = Object.values(participantData)
+    await resetRaceData(input.event_id);
+    const participants = Object.values(participantData);
     const result = await _db.participant.createMany({
-      data: participants
+      data: participants,
     });
 
     const allNewParticipants = await _db.participant.findMany({
       where: {
         race_number: {
-          in: participants.map(i => i.race_number!)
-        }
-      }
+          in: participants.map((i) => i.race_number!),
+        },
+      },
     });
 
+    console.log(allNewParticipants);
+
     for (const race of event.races) {
-      const participantsOfThisRace = allNewParticipants.filter(i => i.races.some(r => r.race_id === race.id));
+      const participantsOfThisRace = allNewParticipants.filter((i) =>
+        i.races.some((r) => r.race_id === race.id),
+      );
       if (race.race_type === "LaneRace")
         await _db.races.update({
           data: {
@@ -120,45 +125,52 @@ export async function importCsv(
               updateMany: {
                 data: {
                   all_participant_ids: {
-                    push: participantsOfThisRace.map(i => i.id)
+                    push: participantsOfThisRace.map((i) => i.id),
                   },
                 },
                 where: {
-                  round_index: 0
-                }
-              }
-            }
+                  round_index: 0,
+                },
+              },
+            },
           },
           where: {
             id: race.id,
-            race_type: "LaneRace"
-          }
+            race_type: "LaneRace",
+          },
         });
 
       if (race.race_type === "StandardNoLaps") {
         await assignParticipantsToRelativeBatch(race, participantsOfThisRace);
       }
     }
+
     return {
       result: {
-        message: `Successfully imported ${allNewParticipants.length} participants!`
+        message: `Successfully imported ${allNewParticipants.length} participants!`,
       },
-      serverError: ""
-    }
+      serverError: "",
+    };
   } catch (error: any) {
+    console.log(error);
     return {
       result: {
-        message: ""
+        message: "",
       },
-      serverError: "There was an error importing your data."
+      serverError: "There was an error importing your data.",
     };
   }
 }
 
-async function assignParticipantsToRelativeBatch(race: races, participants: participant[]) {
+async function assignParticipantsToRelativeBatch(
+  race: races,
+  participants: participant[],
+) {
   for (const batch of race.batches) {
-    const batchParticipants = participants.filter(p => {
-      const isInThisBatch = p.races.some(i => i.race_id === race.id && i.batch_index === batch.index);
+    const batchParticipants = participants.filter((p) => {
+      const isInThisBatch = p.races.some(
+        (i) => i.race_id === race.id && i.batch_index === batch.index,
+      );
       return isInThisBatch;
     });
 
@@ -168,25 +180,59 @@ async function assignParticipantsToRelativeBatch(race: races, participants: part
           updateMany: {
             data: {
               participants: {
-                push: batchParticipants.map(i => ({
+                push: batchParticipants.map((i) => ({
                   time_taken: null,
                   finish_time: null,
                   participant_id: i.id,
                   finish_status: null,
-                  time_taken_ms: null
-                }))
-              }
+                  time_taken_ms: null,
+                })),
+              },
             },
             where: {
-              index: batch.index
-            }
-          }
-        }
+              index: batch.index,
+            },
+          },
+        },
       },
       where: {
         id: race.id,
-        race_type: 'StandardNoLaps'
-      }
+        race_type: "StandardNoLaps",
+      },
     });
+
   }
+}
+
+async function resetRaceData(eventId: string) {
+  await _db.races.updateMany({
+    data: {
+      rounds: {
+        updateMany: {
+          data: {
+            all_participant_ids: []
+          },
+          where: {
+          },
+        }
+      },
+      batches: {
+        updateMany: {
+          where: {},
+          data: {
+            participants: []
+          }
+        }
+      }
+    },
+    where: {
+      event_id: eventId
+    }
+  });
+
+  await _db.participant.deleteMany({
+    where: {
+      event_id: eventId
+    }
+  });
 }

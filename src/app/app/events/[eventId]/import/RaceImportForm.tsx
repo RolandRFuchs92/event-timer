@@ -31,6 +31,11 @@ export function RaceImportForm() {
     form.append("separator", data.separator);
 
     const result = await importCsv(form);
+    if (result.serverError) {
+      toast.error(result.serverError);
+      return;
+    }
+
     toast.success(result.message);
   });
 

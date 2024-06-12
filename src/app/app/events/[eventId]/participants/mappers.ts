@@ -7,13 +7,10 @@ type ParticipantRaceBatches = {
 }
 
 export function mapRacesAndBatches(participantId: string, races: races[]): ParticipantRaceBatches[] {
+
   const relatedBatches = races.reduce((acc, cur) => {
-
-    const batch = cur.batches.find(i => {
-      return i.participants.some(p => p.participant_id === participantId);
-    });
-
-    if (cur.race_type === "LaneRace")
+    const isInLaneRace = cur.rounds[0]?.all_participant_ids.includes(participantId);
+    if (cur.race_type === "LaneRace" && isInLaneRace)
       return [
         ...acc,
         {
@@ -22,6 +19,10 @@ export function mapRacesAndBatches(participantId: string, races: races[]): Parti
           race_name: cur.name
         }
       ];
+
+    const batch = cur.batches.find(i => {
+      return i.participants.some(p => p.participant_id === participantId);
+    });
 
     if (batch)
       return [
