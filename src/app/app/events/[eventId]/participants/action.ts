@@ -25,6 +25,9 @@ export async function getParticipants(eventId: string) {
     where: {
       event_id: eventId,
     },
+    orderBy: {
+      first_name: "asc"
+    }
   });
 
   const races = await _db.races.findMany({

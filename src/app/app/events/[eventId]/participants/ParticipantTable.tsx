@@ -20,6 +20,7 @@ interface ParticpantTableProps {
 export function ParticipantTable({ data }: ParticpantTableProps) {
   const eventId = useEventId();
   const { replace } = useRouter();
+  console.log(data)
 
   return (
     <TwDialog<(typeof data)[0]>
@@ -78,7 +79,9 @@ export function ParticipantTable({ data }: ParticpantTableProps) {
                 {
                   accessorKey: "is_male",
                   header: "Gender",
-                  cell: (p) => (p.getValue() ? "Male" : "Female"),
+                  cell: (p) => {
+                    return p.getValue() ? "Male" : "Female"
+                  },
                 },
                 {
                   accessorKey: "birthdate",

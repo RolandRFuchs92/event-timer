@@ -99,6 +99,10 @@ function AllParticipants({ round }: AllParticipantsProps) {
                   r.participants.some((p) => p.participant_id === i.id),
                 );
 
+                const participantStatus = currentHeat?.participants.find(
+                  (p) => p.participant_id === i.id,
+                );
+
                 return (
                   <li
                     key={i.id}

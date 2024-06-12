@@ -4,13 +4,11 @@ import { parseString } from "fast-csv";
 import { _db } from "@/lib/db";
 import { participant, races } from "@prisma/client";
 import { HeadingsType } from "@/app/api/csvTemplate/route";
-import { ObjectId } from "bson";
 
 interface ActionResponse<T> {
   result: T;
   serverError: string;
 }
-function toActionResponse({ }) { }
 
 export async function importCsv(
   form: FormData,
@@ -56,11 +54,14 @@ export async function importCsv(
       });
   });
 
+  console.log(rawParsedData)
+
   const participantData = rawParsedData.reduce(
     (acc, cur) => {
       const key = `${cur.first_name}-${cur.last_name}`;
       const isIncAcc = key in acc;
       const thisRace = event.races.find((i) => i.id === cur.race_id);
+
       if (!thisRace) return acc as any;
 
       if (isIncAcc) {
@@ -81,7 +82,7 @@ export async function importCsv(
           email: cur.email,
           birthdate: new Date(cur.birthdate),
           race_number: cur.race_number.toString(),
-          is_male: cur.is_male === "true",
+          is_male: /true/i.test(cur.is_male),
           event_id: input.event_id,
           races: [
             {
@@ -112,7 +113,6 @@ export async function importCsv(
       },
     });
 
-    console.log(allNewParticipants);
 
     for (const race of event.races) {
       const participantsOfThisRace = allNewParticipants.filter((i) =>
@@ -200,7 +200,6 @@ async function assignParticipantsToRelativeBatch(
         race_type: "StandardNoLaps",
       },
     });
-
   }
 }
 
@@ -210,29 +209,28 @@ async function resetRaceData(eventId: string) {
       rounds: {
         updateMany: {
           data: {
-            all_participant_ids: []
+            all_participant_ids: [],
           },
-          where: {
-          },
-        }
+          where: {},
+        },
       },
       batches: {
         updateMany: {
           where: {},
           data: {
-            participants: []
-          }
-        }
-      }
+            participants: [],
+          },
+        },
+      },
     },
     where: {
-      event_id: eventId
-    }
+      event_id: eventId,
+    },
   });
 
   await _db.participant.deleteMany({
     where: {
-      event_id: eventId
-    }
+      event_id: eventId,
+    },
   });
 }
