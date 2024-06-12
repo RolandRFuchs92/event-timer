@@ -1,7 +1,7 @@
-import z from 'zod';
+import z from "zod";
 
 export const CsvUploadSchema = z.object({
-  base64Url: z.string(),
+  csv_file: z.any(),
   event_id: z.string(),
-  separator: z.string()
+  separator: z.string(),
 });

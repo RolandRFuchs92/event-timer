@@ -1,85 +1,150 @@
-import { action } from "@/lib/safeAction";
-import { CsvUploadSchema } from "./schema";
+"use server";
 
-export const importCsv = action(CsvUploadSchema, async input => {
-  const base64FileUrl = input.base64Url;
-  const fileData = base64FileUrl
-  // const separator = formData.get("separator")?.toString();
+import { parseString } from "fast-csv";
+import { _db } from "@/lib/db";
+import { participant } from "@prisma/client";
+import { HeadingsType } from "@/app/api/csvTemplate/route";
+import { ObjectId } from "bson";
 
-  // const group = await _db.event_group.findFirst({
-  //     select: {
-  //         id: true,
-  //         is_auto_race_number: true,
-  //         race_number_increment: true
-  //     },
-  //     where: {
-  //         id: eventGroupId
-  //     }
-  // });
-  //
-  // if (!group) {
-  //     return {
-  //         message: "Cannot find that group."
-  //     }
-  // }
-  //
-  // let itteration = group.race_number_increment || 0;
+interface ActionResponse<T> {
+  result: T;
+  serverError: string;
+}
+function toActionResponse({ }) { }
+
+export async function importCsv(
+  form: FormData,
+): Promise<ActionResponse<{ message: string }>> {
+  const input = {
+    csv_file: form.get("csv_file") as File,
+    event_id: form.get("event_id")!.toString(),
+    separator: form.get("separator")!.toString(),
+  };
+
+  const csvFile = await input.csv_file.text();
+  const event = await _db.event.findFirst({
+    include: {
+      races: true,
+    },
+    where: {
+      id: input.event_id?.toString()!,
+    },
+  });
+
+  if (!event) {
+    return {
+      result: { message: "" },
+      serverError: "Unable to find that event.",
+    };
+  }
+
+  let itteration = event.last_race_number;
   // const isAutoRaceNumber = group.is_auto_race_number;
-  //
-  // const dataToUpload: participant[] = []
-  // await new Promise(async res => {
-  //     parseString(await fileData.text(), { headers: true, delimiter: separator || "," })
-  //         .on('data', (row: HeadingsType) => {
-  //             if (isAutoRaceNumber)
-  //                 itteration++;
-  //
-  //             const data: Omit<participant, 'id'> = {
-  //                 birthdate: new Date(row.birthdate),
-  //                 has_paid: row.has_paid.toLowerCase() === "true",
-  //                 is_male: row.is_male.toLowerCase() === "true",
-  //                 event_batch_id: +row.event_batch_id,
-  //                 race_number: isAutoRaceNumber ? itteration.toString() : row.race_number,
-  //                 is_dnf: false,
-  //                 last_name: row.last_name,
-  //                 first_name: row.first_name,
-  //                 finish_time: null
-  //             }
-  //
-  //             dataToUpload.push(data as any);
-  //         })
-  //         .on('end', () => {
-  //             res(true)
-  //         });
-  // });
-  //
-  // if (!dataToUpload.length) {
-  //     return {
-  //         message: "Nothing uploaded."
-  //     }
-  // }
-  // try {
-  //     const [result,] = await _db.$transaction([
-  //         _db.participant.createMany({
-  //             data: dataToUpload
-  //         }),
-  //         _db.event_group.update({
-  //             data: {
-  //                 race_number_increment: itteration
-  //             },
-  //             where: {
-  //                 id: group.id
-  //             }
-  //         })
-  //     ]);
-  //
-  //     return {
-  //         message: `Successfully uploaded ${result.count} participants`
-  //     }
-  // } catch (error: any) {
-  //     return {
-  //         message: error.message
-  //     }
-  // }
-  //
 
+  const rawParsedData: HeadingsType[] = [];
+  await new Promise(async (res) => {
+    parseString(csvFile, { headers: true, delimiter: input.separator || "," })
+      .on("data", (row: HeadingsType) => {
+        itteration++;
+        rawParsedData.push({
+          ...row,
+          race_number: itteration.toString(),
+        });
+      })
+      .on("end", () => {
+        res(true);
+      });
+  });
+
+  const participantData = rawParsedData.reduce(
+    (acc, cur) => {
+      const key = `${cur.first_name}-${cur.last_name}`;
+      const isIncAcc = key in acc;
+      const thisRace = event.races.find((i) => i.id === cur.race_id);
+      if (!thisRace) return acc as any;
+
+      if (isIncAcc) {
+        acc[key].races.push({
+          race_id: cur.race_id,
+          race_type: thisRace.race_type,
+          race_name: thisRace.name,
+          batch_index: +cur.batch_index,
+        });
+        return acc;
+      }
+
+      return {
+        ...acc,
+        [key]: {
+          first_name: cur.first_name,
+          last_name: cur.last_name,
+          birthdate: cur.birthdate,
+          race_number: cur.race_number.toString(),
+          is_male: cur.is_male === "true",
+          event_id: input.event_id,
+          races: [
+            {
+              race_id: cur.race_id,
+              race_type: thisRace.race_type,
+              race_name: thisRace.name,
+              batch_index: +cur.batch_index,
+            },
+          ],
+        },
+      };
+    },
+    {} as { [key: string]: participant },
+  );
+
+
+  try {
+    const participants = Object.values(participantData)
+    const result = await _db.participant.createMany({
+      data: participants
+    });
+
+    const allNewParticipants = await _db.participant.findMany({
+      where: {
+        race_number: {
+          in: participants.map(i => i.race_number!)
+        }
+      }
+    });
+
+    for (const race of event.races) {
+      const participantsOfThisRace = allNewParticipants.filter(i => i.races.some(r => r.race_id === race.id));
+      if (race.race_type === "LaneRace")
+        await _db.races.update({
+          data: {
+            rounds: {
+              updateMany: {
+                data: {
+                  all_participant_ids: {
+                    push: participantsOfThisRace.map(i => i.id)
+                  },
+                },
+                where: {
+                  round_index: 0
+                }
+              }
+            }
+          },
+          where: {
+            id: race.id,
+            race_type: "LaneRace"
+          }
+        });
+    }
+  } catch (error: any) {
+    // return {
+    // message: error.message,
+    // };
+  }
+
+  return {
+    result: {
+      message: "Well done",
+    },
+    serverError: "",
+  };
 }

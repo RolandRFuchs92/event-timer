@@ -36,9 +36,9 @@ export async function RaceLegend({ eventId }: RaceLegendProps) {
                 [batch index] - batch name
                 {i.batches.map((i) => {
                   return (
-                    <div>
+                    <li key={i.index}>
                       [{i.index}] - {i.name}
-                    </div>
+                    </li>
                   );
                 })}
               </ul>

@@ -1,8 +1,8 @@
 "use server";
+
 import {
   ParticipantHeatStatusEnum,
   RaceTypeEnum,
-  heat,
   heat_participant,
   races,
 } from "@prisma/client";
