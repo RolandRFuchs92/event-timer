@@ -328,8 +328,8 @@ export const startLaneRace = action(LaneCompetitorHeatSchema, async (input) => {
       heat_index: input.heat_index,
       race_id: input.race_id,
       start_on: input.start_date,
-      participant_a: heat.participants[0].participant_id,
-      participant_b: heat.participants[1].participant_id,
+      participant_a: heat.participants[0]?.participant_id ?? null,
+      participant_b: heat.participants[1]?.participant_id ?? null,
     },
     where: {
       id: process.env.IOT_ID!,
