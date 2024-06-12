@@ -64,7 +64,7 @@ export async function getFinishers(raceIds: string[]) {
         });
       })
       .filter((i) => !!i.start_on && !!i.finish_time)
-      .sort((a, b) => +a.finish_time! - +b.finish_time!);
+      .sort((a, b) => +b.finish_time! - +a.finish_time!);
 
     return participants;
   });
@@ -96,25 +96,24 @@ export const deleteFinisher = action(
                 finish_status: null,
                 time_taken: null,
                 time_taken_ms: null,
-              }
+              },
             },
             where: {
               participants: {
                 some: {
-                  participant_id: participantId
-                }
-              }
-            }
-          }
-        }
+                  participant_id: participantId,
+                },
+              },
+            },
+          },
+        },
       },
       where: {
         id: {
-          in: race_ids
-        }
-      }
+          in: race_ids,
+        },
+      },
     });
-
 
     revalidatePath("");
     return {
@@ -161,6 +160,13 @@ export const setFinisher = action(FinisherSchema, async (payload) => {
         (i) => i.index === race.batch_index,
       )!;
 
+      const alreadyCaptured = batch.participants.some(
+        (i) => i.participant_id === participantId && !!i.finish_time,
+      );
+
+      if (alreadyCaptured)
+        throw new Error("You have already captured that competitor");
+
       let timeTakenMs = 0;
       if (batch.start_on) {
         timeTaken = getTimerDifference(batch.start_on, payload.finish_time);
@@ -201,10 +207,8 @@ export const setFinisher = action(FinisherSchema, async (payload) => {
       });
     }
   } catch (e) {
-    const message = "Error updating finisher details";
-    console.error(message);
     console.error(e);
-    throw new Error(message);
+    throw new Error((e as any).message);
   }
 
   revalidatePath("");
@@ -225,18 +229,19 @@ export const changeParticipantFinishStatus = action(
 
     if (!participant) throw new Error("Unable to find that participant");
 
-
     const races = await _db.races.findMany({
       where: {
         id: {
-          in: participant.races.map(i => i.race_id),
+          in: participant.races.map((i) => i.race_id),
         },
-        race_type: "StandardNoLaps"
-      }
+        race_type: "StandardNoLaps",
+      },
     });
 
     for (const race of races) {
-      const participantRace = participant.races.find(i => i.race_id === race.id);
+      const participantRace = participant.races.find(
+        (i) => i.race_id === race.id,
+      );
       if (!participantRace) continue;
 
       await _db.races.update({
@@ -248,26 +253,25 @@ export const changeParticipantFinishStatus = action(
                   updateMany: {
                     data: {
                       finish_status: participantData.finish_status,
-                      finish_time: participantData.finish_time
+                      finish_time: participantData.finish_time,
                     },
                     where: {
-                      participant_id: participant.id
-                    }
-                  }
-                }
+                      participant_id: participant.id,
+                    },
+                  },
+                },
               },
               where: {
-                index: participantRace.batch_index!
-              }
-            }
-          }
+                index: participantRace.batch_index!,
+              },
+            },
+          },
         },
         where: {
           race_type: "StandardNoLaps",
-          id: race.id
-        }
+          id: race.id,
+        },
       });
-
     }
 
     revalidatePath("");

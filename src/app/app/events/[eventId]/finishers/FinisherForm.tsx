@@ -35,7 +35,17 @@ export function FinishersForm({ FinisherStatusOptions }: FinisherFormProp) {
       finish_time: new Date(),
     });
 
-    if (result.serverError) toast.error(result.serverError);
+    if (result.serverError) {
+      toast.error(result.serverError);
+      if (/you have already captured/ig.test(result.serverError))
+        form.reset();
+
+      return;
+    }
+
+
+    toast.success(result.data!.message);
+    form.reset();
   });
 
   return (
