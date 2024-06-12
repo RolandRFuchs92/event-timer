@@ -14,6 +14,7 @@ import { millisecondsToHumanFormat } from "@/lib/getTimerDifference";
 
 import { FinisherFilterSchema } from "./schema";
 import { groupBy } from "lodash";
+import { unstable_noStore } from "next/cache";
 
 export const getQualifierLaneRaceResults = action(
   FinisherFilterSchema,
@@ -49,6 +50,8 @@ export const getQualifierLaneRaceResults = action(
         [] as ReturnType<typeof mapEntriesToObject>[],
       )
       .sort((a, b) => +a.bestTimeMs! - +b.bestTimeMs!);
+
+    unstable_noStore();
 
     return results;
   },
@@ -126,6 +129,7 @@ export const getStandardRaceResults = action(
           : "Unknown",
       };
     });
+    unstable_noStore();
 
     return participants;
   },

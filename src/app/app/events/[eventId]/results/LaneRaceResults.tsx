@@ -1,16 +1,26 @@
+"use client";
+
 import React from "react";
 import { z } from "zod";
 
 import { getLaneRaceResults } from "./action";
 import { RoundNames } from "./RoundNames";
 import { FinisherFilterSchema } from "./schema";
+import { useQuery } from "react-query";
 
 interface LaneRaceResultsProps {
   searchParams: z.infer<typeof FinisherFilterSchema>;
 }
 
 export async function LaneRaceResults({ searchParams }: LaneRaceResultsProps) {
-  const laneResults = await getLaneRaceResults(searchParams);
+  const query = useQuery(
+    "getLaneRaceResults",
+    () => getLaneRaceResults(searchParams),
+    {
+      refetchInterval: +searchParams.refresh * 1000,
+    },
+  );
+  const laneResults = query.data;
 
   return (
     <div className="flex flex-col gap-4 ">

@@ -1,17 +1,28 @@
+'use client';
+
 import React from "react";
 import { z } from "zod";
-import { FinisherFilterSchema } from "./schema";
-import { getQualifierLaneRaceResults } from "./action";
 import { twMerge } from "tailwind-merge";
 import ordinal from "ordinal";
+
+import { FinisherFilterSchema } from "./schema";
+import { getQualifierLaneRaceResults } from "./action";
+import { useQuery } from "react-query";
 
 interface LaneRaceQualifierResultProps {
   searchParams: z.infer<typeof FinisherFilterSchema>;
 }
+
 export async function LaneRaceQualifierResults({
   searchParams,
 }: LaneRaceQualifierResultProps) {
-  const results = await getQualifierLaneRaceResults(searchParams);
+  const data = useQuery('getQualifierLaneRaceResults',
+    () => getQualifierLaneRaceResults(searchParams),
+    {
+      refetchInterval: +searchParams.refresh * 1000
+    }
+  )
+  const results = data.data;
 
   return (
     <div className="md:max-w-screen flex w-full flex-col flex-wrap gap-2 overflow-x-scroll py-2 md:flex-row">

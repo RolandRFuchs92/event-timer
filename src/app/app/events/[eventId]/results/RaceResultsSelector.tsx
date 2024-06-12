@@ -1,9 +1,10 @@
 "use client";
 
+import React, { Suspense, useEffect } from "react";
 import { z } from "zod";
-import { FinisherFilterSchema } from "./schema";
 import { races } from "@prisma/client";
-import { Suspense } from "react";
+
+import { FinisherFilterSchema } from "./schema";
 import { LaneRaceQualifierResults } from "./LaneRaceQualifierResults";
 import { LaneRaceResults } from "./LaneRaceResults";
 import { StandardRaceResults } from "./StandardRaceResults";
@@ -17,6 +18,8 @@ export function RaceResultsSelector({
   selectedRace,
   searchParams,
 }: LaneRaceResultsSelectorProps) {
+
+
   if (selectedRace.race_type === "StandardNoLaps")
     return (
       <Suspense key={selectedRace.id} fallback="Loading...">
