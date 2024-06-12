@@ -2,7 +2,7 @@
 
 import { parseString } from "fast-csv";
 import { _db } from "@/lib/db";
-import { participant } from "@prisma/client";
+import { participant, races } from "@prisma/client";
 import { HeadingsType } from "@/app/api/csvTemplate/route";
 import { ObjectId } from "bson";
 
@@ -134,17 +134,59 @@ export async function importCsv(
             race_type: "LaneRace"
           }
         });
+
+      if (race.race_type === "StandardNoLaps") {
+        await assignParticipantsToRelativeBatch(race, participantsOfThisRace);
+      }
+    }
+    return {
+      result: {
+        message: `Successfully imported ${allNewParticipants.length} participants!`
+      },
+      serverError: ""
     }
   } catch (error: any) {
-    // return {
-    // message: error.message,
-    // };
+    return {
+      result: {
+        message: ""
+      },
+      serverError: "There was an error importing your data."
+    };
   }
+}
 
-  return {
-    result: {
-      message: "Well done",
-    },
-    serverError: "",
-  };
+async function assignParticipantsToRelativeBatch(race: races, participants: participant[]) {
+  for (const batch of race.batches) {
+    const batchParticipants = participants.filter(p => {
+      const isInThisBatch = p.races.some(i => i.race_id === race.id && i.batch_index === batch.index);
+      return isInThisBatch;
+    });
+
+    await _db.races.update({
+      data: {
+        batches: {
+          updateMany: {
+            data: {
+              participants: {
+                push: batchParticipants.map(i => ({
+                  time_taken: null,
+                  finish_time: null,
+                  participant_id: i.id,
+                  finish_status: null,
+                  time_taken_ms: null
+                }))
+              }
+            },
+            where: {
+              index: batch.index
+            }
+          }
+        }
+      },
+      where: {
+        id: race.id,
+        race_type: 'StandardNoLaps'
+      }
+    });
+  }
 }
