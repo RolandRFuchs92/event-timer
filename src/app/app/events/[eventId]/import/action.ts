@@ -54,8 +54,6 @@ export async function importCsv(
       });
   });
 
-  console.log(rawParsedData)
-
   const participantData = rawParsedData.reduce(
     (acc, cur) => {
       const key = `${cur.first_name}-${cur.last_name}`;
@@ -118,7 +116,7 @@ export async function importCsv(
       const participantsOfThisRace = allNewParticipants.filter((i) =>
         i.races.some((r) => r.race_id === race.id),
       );
-      if (race.race_type === "LaneRace")
+      if (race.race_type === "LaneRace") {
         await _db.races.update({
           data: {
             rounds: {
@@ -139,6 +137,7 @@ export async function importCsv(
             race_type: "LaneRace",
           },
         });
+      }
 
       if (race.race_type === "StandardNoLaps") {
         await assignParticipantsToRelativeBatch(race, participantsOfThisRace);
