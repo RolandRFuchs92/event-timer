@@ -15,6 +15,7 @@ import { millisecondsToHumanFormat } from "@/lib/getTimerDifference";
 import { FinisherFilterSchema } from "./schema";
 import { groupBy } from "lodash";
 import { unstable_noStore } from "next/cache";
+import { differenceInYears } from "date-fns";
 
 export const getQualifierLaneRaceResults = action(
   FinisherFilterSchema,
@@ -123,12 +124,15 @@ export const getStandardRaceResults = action(
 
       return {
         ...bp,
+        age: differenceInYears(new Date(), me!.birthdate),
         position: ordinal(index + 1),
+        is_male: me?.is_male ?? false,
         name: me
           ? `${me.first_name} ${me.last_name}[${me.race_number}]`
           : "Unknown",
       };
     });
+
     unstable_noStore();
 
     return participants;
@@ -138,6 +142,7 @@ export const getStandardRaceResults = action(
 export const getLaneRaceResults = action(
   FinisherFilterSchema,
   async (input) => {
+    unstable_noStore();
     const laneRaces = await _db.races.findMany({
       where: {
         id: input.raceId,

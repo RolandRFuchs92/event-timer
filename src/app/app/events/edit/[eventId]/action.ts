@@ -1,10 +1,11 @@
 "use server";
 
-import { _db } from "@/lib/db";
+import { MONGO_UPSERT_HACK, _db } from "@/lib/db";
 import { DefaultEvent } from "./schema";
 import { mongoEnumToOptions, optionsToStringArray } from "@/lib/helper";
 import { revalidatePath, unstable_noStore } from "next/cache";
 import { event } from "@prisma/client";
+import { omit } from "lodash";
 
 export async function getEvent(eventId: string) {
   if (eventId === "null") return DefaultEvent;
@@ -32,14 +33,29 @@ export async function mutateEvent({
 }: typeof DefaultEvent) {
   const event: Omit<event, "id"> = {
     ...initialEvent,
+    last_race_number: 0,
     event_type: initialEvent.event_type.map((i) =>
       optionsToStringArray(i),
     ) as any,
   };
 
-  const result = await _db.event.upsert({
-    create: event,
-    update: event,
+  if (id === MONGO_UPSERT_HACK) {
+    const result = await _db.event.create({
+      data: {
+        ...event
+      }
+    });
+
+    return {
+      result,
+      message: "Successfully created a new event!"
+    }
+  }
+
+  const result = await _db.event.update({
+    data: {
+      ...omit(event, ['id'])
+    },
     where: {
       id,
     },

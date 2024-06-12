@@ -4,8 +4,10 @@ import { action } from "@/lib/safeAction";
 import { GetBatchParticipantSchema } from "./schema";
 import { getRace } from "@/app/app/events/[eventId]/action";
 import { _db } from "@/lib/db";
+import { unstable_noStore } from "next/cache";
 
 export const getBatchParticipants = action(GetBatchParticipantSchema, async (input) => {
+  unstable_noStore();
   const race = await getRace(input.race_id);
   const batch = race.batches[input.batch_index];
 

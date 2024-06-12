@@ -653,6 +653,7 @@ export const getWinnersFrom = action(MoveWinersSchema, async (input) => {
     },
   });
 
+  unstable_noStore();
   revalidatePath("");
 
   return {

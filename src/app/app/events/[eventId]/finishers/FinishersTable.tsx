@@ -98,6 +98,13 @@ export function FinishersTable({
                         },
                       },
                       {
+                        accessorKey: "age",
+                        header: "age",
+                        cell: (p) => {
+                          return p.getValue();
+                        },
+                      },
+                      {
                         accessorKey: "time_taken",
                         header: "Race:time:status",
                         cell: (p) => {

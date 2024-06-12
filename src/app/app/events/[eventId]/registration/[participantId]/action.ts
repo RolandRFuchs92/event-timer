@@ -31,6 +31,7 @@ export const mutateParticipant = action(RegistrationSchema, async (input) => {
 });
 
 export async function getEventRaces(eventId: string) {
+  unstable_noStore();
   const races = await _db.races.findMany({
     where: {
       event_id: eventId,
@@ -41,9 +42,9 @@ export async function getEventRaces(eventId: string) {
 }
 
 export async function getParticipant(eventId: string, participantId: string) {
+  unstable_noStore();
   if (participantId === MONGO_UPSERT_HACK) return DefaultRegistration;
 
-  unstable_noStore();
   const result = await _db.participant.findFirst({
     where: {
       event_id: eventId,

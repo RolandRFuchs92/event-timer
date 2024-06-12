@@ -27,13 +27,6 @@ export const deleteRace = action(DeleteRaceSchema, async (raceId) => {
             },
           },
         },
-        {
-          batches: {
-            some: {
-              race_id: raceId,
-            },
-          },
-        },
       ],
     },
   });
@@ -44,7 +37,6 @@ export const deleteRace = action(DeleteRaceSchema, async (raceId) => {
         data: {
           ...omit(i, "id"),
           races: i.races.filter((r) => r.race_id !== raceId),
-          batches: i.batches.filter((b) => b.race_id !== raceId),
         },
         where: {
           id: i.id,

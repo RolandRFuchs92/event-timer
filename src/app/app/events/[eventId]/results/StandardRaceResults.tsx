@@ -15,11 +15,12 @@ interface StandardRaceResultsProps {
 export function StandardRaceResults({
   searchParams,
 }: StandardRaceResultsProps) {
-  const data = useQuery("getStandardRaceResults(searchParams)", () =>
-    getStandardRaceResults(searchParams),
+  const data = useQuery(
+    "getStandardRaceResults(searchParams)",
+    () => getStandardRaceResults(searchParams),
     {
-      refetchInterval: searchParams.refresh * 1000
-    }
+      refetchInterval: searchParams.refresh * 1000,
+    },
   );
   const result = data.data;
 
@@ -40,16 +41,21 @@ export function StandardRaceResults({
             <div
               key={i.participant_id}
               className={twMerge(
-                "flex flex-col gap-2 rounded-md bg-white p-2 lg:w-[15rem] lg:min-w-[15rem]",
+                "flex flex-col rounded-md bg-white p-2 lg:w-[15rem] lg:min-w-[15rem]",
                 customClassName,
               )}
             >
-              <p className="text-lg font-bold text-slate-700 underline">
-                {i?.name}
-              </p>
-              <p>{`Batch: ${i?.batch}`}</p>
-              <p>{`Position: ${i?.position}`}</p>
-              <p>{`Time: ${i?.time_taken}`}</p>
+              <div className="flex flex-row justify-between">
+                <p className="text-lg font-bold text-slate-700 underline">{`${i?.position}`}</p>
+                <p className="text-lg font-bold text-slate-700 underline">
+                  {i?.name}
+                </p>
+              </div>
+              <div className="flex flex-row justify-between">
+                <span>{`Time: ${i?.time_taken}`}</span>
+                <span>{`Age: ${i?.age}`}</span>
+              </div>
+              <span>{`Gender: ${i?.is_male ? "Male" : "Female"}`}</span>
             </div>
           );
         })}
