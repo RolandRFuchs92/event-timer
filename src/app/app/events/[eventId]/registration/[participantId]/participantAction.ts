@@ -23,6 +23,7 @@ export async function createNewParticipant(
 
   const newParticipantResult = await _db.participant.create({
     data: {
+      email: input.email,
       birthdate: input.birthdate,
       event_id: input.event_id,
       is_male: input.is_male,
