@@ -25,6 +25,19 @@
     preact "10.11.3"
     preact-render-to-string "5.2.3"
 
+"@auth/core@0.32.0":
+  version "0.32.0"
+  resolved "https://registry.yarnpkg.com/@auth/core/-/core-0.32.0.tgz#2bc9ba7c52fba798ed46706bbd30d4d5c7021d75"
+  integrity sha512-3+ssTScBd+1fd0/fscAyQN1tSygXzuhysuVVzB942ggU4mdfiTbv36P0ccVnExKWYJKvu3E2r3/zxXCCAmTOrg==
+  dependencies:
+    "@panva/hkdf" "^1.1.1"
+    "@types/cookie" "0.6.0"
+    cookie "0.6.0"
+    jose "^5.1.3"
+    oauth4webapi "^2.9.0"
+    preact "10.11.3"
+    preact-render-to-string "5.2.3"
+
 "@auth/core@^0.28.2":
   version "0.28.2"
   resolved "https://registry.yarnpkg.com/@auth/core/-/core-0.28.2.tgz#90fe3ecf7d381cbe839639e69baf3053b362be5b"
@@ -37,6 +50,13 @@
     oauth4webapi "^2.4.0"
     preact "10.11.3"
     preact-render-to-string "5.2.3"
+
+"@auth/prisma-adapter@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@auth/prisma-adapter/-/prisma-adapter-2.2.0.tgz#78552ddd06ee1b19b2fc9c6c01a3f91c0ebdf4d8"
+  integrity sha512-DiXgyJfqBb/6TPhNJ5IcRw3klxcFD+qaa7qvOYopV6rYinSUvsQkJ30m+so2SRlEsuDA6PqMu+Mf5Sd+zr3g+Q==
+  dependencies:
+    "@auth/core" "0.32.0"
 
 "@babel/runtime@^7.23.2", "@babel/runtime@^7.24.0":
   version "7.24.1"
@@ -2148,7 +2168,7 @@ normalize-range@^0.1.2:
   resolved "https://registry.npmjs.org/normalize-range/-/normalize-range-0.1.2.tgz"
   integrity sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==
 
-oauth4webapi@^2.4.0:
+oauth4webapi@^2.4.0, oauth4webapi@^2.9.0:
   version "2.10.4"
   resolved "https://registry.yarnpkg.com/oauth4webapi/-/oauth4webapi-2.10.4.tgz#4194b784e0ff995edd64bd90177fd7f25b7fbb17"
   integrity sha512-DSoj8QoChzOCQlJkRmYxAJCIpnXFW32R0Uq7avyghIeB6iJq0XAblOD7pcq3mx4WEBDwMuKr0Y1qveCBleG2Xw==
