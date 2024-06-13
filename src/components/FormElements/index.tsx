@@ -173,7 +173,7 @@ const FormElements = () => {
             <div className="flex flex-col gap-5.5 p-6.5">
               <Form formTitle="Demo" formMethods={form}>
                 <FormData />
-                <Checkbox name="test" />
+                <Checkbox name="test" label="Test Label" />
                 <CheckboxTwo />
                 <CheckboxThree />
                 <CheckboxFour />

@@ -36,7 +36,7 @@ export function RaceImportForm() {
       return;
     }
 
-    toast.success(result.message);
+    toast.success(result.result.message);
   });
 
   return (
