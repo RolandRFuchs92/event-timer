@@ -43,7 +43,26 @@ export const {
     }),
   ],
   secret: process.env.AUTH_SECRET!,
+  pages: {
+    signIn: "/public/signin"
+  },
   callbacks: {
+    async authorized({ auth, request: { nextUrl } }) {
+      console.log("ARE YOU AUTHED?");
+      const isLoggedIn = !!auth?.user;
+      const isInApp = nextUrl.pathname.startsWith("/protected");
+
+      if (isInApp) {
+        if (isLoggedIn) {
+          return true;
+        }
+        return false;
+      } else if (isLoggedIn) {
+        return Response.redirect(new URL("/protected", nextUrl));
+      }
+
+      return true;
+    },
     jwt({ token, session, user, account }) {
       return token;
     },

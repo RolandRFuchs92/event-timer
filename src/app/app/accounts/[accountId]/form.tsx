@@ -21,10 +21,12 @@ import toast from "react-hot-toast";
 
 type AccountFormProps = {
   account: Awaited<ReturnType<typeof getAccount>>["data"];
+  roleOptions: any
 };
 
-export function AccountForm({ account }: AccountFormProps) {
+export function AccountForm({ account, roleOptions }: AccountFormProps) {
   const { replace } = useRouter();
+
   const form = useForm({
     resolver: zodResolver(AccountSchema),
     defaultValues: {
@@ -60,7 +62,7 @@ export function AccountForm({ account }: AccountFormProps) {
       </FormRow>
       <MultiSelect
         name="roles"
-        options={enumToOptions(RoleEnum)}
+        options={roleOptions}
         label="Roles"
       />
       <Button label="Submit" />

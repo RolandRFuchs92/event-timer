@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 
 export default function Error({ error, reset }: any) {
+
   useEffect(() => {
     // Here you could log the error or perform other error handling steps
     alert(JSON.stringify(error));
