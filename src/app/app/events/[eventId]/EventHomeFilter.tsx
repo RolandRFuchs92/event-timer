@@ -11,7 +11,7 @@ import { Button } from "@/components/FormElements/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { HomePageFilterSchema } from "./schema";
 import { z } from "zod";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface EventHomeFilter {
   eventId: string
@@ -19,13 +19,15 @@ interface EventHomeFilter {
 }
 
 export function EventHomeFilter({ races, eventId }: EventHomeFilter) {
+  const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
+  const raceId = searchParams.get("raceId");
   const form = useForm<z.infer<typeof HomePageFilterSchema>>({
     resolver: zodResolver(HomePageFilterSchema),
     defaultValues: {
       eventId: eventId,
-      raceId: ""
+      raceId: raceId ?? ""
     }
   });
 

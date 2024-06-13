@@ -1,11 +1,15 @@
+import { LaneRaceWinners } from "./(laneRaceWinners)/LaneRaceWinners";
 import { StandartRaceWinners } from "./(standardRaceWinners)/StandardRaceWinners";
 
 interface RaceResultsFork {
   raceId: string,
-  eventId: string
+  eventId: string,
+  isLaneRace: boolean
 }
 
-export function RaceResultsFork({ raceId, eventId }: RaceResultsFork) {
+export function RaceResultsFork({ raceId, eventId, isLaneRace }: RaceResultsFork) {
 
-  return <StandartRaceWinners eventId={eventId} raceId={raceId} />;
+  if (!isLaneRace)
+    return <StandartRaceWinners eventId={eventId} raceId={raceId} />;
+  return <LaneRaceWinners />
 }
