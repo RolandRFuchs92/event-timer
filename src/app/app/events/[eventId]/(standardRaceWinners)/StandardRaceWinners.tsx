@@ -11,6 +11,7 @@ export async function StandartRaceWinners({
   raceId,
 }: StandardRaceWinnerProps) {
   const winners = await getStandardRaceTop5({ eventId, raceId });
+
   return (
     <div className="w-90">
       <pre>{JSON.stringify(winners, null, 2)}</pre>

@@ -9,15 +9,31 @@ import { action } from "@/lib/safeAction";
 
 import { HomePageFilterSchema } from "../schema";
 
-export const getStandardRaceTop5 = action(HomePageFilterSchema, async (input) => {
-  unstable_noStore();
-  const participants = await getAllParticipantsGroupedByRace(input);
-  const results = getStandardRaceResults(participants);
-  return results;
-});
+export const getStandardRaceTop5 = action(
+  HomePageFilterSchema,
+  async (input) => {
+    unstable_noStore();
+    const participants = await getAllParticipantsGroupedByRace(input);
+    if (participants.length === 0) {
+      const race = await _db.races.findFirst({
+        where: {
+          id: input.raceId
+        }
+      });
+      return {
+        race: race?.name ?? "Unknown",
+        results: []
+      };
+    }
 
-type ParaticpiantResultType =
-  Awaited<ReturnType<typeof getAllParticipantsGroupedByRace>>
+    const results = getStandardRaceResults(participants);
+    return results;
+  },
+);
+
+type ParaticpiantResultType = Awaited<
+  ReturnType<typeof getAllParticipantsGroupedByRace>
+>;
 
 function getStandardRaceResults(participants: ParaticpiantResultType) {
   const youthResult = extractResultByAgeGroup(participants, 0, 10);
@@ -49,7 +65,6 @@ function extractResultByAgeGroup(
   minAge: number,
   maxAge: number,
 ) {
-
   const validParticipants = participants.filter(
     (i) => minAge <= i.age! && maxAge > i.age!,
   );
@@ -80,12 +95,14 @@ function extractResultByAgeGroup(
   };
 }
 
-async function getAllParticipantsGroupedByRace(input: z.infer<typeof HomePageFilterSchema>) {
+async function getAllParticipantsGroupedByRace(
+  input: z.infer<typeof HomePageFilterSchema>,
+) {
   const race = await _db.races.findFirst({
     where: {
       event_id: input.eventId,
       race_type: "StandardNoLaps",
-      id: input.raceId
+      id: input.raceId,
     },
   });
 
@@ -97,8 +114,8 @@ async function getAllParticipantsGroupedByRace(input: z.infer<typeof HomePageFil
 
   if (!race) return [];
 
-  const raceParticipants = race
-    .batches.flatMap((b) =>
+  const raceParticipants = race.batches
+    .flatMap((b) =>
       b.participants.map((p) => {
         const me = allParticipants.find((i) => i.id === p.participant_id);
         const hasAFinishTime = !!p.finish_time;
