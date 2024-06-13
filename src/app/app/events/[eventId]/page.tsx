@@ -1,6 +1,6 @@
 import { _db } from "@/lib/db";
-import { StandartRaceWinners } from "./(standardRaceWinners)/StandardRaceWinners";
 import { EventHomeFilter } from "./EventHomeFilter";
+import { RaceResultsFork } from "./RaceResultsFork";
 
 interface EventHomeProps {
   params: {
@@ -11,7 +11,7 @@ interface EventHomeProps {
   }
 }
 
-export default async function EventHome({ params }: EventHomeProps) {
+export default async function EventHome({ params, searchParams }: EventHomeProps) {
   const races = await _db.races.findMany({
     where: {
       event_id: params.eventId
@@ -20,6 +20,6 @@ export default async function EventHome({ params }: EventHomeProps) {
 
   return <div>
     <EventHomeFilter races={races} eventId={params.eventId} />
-    <StandartRaceWinners eventId={params.eventId} />
+    <RaceResultsFork eventId={params.eventId} raceId={searchParams.raceId} />
   </div>
 }
