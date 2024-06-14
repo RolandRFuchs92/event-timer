@@ -11,15 +11,20 @@ interface IotGetParams {
 }
 
 export function GET(req: Request) {
-  console.log("GOTCHA");
   return Response.json({
-    currentTime: format(new Date(), "dd MMM yyyy HH:mm:ss.SSS"),
+    currentTime: Date.now().toString(),
   });
 }
 
 export async function POST(req: Request, { params }: IotGetParams) {
   const json = await req.json();
-  const parsedData = IotSchema.safeParse(json);
+  const newData = {
+    ...json,
+    end_time: new Date(json.end_time),
+  };
+  const parsedData = IotSchema.safeParse(newData);
+  console.log(JSON.stringify(parsedData, null, 2));
+
   if (!parsedData.success)
     return Response.json({
       message: "Invalid data provided.",

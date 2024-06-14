@@ -12,6 +12,7 @@ import {
   closeLaneRace,
   deleteHeat,
   getLaneRace,
+  refreshCurrentPath,
   startLaneRace,
 } from "./action";
 import {
@@ -20,6 +21,8 @@ import {
   useRoundIndex,
   useSetHeatIndex,
 } from "./hook";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 interface HeatInteractionsProps {
   laneRace: Awaited<ReturnType<typeof getLaneRace>>["data"];
@@ -32,6 +35,8 @@ export function HeatInteractions({ laneRace }: HeatInteractionsProps) {
   const round = laneRace!.rounds[roundIndex];
   const heatIndex = useHeatIndexs();
   const heat = round?.heats[heatIndex];
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   if (!heat) return null;
 
@@ -82,6 +87,11 @@ export function HeatInteractions({ laneRace }: HeatInteractionsProps) {
     toast.success(result.data!.message);
   };
 
+  const handleRefresh = () => {
+    const meee = `${pathname}?${searchParams.toString()}`;
+    refreshCurrentPath();
+  };
+
   if (!heat) return null;
 
   return (
@@ -106,6 +116,7 @@ export function HeatInteractions({ laneRace }: HeatInteractionsProps) {
           disabled={heat.is_closed}
           onClick={() => handleStartClick(new Date())}
         />
+        <Button label="Refresh" onClick={() => handleRefresh()} />
 
         <TwDialog<{}>
           title={`Really delete this heat?`}

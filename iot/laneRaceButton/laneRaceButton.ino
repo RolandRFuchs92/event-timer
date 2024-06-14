@@ -4,10 +4,10 @@
     Created on: 21.11.2016
 
 */
+#include <ArduinoJson.h>
 
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#include <ArduinoJson.h>
 
 /* this can be run with an emulated server on host:
         cd esp8266-core-root-dir
@@ -17,31 +17,44 @@
    then put your PC's IP address in SERVER_IP below, port 9080 (instead of default 80):
 */
 //#define SERVER_IP "10.0.1.7:9080" // PC address with emulation on host
-#define SERVER_IP "192.168.1.100:3000"
-#define PROTOCOL "http://"
+// #define SERVER_IP "192.168.1.100:3000"
+#define SERVER_IP "ocr-event-timer.vercel.app"
+#define PROTOCOL "https://"
 
 #ifndef STASSID
 #define STASSID "Zyxel_8D71"
 #define STAPSK "Q3GJFPL8GG"
+#define IOT_ID "666747d357147815ce862f9a"
 #endif
 
-String CURRENT_TIME = "";
-const int DEBOUNCE_DELAY_MS = 5000;
-int LED_STATE = HIGH;
+struct Debounce {
+  int buttonDelay;
+  int timeCheckDelay;
+};
 
-long LAST_TIME_SET_MS = 0;
-int DEBOUNCE_TIME_SET_MS = 10000;
+struct Clock {
+  long long int currentTimeMs;
+  long msAtLastUpdate;
+};
 
 struct Button {
   int pin;
   bool lastState;
   bool currentState;
-  unsigned long lastDebounceTime;
+  long lastDebounceTime;
   int index;
 };
 
-Button _buttonA = { 2, LOW, 0, 0, 0 };
-Button _buttonB = { 14, LOW, 0, 0, 0 };
+Clock _clock = { 0, 0 };
+Debounce _debounce = { 5000, 10000 };
+
+Button _buttonA = { 16, LOW, 0, 0, 0 };
+Button _buttonB = { 5, LOW, 0, 0, 1 };
+
+const int ledPin = 4;    // the number of the LED pin
+
+// variables will change:
+int buttonState = 0;  // variable for reading the pushbutton status
 
 void setup() {
   Serial.begin(9600);
@@ -61,26 +74,24 @@ void setup() {
   Serial.print("Connected! IP address: ");
   Serial.println(WiFi.localIP());
 
+  pinMode(ledPin, OUTPUT);
   pinMode(_buttonA.pin, INPUT);
   pinMode(_buttonB.pin, INPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
+  ProccessButtonPress(_buttonA);
+  ProccessButtonPress(_buttonB);
 
-  SendParticipantTime(_buttonA);
-  SendParticipantTime(_buttonB);
-
-  long lastTimeSetDifference = millis() - LAST_TIME_SET_MS;
-  bool canUpdateTime = lastTimeSetDifference > DEBOUNCE_TIME_SET_MS;
+  long lastTimeSetDifference = millis() - _clock.msAtLastUpdate;
+  bool canUpdateTime = lastTimeSetDifference > _debounce.timeCheckDelay;
 
   // wait for WiFi connection
   if ((WiFi.status() == WL_CONNECTED) && canUpdateTime) {
-    digitalWrite(BUILTIN_LED, HIGH);
+    // digitalWrite(BUILTIN_LED, HIGH);
     SetCurrentTime();
-    LAST_TIME_SET_MS = millis();
   } else {
-    digitalWrite(BUILTIN_LED, LOW);
+    // digitalWrite(BUILTIN_LED, LOW);
   }
 }
 
@@ -146,40 +157,56 @@ String POST(String path, String params) {
 
 void SetCurrentTime(){
   String reply = GET("/api/nutsack/iot");
-  StaticJsonDocument<200> doc;
-
+  StaticJsonDocument<1024> doc;
   DeserializationError error = deserializeJson(doc, reply);
+
+  JsonObject object = doc.as<JsonObject>();
+
   if (error) {
     Serial.print(F("deserializeJson() failed: "));
     Serial.println(error.f_str());
     return;
   }
 
-  Serial.print("currentTime: ");
-  String currentTime = doc["currentTime"];
-  Serial.println(currentTime);
+  String currentTimeString = object["currentTime"];
+  long long int currentTime = strtoll(object["currentTime"], nullptr, 10);
+  _clock.currentTimeMs = currentTime;
+  _clock.msAtLastUpdate = millis();
 }
 
-void SendParticipantTime(Button buttonData)
+void ProccessButtonPress(Button buttonData)
 {
-  int currentStateButton1 = digitalRead(buttonData.pin);
- 
-
+  buttonData.currentState = digitalRead(buttonData.pin);
   const long timePassedSinceLastPress = millis() - buttonData.lastDebounceTime;
-  const bool hasEnoughTimePassed = timePassedSinceLastPress > DEBOUNCE_DELAY_MS;
+  const bool hasEnoughTimePassed = timePassedSinceLastPress > _debounce.buttonDelay;
 
-  if(hasEnoughTimePassed && currentStateButton1 == HIGH) {
-     Serial.println("currentStateButton1");
-  Serial.println(buttonData.pin);
-  Serial.println(currentStateButton1);
-
+  if(hasEnoughTimePassed && buttonData.currentState == LOW) {
     buttonData.lastDebounceTime = millis();
-    digitalWrite(buttonData.pin, LOW);
-    buttonData.lastState = !buttonData.lastState;
+    Serial.printf("Button %d was pressed\n", buttonData.index);
+    SendParticipantLaneData(buttonData);
   }
-  if(buttonData.pin == 2) {
+
+  if(buttonData.pin == _buttonA.pin) {
     _buttonA = buttonData;
   } else {
     _buttonB = buttonData;
   }
+}
+
+void SendParticipantLaneData(Button buttonData) {
+  StaticJsonDocument<1024> rootDoc;
+
+  // create an object
+  JsonObject doc = rootDoc.to<JsonObject>();
+  doc["iot_id"] = (String)IOT_ID;
+  doc["button_index"] = buttonData.index;
+
+  long timeDifference = millis() - _clock.msAtLastUpdate;
+  long long int actualTime = _clock.currentTimeMs + timeDifference;
+  doc["end_time"] = actualTime;
+  
+  String postParams;
+  serializeJson(doc, postParams);
+
+  String reply = POST("/api/ballbag/iot", postParams);
 }

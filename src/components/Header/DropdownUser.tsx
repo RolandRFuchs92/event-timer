@@ -3,7 +3,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { MyProfileIcon } from "../Icons/MyProfileIcon";
 import { ContactsIcon } from "../Icons/ContactsIcon";
-import { SettingsIcon } from "../Icons/SettingsIcon";
 import { MenuItemTextOnly } from "../Menu/MenuItem";
 import { LogoutIcon } from "../Icons/LogoutIcon";
 import { logUserOut } from "./action";
@@ -56,16 +55,7 @@ const DropdownUser = () => {
         </span>
 
         <span className="h-12 w-12 rounded-full">
-          <Image
-            width={112}
-            height={112}
-            src={"/images/user/user-01.png"}
-            style={{
-              width: "auto",
-              height: "auto",
-            }}
-            alt="User"
-          />
+          <MyProfileIcon />
         </span>
 
         <svg

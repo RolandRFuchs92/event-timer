@@ -86,3 +86,4 @@ export const ChangeRoundQualifierStatus = z.object({
   roundIndex: z.coerce.number(),
   qualifer: z.coerce.boolean()
 });
+

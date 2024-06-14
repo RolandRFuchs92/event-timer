@@ -20,7 +20,7 @@ interface ParticpantTableProps {
 export function ParticipantTable({ data }: ParticpantTableProps) {
   const eventId = useEventId();
   const { replace } = useRouter();
-  console.log(data)
+  console.log(data);
 
   return (
     <TwDialog<(typeof data)[0]>
@@ -51,58 +51,6 @@ export function ParticipantTable({ data }: ParticpantTableProps) {
                 },
               },
               columns: [
-                {
-                  accessorKey: "id",
-                  header: "id",
-                  cell: (p) => p.getValue(),
-                },
-                {
-                  accessorKey: "first_name",
-                  header: "Name",
-                  cell: (p) => {
-                    const fname = p.row.original.first_name;
-                    const lname = p.row.original.last_name;
-                    const name = `${fname} ${lname}`;
-                    return name;
-                  },
-                },
-                {
-                  accessorKey: "race_number",
-                  header: "Race no.",
-                  cell: (p) => p.getValue(),
-                },
-                {
-                  accessorKey: "email",
-                  header: "Email",
-                  cell: (p) => p.getValue().email
-                },
-                {
-                  accessorKey: "is_male",
-                  header: "Gender",
-                  cell: (p) => {
-                    return p.getValue() ? "Male" : "Female"
-                  },
-                },
-                {
-                  accessorKey: "birthdate",
-                  header: "Age",
-                  cell: (p) => differenceInYears(new Date(), p.getValue()),
-                },
-                {
-                  accessorKey: "batches",
-                  header: "Race[Batch]",
-                  cell: (p) => {
-                    const batches = p.row.original.batches;
-                    const batchResult = batches.map((i) => {
-                      if (i.race_type === "StandardNoLaps")
-                        return `${i.race_name}[${i.batch}]`;
-                      return i.race_name;
-                    });
-
-                    const result = batchResult.join(", ");
-                    return result;
-                  },
-                },
                 {
                   accessorKey: "actions",
                   header: "Actions",
@@ -137,6 +85,58 @@ export function ParticipantTable({ data }: ParticpantTableProps) {
                       </button>
                     </div>
                   ),
+                },
+                {
+                  accessorKey: "id",
+                  header: "id",
+                  cell: (p) => p.getValue(),
+                },
+                {
+                  accessorKey: "first_name",
+                  header: "Name",
+                  cell: (p) => {
+                    const fname = p.row.original.first_name;
+                    const lname = p.row.original.last_name;
+                    const name = `${fname} ${lname}`;
+                    return name;
+                  },
+                },
+                {
+                  accessorKey: "race_number",
+                  header: "Race no.",
+                  cell: (p) => p.getValue(),
+                },
+                {
+                  accessorKey: "is_male",
+                  header: "Gender",
+                  cell: (p) => {
+                    return p.getValue() ? "Male" : "Female";
+                  },
+                },
+                {
+                  accessorKey: "birthdate",
+                  header: "Age",
+                  cell: (p) => differenceInYears(new Date(), p.getValue()),
+                },
+                {
+                  accessorKey: "batches",
+                  header: "Race[Batch]",
+                  cell: (p) => {
+                    const batches = p.row.original.batches;
+                    const batchResult = batches.map((i) => {
+                      if (i.race_type === "StandardNoLaps")
+                        return `${i.race_name}[${i.batch}]`;
+                      return i.race_name;
+                    });
+
+                    const result = batchResult.join(", ");
+                    return result;
+                  },
+                },
+                {
+                  accessorKey: "email",
+                  header: "Email",
+                  cell: (p) => p.getValue().email,
                 },
               ],
             }}

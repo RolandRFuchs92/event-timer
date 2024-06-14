@@ -27,6 +27,10 @@ import {
   updateParticipantTimeCommand,
 } from "./mongoCommands";
 
+export async function refreshCurrentPath() {
+  revalidatePath(".");
+}
+
 export const getQualifierCompetitors = action(
   LaneRaceSchema,
   async ({ raceId }) => {
