@@ -69,13 +69,13 @@ export function RaceTable({ data }: RaceTableProps) {
                 },
                 {
                   accessorKey: "race_type",
-                  header: "Type",
+                  header: "Count",
                   cell: (p) => {
                     const row = p.row.original;
                     const isLaneRace = row.race_type === "LaneRace";
                     if (isLaneRace) {
                       const participantCount =
-                        row.rounds[0].all_participant_ids.length;
+                        row.rounds[0]?.all_participant_ids.length ?? 0;
                       return participantCount;
                     }
 
