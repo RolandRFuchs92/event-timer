@@ -28,14 +28,16 @@ export default async function Participants({ params }: ParticipantsProps) {
         <h3>There are not participants for this batch</h3>
       ) : (
         <div className="border-gray-400 flex flex-col gap-2 border">
-          {participants.map((i, index) => (
-            <div
-              key={i.id}
-              className={cn({ "bg-gray-200": index % 2 === 0 }, "p-2")}
-            >
-              {i.first_name} {i.last_name} ({i.race_number})
-            </div>
-          ))}
+          {participants
+            .sort((a, b) => a.first_name.localeCompare(b.first_name))
+            .map((i, index) => (
+              <div
+                key={i.id}
+                className={cn({ "bg-gray-200": index % 2 === 0 }, "p-2")}
+              >
+                {i.first_name} {i.last_name} ({i.race_number})
+              </div>
+            ))}
         </div>
       )}
     </div>

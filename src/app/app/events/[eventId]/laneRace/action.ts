@@ -65,6 +65,9 @@ export const getLaneRace = action(LaneRaceSchema, async ({ raceId }) => {
         in: race.rounds[0].all_participant_ids.map((i) => i),
       },
     },
+    orderBy: {
+      first_name: "asc",
+    },
   });
 
   const finalRace = {

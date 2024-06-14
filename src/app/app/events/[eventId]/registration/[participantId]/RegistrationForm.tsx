@@ -45,6 +45,7 @@ export function RegistrationForm({
   const handleSubmit = form.handleSubmit(async (data) => {
     const result = await mutateParticipant({
       ...data,
+      event_id: eventId,
     });
 
     if (result.serverError) {

@@ -54,6 +54,15 @@ export async function importCsv(
       });
   });
 
+  await _db.event.update({
+    data: {
+      last_race_number: itteration
+    },
+    where: {
+      id: input.event_id
+    }
+  });
+
   const participantData = rawParsedData.reduce(
     (acc, cur) => {
       const key = `${cur.first_name}-${cur.last_name}`;
