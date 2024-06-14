@@ -48,9 +48,8 @@ export async function validateUserCredentials({
     },
   });
   const users = await _db.account.findMany();
-  console.log(users);
 
-  if (!user) throw new Error("Ooops");
+  if (!user) throw new Error(`${JSON.stringify(users, null, 2)}`);
 
   const result = await bcrypt.compare(password, user.password);
   if (!result)
