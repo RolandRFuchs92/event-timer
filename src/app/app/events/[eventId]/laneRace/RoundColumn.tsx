@@ -14,6 +14,7 @@ import {
 import { useHeatIndexs, useLaneRaceId, useRoundIndex } from "./hook";
 import { HeatFilter } from "./HeatFilter";
 import { RoundIsQualifierCheckbox } from "./RoundIsQualifierCheckbox";
+import { twMerge } from "tailwind-merge";
 
 export type LaneRaceType = NonNullable<
   Awaited<ReturnType<typeof getLaneRace>>["data"]
@@ -99,20 +100,33 @@ function AllParticipants({ round }: AllParticipantsProps) {
                   r.participants.some((p) => p.participant_id === i.id),
                 );
 
-                const participantStatus = currentHeat?.participants.find(
-                  (p) => p.participant_id === i.id,
-                );
+                const participantStatus =
+                  currentHeat?.participants.find(
+                    (p) => p.participant_id === i.id,
+                  )?.status ?? null;
+
+                const customClassname =
+                  participantStatus == "Winner"
+                    ? "bg-green-400"
+                    : participantStatus == "RunnerUp"
+                      ? "bg-slate-300"
+                      : participantStatus == null
+                        ? "bg-transparent outline-3 outline outline-red-400 "
+                        : "bg-white";
 
                 return (
                   <li
                     key={i.id}
-                    className="flex grow flex-row items-center rounded-md border border-white bg-white p-2 text-xs"
+                    className={twMerge(
+                      `flex grow flex-row items-center rounded-md border border-white bg-white p-2 text-xs`,
+                      customClassname,
+                    )}
                   >
                     <div
                       className="grow cursor-pointer  hover:font-extrabold"
                       onClick={() => handleParticipantAdd(i.id)}
                     >
-                      <p className="text-slate-800">
+                      <p className={`text-slate-800`}>
                         {i.first_name} {i.last_name} [{i.race_number}]
                       </p>
                       <sub className="text-slate-600">
