@@ -1,0 +1,3 @@
+cd ${0%/*} 2>/dev/null
+python3 /Users/rolandfuchs/Playground/ssl/Arduino/tools/cert.py -sa ocr-event-timer.vercel.app  -n jigsaw > certs.h
+

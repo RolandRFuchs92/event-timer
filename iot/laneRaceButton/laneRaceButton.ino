@@ -8,6 +8,10 @@
 
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <ESP8266WiFiMulti.h>
+#include <WiFiClientSecureBearSSL.h>
+
+#include "certs.h"
 
 /* this can be run with an emulated server on host:
         cd esp8266-core-root-dir
@@ -17,13 +21,16 @@
    then put your PC's IP address in SERVER_IP below, port 9080 (instead of default 80):
 */
 //#define SERVER_IP "10.0.1.7:9080" // PC address with emulation on host
-// #define SERVER_IP "192.168.1.100:3000"
-#define SERVER_IP "ocr-event-timer.vercel.app"
+// #define SERVER_IP "172.20.10.6:3000"
+// #define SERVER_IP "ocr-event-timer.vercel.app"
+// #define PROTOCOL "https://"
 #define PROTOCOL "https://"
 
 #ifndef STASSID
 #define STASSID "Zyxel_8D71"
 #define STAPSK "Q3GJFPL8GG"
+// #define STASSID "OcrWifi"
+// #define STAPSK "12345678"
 #define IOT_ID "666747d357147815ce862f9a"
 #endif
 
@@ -55,6 +62,8 @@ const int ledPin = 4;    // the number of the LED pin
 
 // variables will change:
 int buttonState = 0;  // variable for reading the pushbutton status
+
+ESP8266WiFiMulti WiFiMulti;
 
 void setup() {
   Serial.begin(9600);
@@ -88,19 +97,29 @@ void loop() {
 
   // wait for WiFi connection
   if ((WiFi.status() == WL_CONNECTED) && canUpdateTime) {
-    // digitalWrite(BUILTIN_LED, HIGH);
+    digitalWrite(BUILTIN_LED, HIGH);
+
+    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+    client->setFingerprint(fingerprint___vercel_app);
+
     SetCurrentTime();
   } else {
-    // digitalWrite(BUILTIN_LED, LOW);
+    digitalWrite(BUILTIN_LED, LOW);
   }
 }
 
 String GET(String path){
     HTTPClient http;
-    WiFiClient client;
+    // WiFiClient client;
 
-    const String uri = (String)PROTOCOL + (String)SERVER_IP + path;
-    http.begin(client, uri); 
+    // const String uri = (String)PROTOCOL + ocr_event_timer_host + path;
+    const String uri = (String)PROTOCOL + "ocr-event-timer.vercel.app" + path;
+
+    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+    client->setFingerprint(fingerprint___vercel_app);
+
+    // http.begin(*client, ocr_event_timer_host, ocr_event_timer_port);
+    http.begin(*client, uri);
     http.addHeader("Content-Type", "application/json");
 
     Serial.printf("GET [ %s ]...", uri);
@@ -112,7 +131,7 @@ String GET(String path){
       Serial.printf("CODE: [ %d ]...", httpCode);
 
       // file found at server
-      if (httpCode == HTTP_CODE_OK) {
+      if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
         const String& payload = http.getString().c_str();
         Serial.printf("RESPONSE [ %s ]\n", payload);
         http.end();
@@ -127,12 +146,15 @@ String GET(String path){
     return "";
 }
 
-String POST(String path, String params) { 
+String POST(String path, String params) {
     HTTPClient http;
-    WiFiClient client;
+    // WiFiClient client;
 
-    String uri = (String)PROTOCOL + (String)SERVER_IP + path;
-    http.begin(client, uri); 
+    String uri = (String)PROTOCOL + "ocr-event-timer.vercel.app" +  path;
+    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+    client->setFingerprint(fingerprint___vercel_app);
+
+    http.begin(*client, uri);
     http.addHeader("Content-Type", "application/json");
 
     Serial.printf("POST[ %s ]...", uri);
@@ -204,7 +226,7 @@ void SendParticipantLaneData(Button buttonData) {
   long timeDifference = millis() - _clock.msAtLastUpdate;
   long long int actualTime = _clock.currentTimeMs + timeDifference;
   doc["end_time"] = actualTime;
-  
+
   String postParams;
   serializeJson(doc, postParams);
 

@@ -49,10 +49,10 @@ export function HeatDisplay({ laneRace }: HeatDisplayProps) {
 
 interface DisplayParticipantProps {
   participant:
-    | NonNullable<
-        HeatDisplayProps["laneRace"]
-      >["rounds"][0]["heats"][0]["participants"][0]
-    | null;
+  | NonNullable<
+    HeatDisplayProps["laneRace"]
+  >["rounds"][0]["heats"][0]["participants"][0]
+  | null;
   title: string;
   race_id: string;
   round_index: number;
@@ -87,7 +87,7 @@ function DisplayParticipant({
     <TwDialog<NonNullable<typeof participant>>
       title={(i) => `Edit ${participant?.name ?? `${title} details`}`}
       body={<HeatForm participant={participant!} />}
-      onYes={async () => {}}
+      onYes={async () => { }}
       disableButtons
     >
       {(setData, toggle) => {
