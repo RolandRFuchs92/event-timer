@@ -17,12 +17,43 @@ export const getStandardRaceTop5 = action(
     if (participants.length === 0) {
       const race = await _db.races.findFirst({
         where: {
-          id: input.raceId
-        }
+          id: input.raceId,
+        },
       });
       return {
         race: race?.name ?? "Unknown",
-        results: []
+        results: {
+          youthResult: {
+            top5Males: [],
+            top5Females: [],
+            top5Overall: [],
+          },
+          subYouthResult: {
+            top5Males: [],
+            top5Females: [],
+            top5Overall: [],
+          },
+          youthSeniorResult: {
+            top5Males: [],
+            top5Females: [],
+            top5Overall: [],
+          },
+          eliteResult: {
+            top5Males: [],
+            top5Females: [],
+            top5Overall: [],
+          },
+          veteranResult: {
+            top5Males: [],
+            top5Females: [],
+            top5Overall: [],
+          },
+          masterResult: {
+            top5Males: [],
+            top5Females: [],
+            top5Overall: [],
+          },
+        },
       };
     }
 
