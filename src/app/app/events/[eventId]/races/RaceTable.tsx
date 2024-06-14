@@ -68,6 +68,21 @@ export function RaceTable({ data }: RaceTableProps) {
                   cell: (p) => startCase(p.getValue()),
                 },
                 {
+                  accessorKey: "race_type",
+                  header: "Type",
+                  cell: (p) => {
+                    const row = p.row.original;
+                    const isLaneRace = row.race_type === "LaneRace";
+                    if (isLaneRace) {
+                      const participantCount =
+                        row.rounds[0].all_participant_ids.length;
+                      return participantCount;
+                    }
+
+                    return row.batches.flatMap((b) => b.participants).length;
+                  },
+                },
+                {
                   accessorKey: "batches",
                   header: "Batches",
                   cell: (p) =>

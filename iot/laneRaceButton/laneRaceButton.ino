@@ -29,10 +29,10 @@
 #ifndef STASSID
 // #define STASSID "Zyxel_8D71"
 // #define STAPSK "Q3GJFPL8GG"
-#define STASSID "ALHN-9BE9"
-#define STAPSK "0847662363"
-// #define STASSID "OcrWifi"
-// #define STAPSK "12345678"
+// #define STASSID "ALHN-9BE9"
+// #define STAPSK "0847662363"
+#define STASSID "OcrWifi"
+#define STAPSK "12345678"
 #define IOT_ID "666747d357147815ce862f9a"
 #endif
 
@@ -95,7 +95,8 @@ void loop() {
   ProccessButtonPress(_buttonB);
 
   long lastTimeSetDifference = millis() - _clock.msAtLastUpdate;
-  bool canUpdateTime = lastTimeSetDifference > _debounce.timeCheckDelay;
+  // bool canUpdateTime = lastTimeSetDifference > _debounce.timeCheckDelay;
+  bool canUpdateTime = _clock.currentTimeMs == 0;
 
   // wait for WiFi connection
   if ((WiFi.status() == WL_CONNECTED) && canUpdateTime) {
@@ -106,7 +107,6 @@ void loop() {
 
     SetCurrentTime();
   } else {
-    digitalWrite(BUILTIN_LED, LOW);
   }
 }
 

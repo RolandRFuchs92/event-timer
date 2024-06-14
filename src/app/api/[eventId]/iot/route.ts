@@ -4,6 +4,9 @@ import { ParticipantHeatStatusEnum } from "@prisma/client";
 
 import { IotSchema } from "./schema";
 
+
+export const runtime = "edge";
+
 interface IotGetParams {
   params: {
     eventId: string;
