@@ -12,8 +12,8 @@ export async function StandartRaceWinners({
   raceId,
 }: StandardRaceWinnerProps) {
   const winners = await getStandardRaceTop5({ eventId, raceId });
-
-  const results = Object.entries(winners.data!.results);
+  if (!winners.data?.results ?? true) return null;
+  const results = Object.entries(winners.data.results);
 
   return (
     <div className="pt-2">
