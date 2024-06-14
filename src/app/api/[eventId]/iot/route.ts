@@ -1,5 +1,5 @@
 import { _db } from "@/lib/db";
-import { differenceInMilliseconds } from "date-fns";
+import { differenceInMilliseconds, format } from "date-fns";
 import { ParticipantHeatStatusEnum } from "@prisma/client";
 
 import { IotSchema } from "./schema";
@@ -8,6 +8,13 @@ interface IotGetParams {
   params: {
     eventId: string;
   };
+}
+
+export function GET(req: Request) {
+  console.log("GOTCHA");
+  return Response.json({
+    currentTime: format(new Date(), "dd MMM yyyy HH:mm:ss.SSS"),
+  });
 }
 
 export async function POST(req: Request, { params }: IotGetParams) {
