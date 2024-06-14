@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { SignInSchema } from "./schema";
 import { LockIcon } from "@/components/Icons/PasswordIcon";
 import { signInAction } from "./action";
+import toast from "react-hot-toast";
 
 const appName = process.env.APP_NAME;
 
@@ -23,7 +24,11 @@ export function SigninForm() {
   });
 
   const handleSubmit = formMethods.handleSubmit(async (data) => {
-    await signInAction(data);
+    const result = await signInAction(data);
+
+    if (result.serverError) {
+      toast.error("There was an error on the server side.");
+    }
   });
 
   return (

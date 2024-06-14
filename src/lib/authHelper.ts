@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { decode, getToken } from "@auth/core/jwt";
 import { auth } from "../../auth";
 import { _db } from "./db";
+import { CredentialsSignin } from "next-auth";
 
 export async function getSessionUser() {
   const au = await auth();
@@ -33,6 +34,10 @@ type ValidateUserCredentialsProps = {
   password: string;
 };
 
+class InvalidLoginError extends CredentialsSignin {
+  code = "Invalid identifier or password";
+}
+
 export async function validateUserCredentials({
   username,
   password,
@@ -42,8 +47,10 @@ export async function validateUserCredentials({
       email: username,
     },
   });
+  const users = await _db.account.findMany();
+  console.log(users);
 
-  if (!user) throw new Error("Cannot find user.");
+  if (!user) throw new Error("Ooops");
 
   const result = await bcrypt.compare(password, user.password);
   if (!result)
