@@ -28,8 +28,7 @@ export function RoundNames({ data }: RoundNamesType) {
               <h1 className="font-semibold underline">
                 Heat Number: {heats?.heatNumber}
               </h1>
-              <p>{`Is finished: ${heats?.isClosed}`}</p>
-              <p>Participants:</p>
+
               <div
                 id="participant"
                 className="flex flex-col rounded-md border-[1px] border-slate-300"
