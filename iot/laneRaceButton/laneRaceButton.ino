@@ -27,8 +27,10 @@
 #define PROTOCOL "https://"
 
 #ifndef STASSID
-#define STASSID "Zyxel_8D71"
-#define STAPSK "Q3GJFPL8GG"
+// #define STASSID "Zyxel_8D71"
+// #define STAPSK "Q3GJFPL8GG"
+#define STASSID "ALHN-9BE9"
+#define STAPSK "0847662363"
 // #define STASSID "OcrWifi"
 // #define STAPSK "12345678"
 #define IOT_ID "666747d357147815ce862f9a"

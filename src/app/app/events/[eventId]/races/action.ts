@@ -59,6 +59,14 @@ export async function getEventRaces(eventId: string) {
     where: {
       event_id: eventId,
     },
+    orderBy: [
+      {
+        race_type: "asc",
+      },
+      {
+        name: "asc",
+      },
+    ],
   });
 
   return result;
