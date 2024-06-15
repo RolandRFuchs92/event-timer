@@ -55,12 +55,12 @@ struct Button {
 };
 
 Clock _clock = { 0, 0 };
-Debounce _debounce = { 5000, 10000 };
+Debounce _debounce = { 5000, 5000 };
 
 Button _buttonA = { 16, LOW, 0, 0, 0 };
 Button _buttonB = { 5, LOW, 0, 0, 1 };
 
-const int ledPin = 4;    // the number of the LED pin
+const int ledPin = BUILTIN_LED;    // the number of the LED pin
 
 // variables will change:
 int buttonState = 0;  // variable for reading the pushbutton status
@@ -95,8 +95,8 @@ void loop() {
   ProccessButtonPress(_buttonB);
 
   long lastTimeSetDifference = millis() - _clock.msAtLastUpdate;
-  // bool canUpdateTime = lastTimeSetDifference > _debounce.timeCheckDelay;
-  bool canUpdateTime = _clock.currentTimeMs == 0;
+  bool canUpdateTime = lastTimeSetDifference > _debounce.timeCheckDelay;
+  // bool canUpdateTime = _clock.currentTimeMs == 0;
 
   // wait for WiFi connection
   if ((WiFi.status() == WL_CONNECTED) && canUpdateTime) {
